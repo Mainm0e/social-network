@@ -98,6 +98,9 @@ function RegisterPage() {
           Register
         </button>
       </form>
+      <div className='links'>
+        <a href='/login'>Login</a>
+      </div>
     </div>
   );
 }

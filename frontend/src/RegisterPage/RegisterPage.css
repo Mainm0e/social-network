@@ -38,3 +38,8 @@
 .register-container button:hover {
     background-color: #45a049;
 }
+
+.register-container .links {
+    text-align: center;
+    margin-top: 10px;
+}

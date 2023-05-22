@@ -43,6 +43,9 @@ function LoginPage() {
           Login
         </button>
       </form>
+      <div className='links'>
+        <a href='/register'>Register</a>
+      </div>
     </div>
   );
   
