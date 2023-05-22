@@ -1,25 +1,25 @@
-import logo from './logo.svg';
+import LoginPage from "./LoginPage/LoginPage";
+import RegisterPage from "./RegisterPage/RegisterPage";
 import './App.css';
-
 function App() {
+  // function handle that check url and return the page
+  const getPage = () => {
+    const page = window.location.pathname;
+    if (page === '/login') {
+      return <LoginPage />;
+    } else if (page === '/register') {
+      return <RegisterPage />;
+    } else {
+      return <LoginPage />;
+    }
+  };
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {getPage()}
     </div>
   );
-}
+};
 
 export default App;
