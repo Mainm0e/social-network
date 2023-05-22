@@ -1,0 +1,17 @@
+
+File structure
+
+Docker file
+
+1. Frontend
+    1.1 React image
+        a. Corresponding endpoint handling (2.1.e)
+        b. Chat functionality
+
+2. Backend
+    2.1 Backend server image
+        a. Database -- a masterpiece
+        b. Socket -- needs work
+        c. Server (HTTP) -- partially complete
+        d. Sessions (cookies) -- needs work
+        e. Endpoint handling (API) -- start from scratch
