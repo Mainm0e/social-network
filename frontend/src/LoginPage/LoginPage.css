@@ -53,3 +53,23 @@
     text-align: center;
     margin-top: 10px;
 }
+
+@media only screen and (min-width: 768px) {
+    /* Tablet Styles */
+    .login-page {
+      grid-template-columns: 1fr;
+      grid-template-areas: "login";
+    }
+    
+    .login-container {
+      max-width: 400px;
+    }
+  }
+  
+  @media only screen and (min-width: 992px) {
+    /* PC Full Screen Styles */
+    .login-page {
+      grid-template-columns: 1.3fr 0.7fr;
+      grid-template-areas: "text login";
+    }
+  }
