@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './RegisterPage.css';
+import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 function RegisterPage() {
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -43,6 +44,8 @@ function RegisterPage() {
   };
 
   return (
+    <div className='register-page'>
+    <WelcomeBox />
     <div className="register-container">
       <h1>Register Page</h1>
       <form>
@@ -52,6 +55,7 @@ function RegisterPage() {
             type="text"
             value={username}
             onChange={handleUsernameChange}
+            required
           />
         </div>
         <div>
@@ -60,6 +64,7 @@ function RegisterPage() {
             type="text"
             value={firstName}
             onChange={handleFirstNameChange}
+            required
           />
         </div>
         <div>
@@ -68,6 +73,7 @@ function RegisterPage() {
             type="text"
             value={lastName}
             onChange={handleLastNameChange}
+            required
           />
         </div>
         <div>
@@ -76,6 +82,7 @@ function RegisterPage() {
             type="date"
             value={birthdate}
             onChange={handleBirthdateChange}
+            required
           />
         </div>
         <div>
@@ -84,6 +91,7 @@ function RegisterPage() {
             type="password"
             value={password}
             onChange={handlePasswordChange}
+            required
           />
         </div>
         <div>
@@ -92,6 +100,7 @@ function RegisterPage() {
             type="password"
             value={confirmPassword}
             onChange={handleConfirmPasswordChange}
+            required
           />
         </div>
         <button type="button" onClick={handleRegister}>
@@ -101,6 +110,7 @@ function RegisterPage() {
       <div className='links'>
         <a href='/login'>Login</a>
       </div>
+    </div>
     </div>
   );
 }
