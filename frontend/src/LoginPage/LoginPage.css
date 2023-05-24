@@ -73,3 +73,10 @@
       grid-template-areas: "text login";
     }
   }
+
+  @media screen and (max-width: 768px) {
+    .login-page {
+      grid-template-columns: 1fr;
+      grid-template-areas: "login";
+    }
+    }
