@@ -1,10 +1,13 @@
 package main
 
 import (
-	"backend/config"
+	"backend/db"
+	"errors"
 )
 
 func main() {
-	config.SetupDatabase("db/database.db")
-	config.Migrate()
+	err := db.StartDB()
+	if err != nil {
+		panic(errors.New("Error starting database: " + err.Error()))
+	}
 }
