@@ -1,8 +1,10 @@
 package main
 
-import "social-network/backend/config"
+import (
+	"backend/config"
+)
 
 func main() {
-	config.DB = config.SetupDatabase()
+	config.SetupDatabase("db/database.db")
 	config.Migrate()
 }

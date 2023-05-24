@@ -8,14 +8,15 @@ import (
 )
 
 func Migrate() {
+	fmt.Println("Migrating...")
 	migrations := &migrate.FileMigrationSource{
-		Dir: "migrations/",
+		Dir: "./db/migrations",
 	}
-
-	n, err := migrate.Exec(DB.DB(), "sqlite3", migrations, migrate.Up)
+	fmt.Println("migration:", migrations)
+	n, err := migrate.Exec(DB, "sqlite3", migrations, migrate.Up)
 	if err != nil {
 		fmt.Println("Error occcured:", err)
 	}
 
-	fmt.Printf("Applied %d migrations!\n", n)
+	fmt.Println("Applied migrations!\n", n)
 }
