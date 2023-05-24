@@ -6,6 +6,7 @@ function WelcomeBox() {
 
     return (
         <div className="welcome-container">
+            
         </div>
     );
 }

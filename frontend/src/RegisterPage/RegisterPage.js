@@ -55,6 +55,7 @@ function RegisterPage() {
             type="text"
             value={username}
             onChange={handleUsernameChange}
+            required
           />
         </div>
         <div>
@@ -63,6 +64,7 @@ function RegisterPage() {
             type="text"
             value={firstName}
             onChange={handleFirstNameChange}
+            required
           />
         </div>
         <div>
@@ -71,6 +73,7 @@ function RegisterPage() {
             type="text"
             value={lastName}
             onChange={handleLastNameChange}
+            required
           />
         </div>
         <div>
@@ -79,6 +82,7 @@ function RegisterPage() {
             type="date"
             value={birthdate}
             onChange={handleBirthdateChange}
+            required
           />
         </div>
         <div>
@@ -87,6 +91,7 @@ function RegisterPage() {
             type="password"
             value={password}
             onChange={handlePasswordChange}
+            required
           />
         </div>
         <div>
@@ -95,6 +100,7 @@ function RegisterPage() {
             type="password"
             value={confirmPassword}
             onChange={handleConfirmPasswordChange}
+            required
           />
         </div>
         <button type="button" onClick={handleRegister}>
