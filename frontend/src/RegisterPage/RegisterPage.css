@@ -1,11 +1,19 @@
+.register-page {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    grid-template-rows: 1fr;
+    gap: 0px 0px;
+    grid-template-areas:
+      "text register";
+    
+}
 .register-container {
     width: 400px;
     margin: 0 auto;
     padding: 20px;
-    border: 1px solid #ccc;
     border-radius: 4px;
-    background-color: #f9f9f9;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    grid-area: register;
+    font-family: myFancyFont;
 }
 
 .register-container h1 {
@@ -23,20 +31,22 @@
     padding: 10px;
     margin-bottom: 10px;
     box-sizing: border-box;
+    outline: none;
+    font-family: myFancyFont;
 }
 
 .register-container button {
     width: 100%;
     padding: 10px;
-    background-color: #4caf50;
-    color: #fff;
-    border: none;
+    background-color: #ddd;
+    color: black;
     border-radius: 4px;
     cursor: pointer;
+    font-family: myFancyFont;
 }
 
 .register-container button:hover {
-    background-color: #45a049;
+    background-color: #a2a0a0;
 }
 
 .register-container .links {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './LoginPage.css';
-
+import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -20,6 +20,8 @@ function LoginPage() {
   };
 
   return (
+    <div className='login-page'>
+    <WelcomeBox />
     <div className="login-container">
       <h1>Login Page</h1>
       <form>
@@ -46,6 +48,7 @@ function LoginPage() {
       <div className='links'>
         <a href='/register'>Register</a>
       </div>
+    </div>
     </div>
   );
   

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './RegisterPage.css';
+import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 function RegisterPage() {
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -43,6 +44,8 @@ function RegisterPage() {
   };
 
   return (
+    <div className='register-page'>
+    <WelcomeBox />
     <div className="register-container">
       <h1>Register Page</h1>
       <form>
@@ -101,6 +104,7 @@ function RegisterPage() {
       <div className='links'>
         <a href='/login'>Login</a>
       </div>
+    </div>
     </div>
   );
 }
