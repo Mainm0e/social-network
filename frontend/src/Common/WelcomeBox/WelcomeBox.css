@@ -1,0 +1,10 @@
+.welcome-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-image: url("./Img/Welcome.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    grid-area: text;
+  }

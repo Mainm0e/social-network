@@ -1,15 +1,30 @@
+
+.login-page {
+    display: grid; 
+    grid-template-columns: 1.3fr 0.7fr; 
+    grid-template-rows: 1fr; 
+    gap: 0px 0px; 
+    grid-template-areas: 
+      "text login"; 
+    
+}   
 .login-container {
     width: 300px;
     margin: 0 auto;
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f9f9f9;
+    grid-area: login;
+    font-family: myFancyFont;
 }
-
 .login-container h1 {
     text-align: center;
     margin-bottom: 20px;
+}
+.login-container a{
+    text-decoration: none;
+    color: black;
+}
+.login-container a:hover{
+    color:#FFEA00;
 }
 
 .login-container label {
@@ -22,24 +37,53 @@
     padding: 10px;
     margin-bottom: 10px;
     box-sizing: border-box;
+    outline: none;
+    font-family: myFancyFont;
     /* Include padding and border in the element's total width */
 }
 
 .login-container button {
     width: 100%;
     padding: 10px;
-    background-color: #4caf50;
-    color: #fff;
-    border: none;
+    background-color: #ddd;
+    color:black;
     border-radius: 4px;
     cursor: pointer;
+    font-family: myFancyFont;
 }
 
 .login-container button:hover {
-    background-color: #45a049;
+    background-color: #a2a0a0;
 }
 
 .login-container .links {
     text-align: center;
     margin-top: 10px;
 }
+
+@media only screen and (min-width: 768px) {
+    /* Tablet Styles */
+    .login-page {
+      grid-template-columns: 1fr;
+      grid-template-areas: "login";
+    }
+    
+    .login-container {
+      max-width: 400px;
+    }
+  }
+  
+  @media only screen and (min-width: 992px) {
+    /* PC Full Screen Styles */
+    .login-page {
+      grid-template-columns: 1.3fr 0.7fr;
+      grid-template-areas: "text login";
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .login-page {
+      grid-template-columns: 1fr;
+      grid-template-areas: "login";
+    }
+    }
