@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './LoginPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
+import AlertBox from '../Common/AlertBox/AlertBox';
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -30,16 +31,22 @@ function LoginPage() {
     setPassword(event.target.value);
   };
 
-  const handleLogin = () => {
-    // Perform login logic here
-    console.log('Username:', username);
-    console.log('Password:', password);
-  };
+  const [loginStatus, setLoginStatus] = useState(true);
 
+    const handleLogin = () => {
+      // Perform login logic here
+      if (checkUsername(username, password)) {
+        setLoginStatus(true);
+      } else {
+        setLoginStatus(false);
+      }
+  };
+  console.log("loginStatus",loginStatus)
   return (
     <div className='login-page'>
     <WelcomeBox />
     <div className="login-container">
+      {loginStatus ? null : <AlertBox title="HI" message="im fine" status={loginStatus} />}
       <h1 >Login Page</h1>
       <form>
         <div>
@@ -47,6 +54,7 @@ function LoginPage() {
           <input
             type="text"
             value={username}
+            style={{ background: loginStatus === false ? "#FFEA00" : "" }}
             onChange={handleUsernameChange}
             required
           />
@@ -56,6 +64,7 @@ function LoginPage() {
           <input
             type="password"
             value={password}
+            style={{ background: loginStatus === false ? "#FFEA00" : "" }}
             onChange={handlePasswordChange}
             required
           />
@@ -71,6 +80,11 @@ function LoginPage() {
     </div>
   );
   
+}
+
+function checkUsername(username, password) {
+  // Perform username validation here
+  return false;
 }
 
 export default LoginPage;
