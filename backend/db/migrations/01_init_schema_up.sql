@@ -1,25 +1,16 @@
 -- +migrate Up
-/* just example migration up */
-CREATE TABLE event
-(
-);
-
-CREATE TABLE notification
-(
-);
-
 CREATE TABLE users
 (
-  userId       INTEGER NULL    ,
-  NickName     TEXT    NULL    ,
+  userId       INTEGER NULL,
+  NickName     TEXT    NULL,
   firstName    TEXT    NOT NULL,
   lastName     TEXT    NOT NULL,
   birthDate    TEXT    NOT NULL,
   email        TEXT    NOT NULL,
   password     TEXT    NOT NULL,
-  aboutMe      TEXT    NULL    ,
+  aboutMe      TEXT    NULL,
   -- NOT YET
-  avatar               NULL    ,
+  avatar               NULL,
   creationTime TEXT    NOT NULL,
   PRIMARY KEY (userId AUTOINCREMENT)
 );
@@ -36,17 +27,17 @@ CREATE TABLE groups
 
 CREATE TABLE posts
 (
-  postId       INTEGER NULL    ,
+  postId       INTEGER NULL,
   userId       INTEGER NOT NULL,
   title        TEXT    NOT NULL,
   content      TEXT    NOT NULL,
   creationTime TEXT    NOT NULL,
-  -- group,public, private, semi-private 
+  -- group, public, private, semi-private
   status       TEXT    NOT NULL,
   -- NOT YET
-  image                NULL    ,
+  image        NULL,
   -- if posting in a group
-  groupId      INTEGER NULL     DEFAULT -1,
+  groupId      INTEGER NULL DEFAULT -1,
   PRIMARY KEY (postId AUTOINCREMENT),
   FOREIGN KEY (userId) REFERENCES users (userId),
   FOREIGN KEY (groupId) REFERENCES groups (groupId)
@@ -54,7 +45,7 @@ CREATE TABLE posts
 
 CREATE TABLE comments
 (
-  commentId    INTEGER NULL    ,
+  commentId    INTEGER NULL,
   userId       INTEGER NOT NULL,
   postId       INTEGER NOT NULL,
   content      TEXT    NOT NULL,
@@ -64,7 +55,7 @@ CREATE TABLE comments
   FOREIGN KEY (postId) REFERENCES posts (postId)
 );
 
--- follower and followeee relationship
+-- follower and followee relationship
 CREATE TABLE follow
 (
   followerId INTEGER NOT NULL,
@@ -74,8 +65,8 @@ CREATE TABLE follow
   FOREIGN KEY (followerId) REFERENCES users (userId)
 );
 
--- group-members is a N to N relationship so we used third table for it
-CREATE TABLE group-member
+-- group-members is an N-to-N relationship, so we use a third table for it
+CREATE TABLE group_member
 (
   userId  INTEGER NOT NULL,
   groupId INTEGER NOT NULL,
@@ -88,7 +79,7 @@ CREATE TABLE group-member
 -- OLD VERSION
 CREATE TABLE messages
 (
-  messageId      INTEGER NULL    ,
+  messageId      INTEGER NULL,
   senderId       INTEGER NOT NULL,
   receiverId     INTEGER NOT NULL,
   messageContent TEXT    NOT NULL,
