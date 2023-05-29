@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
 import './ChatRoom.css';
+import { dummyMessages } from '../DummyData';
 const ChatRoom = (props) => {
   const { receiver, onClose } = props;
   const [isClosed, setIsClosed] = useState(false);
+  const dummySender = 1;
+  const dummyReceiver = 2;
+
+  const chatContent = dummyMessages.map((message) => {
+    const isSender = message.sender === dummySender;
+    return (
+      <div
+        className={`${isSender ? 'sender' : 'receiver'}-message`}
+        key={message.id}
+      >
+        <div className="chat-message">{message.message}</div>
+      </div>
+    );
+  });
+
 
   const handleUserClick = () => {
     setIsClosed(true);
@@ -25,6 +41,7 @@ const ChatRoom = (props) => {
         </span>
       </div>
         <div className="chat-room-content">
+           {dummyMessages ?  chatContent : <div className="no-message">No messages</div>}
         </div>
         <div className="chat-room-input">
             <input type="text" placeholder="Type a message..." />
