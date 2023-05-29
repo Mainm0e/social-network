@@ -23,9 +23,7 @@
     text-decoration: none;
     color: black;
 }
-.login-container a:hover{
-    color:#FFEA00;
-}
+
 
 .login-container label {
     display: block;
@@ -50,15 +48,20 @@
     border-radius: 4px;
     cursor: pointer;
     font-family: myFancyFont;
+    font-size: 15px;
 }
 
 .login-container button:hover {
+    font-weight: 800;
     background-color: #a2a0a0;
 }
 
 .login-container .links {
     text-align: center;
     margin-top: 10px;
+}
+.login-container a:hover{
+  color:#FFEA00;
 }
 
 @media only screen and (min-width: 768px) {

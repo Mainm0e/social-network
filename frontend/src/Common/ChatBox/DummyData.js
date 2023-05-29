@@ -72,3 +72,76 @@ export const dummyUsers = [
     },
     
 ];
+
+export const dummyMessages = [
+    {
+        id: 1,
+        sender: 1,
+        receiver: 2,
+        message: "Hello",
+        timestamp: "2021-05-01T10:00:00.000Z",
+    },
+    {
+        id: 2,
+        sender: 2,
+        receiver: 1,
+        message: "Hi",
+        timestamp: "2021-05-01T10:01:00.000Z",
+    },
+    {
+        id: 3,
+        sender: 1,
+        receiver: 2,
+        message: "How are you?",
+        timestamp: "2021-05-01T10:02:00.000Z",
+    },
+    {
+        id: 4,
+        sender: 2,
+        receiver: 1,
+        message: "I'm fine.",
+        timestamp: "2021-05-01T10:03:00.000Z",
+    },
+    {
+        id: 5,
+        sender: 1,
+        receiver: 2,
+        message: "Good to hear that.",
+        timestamp: "2021-05-01T10:04:00.000Z",
+    },
+    {
+        id: 6,
+        sender: 2,
+        receiver: 1,
+        message: "How about you?",
+        timestamp: "2021-05-01T10:05:00.000Z",
+    },
+    {
+        id: 7,
+        sender: 1,
+        receiver: 2,
+        message: "I'm fine too.",
+        timestamp: "2021-05-01T10:06:00.000Z",
+    },
+    {
+        id: 8,
+        sender: 2,
+        receiver: 1,
+        message: "Good to hear that.",
+        timestamp: "2021-05-01T10:07:00.000Z",
+    },
+    {
+        id: 9,
+        sender: 1,
+        receiver: 2,
+        message: "Bye",
+        timestamp: "2021-05-01T10:08:00.000Z",
+    },
+    {
+        id: 10,
+        sender: 2,
+        receiver: 1,
+        message: "Bye",
+        timestamp: "2021-05-01T10:09:00.000Z",
+    }
+];
