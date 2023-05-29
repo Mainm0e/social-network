@@ -1,5 +1,4 @@
 import "./AlertBox.css";
-import React, { useState } from 'react';
 
 
 // AlertBox component

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 import AlertBox from '../Common/AlertBox/AlertBox';
+import ChatBox from '../Common/ChatBox/ChatBox';
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -88,6 +89,7 @@ function LoginPage() {
         <a href='/register'>Register</a>
       </div>
     </div>
+    <ChatBox />
     </div>
   );
   
