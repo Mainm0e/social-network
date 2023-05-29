@@ -9,9 +9,13 @@ const ChatRoom = (props) => {
 
   const chatContent = dummyMessages.map((message) => {
     const isSender = message.sender === dummySender;
+    const isReceiver = message.sender === dummyReceiver;
+    if (!isSender && !isReceiver) {
+      return null;
+    }
     return (
       <div
-        className={`${isSender ? 'sender' : 'receiver'}-message`}
+      className={`${isSender ? 'sender' : isReceiver ? 'receiver' : ''}-message`}
         key={message.id}
       >
         <div className="chat-message">{message.message}</div>
