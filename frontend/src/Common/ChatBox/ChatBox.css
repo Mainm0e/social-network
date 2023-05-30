@@ -1,0 +1,63 @@
+.chat-container {
+    position: fixed;
+    display: inline-flex;
+    bottom: 20px;
+    right: 20px;
+    border-radius: 5px;
+    padding: 10px;
+  }
+.chat-container .top-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px;
+
+  }
+.chat-container .top-bar .close-button {
+    cursor: pointer;
+    font-size: 20px;
+    color: #000;
+    transition: all 0.3s ease-in-out;
+    font-family: myFancyFont;
+  }
+  .chat-container .top-bar .close-button:hover {
+    font-size: 30px;
+    color: #FFEA00;
+  }
+
+.chat-button{
+    font-family: myFancyFont;
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: #000;
+    transition: all 0.3s ease-in-out;
+    background: transparent;
+    align-items: flex-end;
+}
+
+.chat-button:hover{
+    font-size: 30px;
+    color:#FFEA00;
+}
+.chat-container .contact-list{
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+    width: 300px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    font-family: myFancyFont;
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+  }
+  
