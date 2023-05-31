@@ -1,0 +1,147 @@
+
+export const dummyUsers = [
+    {
+        id: 1,
+        name: "John",
+        avatar: "https://i.pravatar.cc/150?img=1",
+        status: "online",
+        unseemessage: 0,
+    },
+    {
+        id: 2,
+        name: "Bob",
+        avatar: "https://i.pravatar.cc/150?img=2",
+        status: "offline",
+        unseemessage: 0,
+    },
+    {
+        id: 3,
+        name: "Alice",
+        avatar: "https://i.pravatar.cc/150?img=3",
+        status: "online",
+        unseemessage: 0,
+    },
+    {
+        id: 4,
+        name: "Dora",
+        avatar: "https://i.pravatar.cc/150?img=4",
+        status: "offline",
+        unseemessage: 0,
+    },
+    {
+        id: 5,
+        name: "Lisa",
+        avatar: "https://i.pravatar.cc/150?img=5",
+        status: "online",
+        unseemessage: 0,
+    },
+    {
+        id: 6,
+        name: "Mike",
+        avatar: "https://i.pravatar.cc/150?img=6",
+        status: "offline",
+        unseemessage: 0,
+    },
+    {
+        id: 7,
+        name: "John",
+        avatar: "https://i.pravatar.cc/150?img=7",
+        status: "online",
+        unseemessage: 0,
+    },
+    {
+        id: 8,
+        name: "Bob",
+        avatar: "https://i.pravatar.cc/150?img=8",
+        status: "offline",
+        unseemessage: 0,
+    },
+    {
+        id: 9,
+        name: "Alice",
+        avatar: "https://i.pravatar.cc/150?img=9",
+        status: "online",
+        unseemessage: 0,
+    },
+    {
+        id: 10,
+        name: "Dora",
+        avatar: "https://i.pravatar.cc/150?img=10",
+        status: "offline",
+        unseemessage: 0,
+    },
+    
+];
+
+export const dummyMessages = [
+    {
+        id: 1,
+        sender: 1,
+        receiver: 2,
+        message: "Hello",
+        timestamp: "2021-05-01T10:00:00.000Z",
+    },
+    {
+        id: 2,
+        sender: 2,
+        receiver: 1,
+        message: "Hi",
+        timestamp: "2021-05-01T10:01:00.000Z",
+    },
+    {
+        id: 3,
+        sender: 1,
+        receiver: 2,
+        message: "How are you?",
+        timestamp: "2021-05-01T10:02:00.000Z",
+    },
+    {
+        id: 4,
+        sender: 2,
+        receiver: 1,
+        message: "I'm fine.",
+        timestamp: "2021-05-01T10:03:00.000Z",
+    },
+    {
+        id: 5,
+        sender: 1,
+        receiver: 2,
+        message: "Good to hear that.",
+        timestamp: "2021-05-01T10:04:00.000Z",
+    },
+    {
+        id: 6,
+        sender: 2,
+        receiver: 1,
+        message: "How about you?",
+        timestamp: "2021-05-01T10:05:00.000Z",
+    },
+    {
+        id: 7,
+        sender: 1,
+        receiver: 2,
+        message: "I'm fine too.",
+        timestamp: "2021-05-01T10:06:00.000Z",
+    },
+    {
+        id: 8,
+        sender: 2,
+        receiver: 1,
+        message: "Good to hear that.",
+        timestamp: "2021-05-01T10:07:00.000Z",
+    },
+    {
+        id: 9,
+        sender: 1,
+        receiver: 2,
+        message: "Bye",
+        timestamp: "2021-05-01T10:08:00.000Z",
+    },
+    {
+        id: 10,
+        sender: 2,
+        receiver: 1,
+        message: "Bye",
+        timestamp: "2021-05-01T10:09:00.000Z",
+    }
+];

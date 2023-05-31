@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 import AlertBox from '../Common/AlertBox/AlertBox';
+import ChatBox from '../Common/ChatBox/ChatBox';
 function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
   // is part is for the color changing text animation
   /*
   // import useEffect from react befor using this
@@ -30,23 +33,32 @@ function LoginPage() {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
+  const checkUsername = (username, password) => {
+    if (username === "admin" && password === "admin") {
+      return true;
+    } else {
+      setAlertTitle("Error");
+      setAlertMessage("Wrong username or password");
+      return false;
+    }
+  }
 
   const [loginStatus, setLoginStatus] = useState(true);
-
-    const handleLogin = () => {
-      // Perform login logic here
-      if (checkUsername(username, password)) {
-        setLoginStatus(true);
-      } else {
-        setLoginStatus(false);
-      }
+  const handleLogin = () => {
+    // Perform login logic here
+    if (checkUsername(username, password)) {
+      setLoginStatus(true);
+      document.querySelector(".alert-box").style.display = "none";
+    } else {
+      setLoginStatus(false);
+      document.querySelector(".alert-box").style.display = "block";
+    }
   };
-  console.log("loginStatus",loginStatus)
   return (
     <div className='login-page'>
     <WelcomeBox />
     <div className="login-container">
-      {loginStatus ? null : <AlertBox title="HI" message="im fine" status={loginStatus} />}
+    <AlertBox title={alertTitle} message={alertMessage} status={true} />
       <h1 >Login Page</h1>
       <form>
         <div>
@@ -77,14 +89,10 @@ function LoginPage() {
         <a href='/register'>Register</a>
       </div>
     </div>
+    <ChatBox />
     </div>
   );
   
-}
-
-function checkUsername(username, password) {
-  // Perform username validation here
-  return false;
 }
 
 export default LoginPage;
