@@ -3,11 +3,16 @@ import './LoginPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 import AlertBox from '../Common/AlertBox/AlertBox';
 import ChatBox from '../Common/ChatBox/ChatBox';
+
+// LoginPage component
+// This component is used to render the login page
+// Props: none
 function LoginPage() {
+  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertMessage, setAlertMessage] = useState([]);
   // is part is for the color changing text animation
   /*
   // import useEffect from react befor using this
@@ -33,17 +38,22 @@ function LoginPage() {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
+  let msg = [];
   const checkUsername = (username, password) => {
     if (username === "admin" && password === "admin") {
       return true;
     } else {
       setAlertTitle("Error");
-      setAlertMessage("Wrong username or password");
+      msg.push("Username or password is incorrect");
+      setAlertMessage(msg);
       return false;
     }
   }
 
   const [loginStatus, setLoginStatus] = useState(true);
+
+  // handleLogin function
+  //  this function is main function of the login page
   const handleLogin = () => {
     // Perform login logic here
     if (checkUsername(username, password)) {

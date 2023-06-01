@@ -1,0 +1,22 @@
+.avatar-container{
+   display: inline-flex;
+}
+.avatar-input-container img{
+   height: 60px;
+    width: 60px;
+    object-fit: cover;
+    margin-right: 10px;
+    padding: 5px;
+    border: 1px solid #4c4b4b;
+    box-sizing: border-box;
+    outline: none;
+    font-family: myFancyFont;
+}
+.avatar-input-container input{
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    outline: none;
+    font-family: myFancyFont;
+
+}
