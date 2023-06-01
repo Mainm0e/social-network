@@ -1,0 +1,6 @@
+RegisterPage
+    need todo
+        * find the way how to send IMG file to backend
+        * how to communicate with backend
+        * add function checked message from backend
+        

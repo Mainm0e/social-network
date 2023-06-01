@@ -5,7 +5,6 @@ import "./AlertBox.css";
 // Props: title, message, status
 function AlertBox(props) {
   const { title, message, status } = props;
-
   const boxclose = () => {
    document.querySelector(".alert-box").style.display = "none";
   }
@@ -17,8 +16,13 @@ function AlertBox(props) {
             &times;
           </span>
           <strong>{title}</strong>
-          <br />
-          <p>{message}</p>
+          <br/>
+          <br/>
+          {/* message is array */}
+          {message.map((msg, index) => (
+            <span key={index}>{msg}<br/></span>
+          ))}
+         
         </div>
   );
 }

@@ -1,89 +1,95 @@
 .register-page {
-    display: grid;
-    grid-template-columns: 1.3fr 0.7fr;
-    grid-template-rows: 1fr;
-    gap: 0px 0px;
-    grid-template-areas:
-      "text register";
-    
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  grid-template-rows: 1fr;
+  gap: 0px 0px;
+  grid-template-areas: "text register";
 }
+
 .register-container {
-    width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border-radius: 4px;
-    grid-area: register;
-    font-family: myFancyFont;
+  width: 400px;
+  height: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 4px;
+  grid-area: register;
+  font-family: myFancyFont;
 }
-.register-container a{
+
+.register-container a {
   text-decoration: none;
   color: black;
 }
-.register-container a:hover{
-  color:#FFEA00;
+
+.register-container a:hover {
+  color: #FFEA00;
 }
 
 .register-container h1 {
-    text-align: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .register-container label {
-    display: block;
-    margin-bottom: 10px;
+  display: block;
+  margin-bottom: 10px;
 }
 
 .register-container input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-    outline: none;
-    font-family: myFancyFont;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  outline: none;
+  font-family: myFancyFont;
+}
+
+.select-container {
+  display: inline-flex;
 }
 
 .register-container button {
-    width: 100%;
-    padding: 10px;
-    background-color: #ddd;
-    color: black;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: myFancyFont;
+  width: 100%;
+  padding: 10px;
+  background-color: #ddd;
+  color: black;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: myFancyFont;
 }
 
 .register-container button:hover {
-    background-color: #a2a0a0;
+  background-color: #a2a0a0;
 }
 
 .register-container .links {
-    text-align: center;
-    margin-top: 10px;
+  text-align: center;
+  margin-top: 10px;
 }
 
 @media only screen and (min-width: 768px) {
-    /* Tablet Styles */
-    .register-page {
-      grid-template-columns: 1fr;
-      grid-template-areas: "register";
-    }
-    
-    .register-container {
-      max-width: 400px;
-    }
-  }
-  
-  @media only screen and (min-width: 992px) {
-    /* PC Full Screen Styles */
-    .register-page {
-      grid-template-columns: 1.3fr 0.7fr;
-      grid-template-areas: "text register";
-    }
+  /* Tablet Styles */
+  .register-page {
+    grid-template-columns: 1fr;
+    grid-template-areas: "register";
   }
 
-  @media screen and (max-width: 768px) {
-    .register-page {
-      grid-template-columns: 1fr;
-      grid-template-areas: "register";
-    }
-    }
+  .register-container {
+    max-width: 400px;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  /* PC Full Screen Styles */
+  .register-page {
+    grid-template-columns: 1.3fr 0.7fr;
+    grid-template-areas: "text register";
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .register-page {
+    grid-template-columns: 1fr;
+    grid-template-areas: "register";
+  }
+}
