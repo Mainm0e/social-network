@@ -4,9 +4,14 @@ import Info2 from './Info2/info2';
 import './RegisterPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 import AlertBox from '../Common/AlertBox/AlertBox';
+import { checkData } from './checkdata';
 
-
+// RegisterPage component
+// Props: none
 function RegisterPage() {
+
+  // !!! Junk useSate !!! 
+  //
   const [selectedOption, setSelectedOption] = useState('info1');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -16,12 +21,17 @@ function RegisterPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-   // [username, password, confirmPassword, firstName, lastName, email, birthdate, avatar
+
+  // handleOptionChange function 
+ // This function is used to change the form state 
   const handleOptionChange = (event) => {
     const selectedOption = event.target.value;
     setSelectedOption(selectedOption); 
   };
   
+  // handleInfoChange function
+  // this function get the values from Info1 and Info2 components
+  // and set the state of the form
   const handleInfoChange = (values) => {
     if (values.type === "info1"){
       setFirstName(values.firstName);
@@ -36,31 +46,32 @@ function RegisterPage() {
       setAvatar(values.avatar);
     }
   };
+
+  // handleRegister function
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState([]);
   const [registerStatus, setRegisterStatus] = useState(true);
-
-  const handleRegister = () => {
-  let msg = [];
-    // Perform registration logic here
-    let matchPassword = password === confirmPassword ? password : "";
-    const data = {firstName, lastName, email, birthdate, avatar,username, matchPassword};
-  for (let key in data) {
-  if (data.hasOwnProperty(key)) {
-    const value = data[key];
-    if (value == ""&& key !== "avatar"&& key !== "matchPassword") {
-      msg.push(key + " is empty");
-      setRegisterStatus(false);
+  // matchPassword is used to check if the password and confirmPassword are the same
+  // if they are the same, {matchPassword = password} else {matchPassword = ""}
+  let matchPassword = password === confirmPassword ? password : "";
+  const data = {firstName, lastName, email, birthdate, avatar,username, matchPassword};
+  
+  // register function
+  // this function is main function of the register page
+  const register = () => {
+    const response = checkData(data)
+    setAlertTitle(response.title);
+    setAlertMessage(response.message);
+    setRegisterStatus(response.status);
+    console.log(response.status)
+    if (registerStatus){
+      document.querySelector(".alert-box").style.display = "none";
     }
-    if (key === "matchPassword" && value === "") {
-      msg.push("Password does not match");
-      console.log(msg);
-      setRegisterStatus(false);
+    else {
+      document.querySelector(".alert-box").style.display = "block";
     }
-  }
-  }
 
-
+    
 /*    if (username !== "" && password !== "" && firstName !== "" && lastName !== "" && email !== "" && birthdate !== "" && avatar !== ""){
     fetch('http://localhost:5000/api/register', {
       method: 'POST',
@@ -84,26 +95,14 @@ function RegisterPage() {
         console.error('Error:', error);
       });
     } */
-    if (msg.length === 0){
-      setRegisterStatus(true);
-    } else if (msg.length > 0){
-      setRegisterStatus(false);
-    }
-
-    if (registerStatus){
-      document.querySelector(".alert-box").style.display = "none";
-    } else {
-      setAlertTitle('Error');
-      setAlertMessage(msg);
-      document.querySelector(".alert-box").style.display = "block";
-    }
-  };
+  }
 
   return (
     <div className='register-page'>
     <WelcomeBox />
     <div className="register-container">
-    <AlertBox title={alertTitle} message={alertMessage} status={true} />
+
+    <AlertBox title={alertTitle} message={alertMessage} status={registerStatus} />
       <h1>Register Page</h1>
       <Info1 selectedOption={selectedOption} onChange={handleInfoChange} registerStatus={registerStatus}/>
       <Info2 selectedOption={selectedOption} onChange={handleInfoChange} registerStatus={registerStatus}/>
@@ -121,7 +120,7 @@ function RegisterPage() {
           onChange={handleOptionChange}
         />
       </div>
-        <button type="button" onClick={handleRegister}>
+        <button type="button" onClick={register}>
           Register
         </button>
       

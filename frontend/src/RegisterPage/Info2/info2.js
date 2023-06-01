@@ -3,6 +3,12 @@ import defaultAvatar from '../avatar/default-avatar.png';
 import '../RegisterPage.css';
 import './info2.css'
 
+
+// Info2 component
+// Props: selectedOption, onChange, registerStatus
+// selectedOption is the state of the form
+// onChange is the function to change the state of the form
+// registerStatus is the state of the register status
 const Info2 = ({ selectedOption, onChange,registerStatus }) => {
     const type = 'info2';
 

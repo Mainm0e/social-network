@@ -1,13 +1,4 @@
-
-!!! working in RegisterPage right now
-    need todo
-        * fix registerStatus bug
-        * clean AlertBox component
-        * clean RegisterPage component
-        * add Comment to RegisterPage component
-        * find the way to safe img file from register page
-    
-!!! Bonus ChatBox component
+    !!! Bonus ChatBox component
     #point  #Quest
         10  add Comment
         10  clean code

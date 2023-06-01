@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import '../RegisterPage.css';
 
+// Info1 component
+// Props: selectedOption, onChange, registerStatus
+// selectedOption is the state of the form
+// onChange is the function to change the state of the form
+// registerStatus is the state of the register status
 const Info1 = ({ selectedOption, onChange ,registerStatus}) => {
     const type = 'info1';
   const [firstName, setFirstName] = useState('');

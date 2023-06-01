@@ -3,7 +3,12 @@ import './LoginPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 import AlertBox from '../Common/AlertBox/AlertBox';
 import ChatBox from '../Common/ChatBox/ChatBox';
+
+// LoginPage component
+// This component is used to render the login page
+// Props: none
 function LoginPage() {
+  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
@@ -46,6 +51,9 @@ function LoginPage() {
   }
 
   const [loginStatus, setLoginStatus] = useState(true);
+
+  // handleLogin function
+  //  this function is main function of the login page
   const handleLogin = () => {
     // Perform login logic here
     if (checkUsername(username, password)) {
