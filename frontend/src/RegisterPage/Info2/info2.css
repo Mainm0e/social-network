@@ -1,3 +1,9 @@
+.user-info2_false{
+    display:block;
+}
+.user-info2_hidden{
+    display:none;
+}
 .avatar-container{
    display: inline-flex;
 }

@@ -57,57 +57,29 @@ const Info2 = ({ selectedOption, onChange, registerStatus }) => {
 
   return (
     <form>
-      <div className={`user-info2 ${selectedOption !== "info2" && "hidden"}`}>
-        <div className="avatar-input-container">
-          <label> Avatar: </label>{" "}
-          <div className="avatar-container">
-            {" "}
-            {previewSource && <img src={previewSource} alt="Preview" />}{" "}
-            <input type="file" onChange={handleFileChange} />{" "}
-          </div>{" "}
-        </div>{" "}
-        <div className="input-container">
-          <label> Username: </label>{" "}
-          <input
-            type="text"
-            name="username"
-            style={{
-              background:
-                registerStatus === false && username === "" ? "#FFEA00" : "",
-            }}
-            value={username}
-            onChange={handleInputChanges}
-          />{" "}
-        </div>{" "}
-        <div className="input-container">
-          <label> Password: </label>{" "}
-          <input
-            type="password"
-            name="password"
-            style={{
-              background:
-                registerStatus === false && password === "" ? "#FFEA00" : "",
-            }}
-            value={password}
-            onChange={handleInputChanges}
-          />{" "}
-        </div>{" "}
-        <div className="input-container">
-          <label> Confirm Password: </label>{" "}
-          <input
-            type="password"
-            name="confirmPassword"
-            style={{
-              background:
-                registerStatus === false && confirmPassword === ""
-                  ? "#FFEA00"
-                  : "",
-            }}
-            value={confirmPassword}
-            onChange={handleInputChanges}
-          />{" "}
-        </div>{" "}
-      </div>{" "}
+    <div className={`user-info2_${selectedOption !== 'info2' && 'hidden'}`}>
+      <div className='avatar-input-container' >
+          <label>Avatar:</label>
+          <div className='avatar-container'>
+        {previewSource && (
+          <img src={previewSource} alt='Preview'/>
+        )}
+        <input type='file' onChange={handleFileChange} />
+        </div>
+      </div>
+      <div className='input-container'>
+        <label>Username:</label>
+        <input type='text' name='username' style={{ background: registerStatus === false && username === "" ? "#FFEA00" : "" }} value={username} onChange={handleInputChanges} />
+      </div>
+      <div className='input-container'>
+        <label>Password:</label>
+        <input type='password' name='password' style={{ background: registerStatus === false && password === "" ? "#FFEA00" : "" }} value={password} onChange={handleInputChanges} />
+      </div>
+      <div className='input-container'>
+        <label>Confirm Password:</label>
+        <input type='password' name='confirmPassword' style={{ background: registerStatus === false && confirmPassword === "" ? "#FFEA00" : "" }} value={confirmPassword} onChange={handleInputChanges} />
+      </div>
+    </div>
     </form>
   );
 };

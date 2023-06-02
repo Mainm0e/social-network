@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import "../RegisterPage.css";
+import React, { useState } from 'react';
+import '../RegisterPage.css';
+import './info1.css';
 
 // Info1 component
 // Props: selectedOption, onChange, registerStatus
@@ -49,60 +50,24 @@ const Info1 = ({ selectedOption, onChange, registerStatus }) => {
 
   return (
     <form>
-      <div className={`user-info1 ${selectedOption !== "info1" && "hidden"}`}>
-        <div className="input-container">
-          <label> First Name: </label>{" "}
-          <input
-            type="text"
-            style={{
-              background:
-                registerStatus === false && firstName === "" ? "#FFEA00" : "",
-            }}
-            name="firstName"
-            value={firstName}
-            onChange={handleInputChange}
-          />{" "}
-        </div>{" "}
-        <div className="input-container">
-          <label> Last Name: </label>{" "}
-          <input
-            type="text"
-            style={{
-              background:
-                registerStatus === false && lastName === "" ? "#FFEA00" : "",
-            }}
-            name="lastName"
-            value={lastName}
-            onChange={handleInputChange}
-          />{" "}
-        </div>{" "}
-        <div className="input-container">
-          <label> Email: </label>{" "}
-          <input
-            type="text"
-            style={{
-              background:
-                registerStatus === false && email === "" ? "#FFEA00" : "",
-            }}
-            name="email"
-            value={email}
-            onChange={handleInputChange}
-          />{" "}
-        </div>{" "}
-        <div className="input-container">
-          <label> Birthdate: </label>{" "}
-          <input
-            type="date"
-            style={{
-              background:
-                registerStatus === false && birthdate === "" ? "#FFEA00" : "",
-            }}
-            name="birthdate"
-            value={birthdate}
-            onChange={handleInputChange}
-          />{" "}
-        </div>{" "}
-      </div>{" "}
+    <div className={`user-info1_${selectedOption !== 'info1' && 'hidden'}`}>
+      <div className='input-container'>
+        <label>First Name:</label>
+        <input type='text' style={{ background: registerStatus === false && firstName === "" ? "#FFEA00" : "" }} name='firstName' value={firstName} onChange={handleInputChange} />
+      </div>
+      <div className='input-container'>
+        <label>Last Name:</label>
+        <input type='text' style={{ background: registerStatus === false && lastName === "" ? "#FFEA00" : "" }} name='lastName' value={lastName} onChange={handleInputChange} />
+      </div>
+      <div className='input-container'>
+        <label>Email:</label>
+        <input type='text' style={{ background: registerStatus === false && email === "" ? "#FFEA00" : "" }} name='email' value={email} onChange={handleInputChange} />
+      </div>
+      <div className='input-container'>
+        <label>Birthdate:</label>
+        <input type='date' style={{ background: registerStatus === false && birthdate ==="" ? "#FFEA00" : "" }} name='birthdate' value={birthdate} onChange={handleInputChange} />
+      </div>
+    </div>
     </form>
   );
 };
