@@ -9,7 +9,6 @@ import './info1.css';
 // registerStatus is the state of the register status
 const Info1 = ({ selectedOption, onChange, registerStatus }) => {
   const type = "info1";
-  console.log("Info1.js: selectedOption = ", selectedOption);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");

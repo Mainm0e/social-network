@@ -9,7 +9,6 @@ import "./info2.css";
 // onChange is the function to change the state of the form
 // registerStatus is the state of the register status
 const Info2 = ({ selectedOption, onChange, registerStatus }) => {
-  console.log("Info2.js: selectedOption = ", selectedOption);
   const type = "info2";
 
   // Upload avatar
