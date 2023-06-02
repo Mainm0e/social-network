@@ -1,27 +1,29 @@
 import "./AlertBox.css";
-import React, { useState } from 'react';
 
+
+// AlertBox component
+// Props: title, message, status
 function AlertBox(props) {
   const { title, message, status } = props;
-  const [showAlert, setShowAlert] = useState(status);
-
-  const closeAlert = () => {
-    setShowAlert(false);
-  };
-
+  const boxclose = () => {
+   document.querySelector(".alert-box").style.display = "none";
+  }
   return (
-    <>
-      {showAlert ? (
-        <div className="alert-box">
-          <span className="closebtn" onClick={closeAlert}>
+        <div 
+        className="alert-box" 
+        style={{display: status === false ? "block":"none" }}>
+          <span className="closebtn" onClick={boxclose} >
             &times;
           </span>
           <strong>{title}</strong>
-          <br />
-          <p>{message}</p>
+          <br/>
+          <br/>
+          {/* message is array */}
+          {message.map((msg, index) => (
+            <span key={index}>{msg}<br/></span>
+          ))}
+         
         </div>
-      ) : null}
-    </>
   );
 }
 

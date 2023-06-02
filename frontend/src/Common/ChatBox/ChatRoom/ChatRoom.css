@@ -1,0 +1,98 @@
+.chat-room {
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+    width: 300px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    font-family: myFancyFont;
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+  }
+
+  
+  .chat-room .top-bar {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #ccc;
+  }
+  .chat-room .top-bar .close-button:hover{
+    font-size: 25px;
+    color: #90caf9;
+  }
+  
+  .chat-room .chat-room-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+  }
+  
+  .chat-room .chat-room-name {
+    font-weight: bold;
+  }
+  
+  .chat-room .close-button {
+    cursor: pointer;
+    margin-left: auto;
+  }
+  
+  .chat-room .chat-room-content {
+    flex-grow: 1;
+    overflow: scroll;
+    max-width: 300px;
+  }
+  
+  .chat-room .chat-room-input {
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+  }
+  .chat-room .chat-room-input ::placeholder {
+    color: #ddd;
+    font-family: myFancyFont;
+  }
+  
+  .chat-room  .chat-room-input input {
+    flex-grow: 1; /* Take up remaining horizontal space */
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .chat-room .sender-message {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+  
+  .chat-room .receiver-message {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+  }
+  
+  .chat-room .chat-message {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #e1f5fe;
+    color: #000;
+    margin: 0 10px;
+  }
+  
+  .chat-room .sender-message .chat-message {
+    background-color: #90caf9;
+  }
+  
+  .chat-room .receiver-message .chat-message {
+    background-color: #e1f5fe;
+  }
+  
