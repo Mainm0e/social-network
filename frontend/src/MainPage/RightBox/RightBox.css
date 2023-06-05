@@ -1,0 +1,13 @@
+.right-box{
+    padding: 20px 10px;
+    position: sticky;
+    right: 0;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 800px;
+    width: 400px;
+    border-radius: 10px;
+    background: #ddd;
+}

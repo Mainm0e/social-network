@@ -1,0 +1,9 @@
+.main-box{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 1000vh;
+    width: 100vw;
+    background: green;
+}

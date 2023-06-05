@@ -1,0 +1,13 @@
+
+.main-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+}
+.main-page-container{
+    display: flex;
+    width: 1000px;
+    position: relative;
+}
