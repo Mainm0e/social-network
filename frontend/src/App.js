@@ -1,6 +1,7 @@
 import LoginPage from "./LoginPage/LoginPage";
 import RegisterPage from "./RegisterPage/RegisterPage";
 import MainPage from "./MainPage/MainPage";
+import ErrorPage from "./ErrorPage/ErrorPage";
 import './App.css';
 function App() {
   // function handle that check url and return the page
@@ -13,7 +14,7 @@ function App() {
     } else if (page === '/') {
       return <MainPage />;
     } else {
-      return <div>404 Not Found</div> ;
+      return <ErrorPage /> ;
     }
   };
 

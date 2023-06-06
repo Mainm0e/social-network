@@ -1,9 +1,10 @@
-
+import React from "react";
+import Header from "./Header.js";
 import "./MainBox.css";
-const MainBox = ({ type, onChange }) => {
+const MainBox = ({ user }) => {
     return (
         <div className="main-box">
-            black + yellow = green
+            <Header user={user} />
         </div>
     );
 

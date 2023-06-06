@@ -13,7 +13,7 @@ function MainPage() {
     <div className="main-page">
         <div className="main-page-container">
         <LeftBox user={user1}/>
-        <MainBox />
+        <MainBox user={user1}/>
         <RightBox />
         <ChatBox />
         </div>

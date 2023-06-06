@@ -7,9 +7,11 @@ let link1 = {
     }
 export const user1 = {
     username: "kettu",
+    fName: "Kettu",
+    lName: "Kettunen",
     avatar: "https://picsum.photos/200",
     email: "example@example.com",
-    birtdate: "01.01.1970",
+    birthdate: "01.01.1970",
     bio: "I am a fox",
     following: 0,
     followers: 0,

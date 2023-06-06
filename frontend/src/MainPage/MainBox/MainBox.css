@@ -1,9 +1,56 @@
 .main-box{
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    height: 1000vh;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
     width: 100vw;
-    background: green;
+    max-width: 1000px;
+}
+
+.main_header{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-start ;
+    height: 300px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.info_img{
+    position: absolute;
+    top: 75px;
+    left: 25px;
+    z-index: 1;
+}
+.info_img img{
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+}
+.info_box{
+    display: flex;
+    justify-content: flex-start;
+    max-height: 150px;
+    height: 150px;
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: row-reverse;
+    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+    background-color: red;
+}
+.info_bio{
+    position: absolute;
+    left: 50px;
+    top: 50px;
+}
+.user_info label{
+    font-size: 15px;
+    font-family: myFancyFont;
+}
+.user_info span{
+    font-size: 15px;
+    font-family: myFancyFont;
 }
