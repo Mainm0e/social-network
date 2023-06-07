@@ -1,4 +1,4 @@
-import "./MainBox.css"
+import "../MainBox.css"
 const Header = (profile) => {
     const user = profile.user
     return (

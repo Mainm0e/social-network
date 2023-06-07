@@ -23,7 +23,6 @@ const ChatRoom = (props) => {
     );
   });
 
-
   const handleUserClick = () => {
     setIsClosed(true);
     onClose(true); // Pass the boolean value back to the parent component
@@ -48,7 +47,7 @@ const ChatRoom = (props) => {
            {dummyMessages ?  chatContent : <div className="no-message">No messages</div>}
         </div>
         <div className="chat-room-input">
-            <input type="text" placeholder="Type a message..." />
+            <input type="text" placeholder="Type a message..."/>
         </div>
     </div>
   );

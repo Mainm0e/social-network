@@ -5,6 +5,7 @@ let link1 = {
     following: "/following",
     explore: "/explore",
     }
+
 export const user1 = {
     username: "kettu",
     fName: "Kettu",
