@@ -19,16 +19,16 @@ Global database insertion rules for ease of maintenance, and simplifying of the 
 */
 var InsertRules = map[string]InsertRule{
 	"users": {
-		Query:      "INSERT INTO users(nickName, email, pass, creationTime, age, gender, firstName, lastName) VALUES(?,?,?,?,?,?,?,?)",
+		Query:      "INSERT INTO users(nickName, firstName, lastName, birthDate, email, password, creationTime) VALUES(?,?,?,?,?,?,?)",
 		ExistTable: "users",
 		ExistField: "nickName",
 		ExistError: "nickname already exists",
 	},
 	"posts": {
-		Query:          "INSERT INTO posts(userId, topicId, title, content, creationTime) VALUES(?,?,?,?,?)",
-		NotExistTables: []string{"users", "topics"},
-		NotExistFields: []string{"userId", "topicId"},
-		NotExistErrors: []string{"user does not exist", "topic does not exist"},
+		Query:          "INSERT INTO posts(userId, title, content, creationTime, status, groupId) VALUES(?,?,?,?,?,?)",
+		NotExistTables: []string{"users", "groups"},
+		NotExistFields: []string{"userId", "groupId"},
+		NotExistErrors: []string{"user does not exist", "group does not exist"},
 	},
 	"comments": {
 		Query:          "INSERT INTO comments(userId, postId, content, creationTime) VALUES(?,?,?,?)",
@@ -36,23 +36,47 @@ var InsertRules = map[string]InsertRule{
 		NotExistFields: []string{"userId", "postId"},
 		NotExistErrors: []string{"user does not exist", "post does not exist"},
 	},
-	"reactions": {
-		Query:          "INSERT INTO reactions(userId, postId, commentId, reaction) VALUES(?,?,?,?)",
-		NotExistTables: []string{"users", "posts", "comments"},
-		NotExistFields: []string{"userId", "postId", "commentId"},
-		NotExistErrors: []string{"user does not exist", "post does not exist", "comment does not exist"},
-	},
-	"topics": {
-		Query:      "INSERT INTO topics(topicName) VALUES(?)",
-		ExistTable: "topics",
-		ExistField: "topicName",
-		ExistError: "topic already exists",
+	"groups": {
+		Query:          "INSERT INTO groups(creatorId, title, description) VALUES(?,?,?)",
+		NotExistTables: []string{"users"},
+		NotExistFields: []string{"creatorId"},
+		NotExistErrors: []string{"creator does not exist"},
 	},
 	"messages": {
-		Query:          "INSERT INTO messages(senderId, receiverId, content, creationTime) VALUES(?,?,?,?)",
+		Query:          "INSERT INTO messages(senderId, receiverId, messageContent, sendTime, seen) VALUES(?,?,?,?,?)",
 		NotExistTables: []string{"users", "users"},
 		NotExistFields: []string{"senderId", "receiverId"},
 		NotExistErrors: []string{"sender does not exist", "receiver does not exist"},
+	},
+	"follow": {
+		Query:          "INSERT INTO follow(followerId, followeeId, status) VALUES(?,?,?)",
+		NotExistTables: []string{"users", "users"},
+		NotExistFields: []string{"followerId", "followeeId"},
+		NotExistErrors: []string{"follower does not exist", "followee does not exist"},
+	},
+	"group_member": {
+		Query:          "INSERT INTO group_member(userId, groupId, status) VALUES(?,?,?)",
+		NotExistTables: []string{"users", "groups"},
+		NotExistFields: []string{"userId", "groupId"},
+		NotExistErrors: []string{"user does not exist", "group does not exist"},
+	},
+	"semiPrivate": {
+		Query:          "INSERT INTO semiPrivate(postId, userId) VALUES(?,?)",
+		NotExistTables: []string{"posts", "users"},
+		NotExistFields: []string{"postId", "userId"},
+		NotExistErrors: []string{"post does not exist", "user does not exist"},
+	},
+	"notifications": {
+		Query:          "INSERT INTO notifications(receiverId, senderId, type, content, creationTime) VALUES(?,?,?,?,?)",
+		NotExistTables: []string{"users", "users"},
+		NotExistFields: []string{"receiverId", "senderId"},
+		NotExistErrors: []string{"receiver does not exist", "sender does not exist"},
+	},
+	"events": {
+		Query:          "INSERT INTO events(creatorId, receiverId, groupId, title, content, creationTime, option) VALUES(?,?,?,?,?,?,?)",
+		NotExistTables: []string{"users", "users", "groups"},
+		NotExistFields: []string{"creatorId", "receiverId", "groupId"},
+		NotExistErrors: []string{"creator does not exist", "receiver does not exist", "group does not exist"},
 	},
 }
 
