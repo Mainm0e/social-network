@@ -137,21 +137,21 @@ var FetchRules = map[string]struct {
 		and an error. The interface is the struct that the data will be scanned into, and the error is
 		the error returned from the rows.Scan() function.
 	*/
-	ScanFields func(rows *sql.Rows) (interface{}, error)
+	ScanFields func(rows *sql.Rows) (any, error)
 }{
 	"users": {
-		SelectFields: "userId, nickName, email, pass, creationTime, age, gender, firstName, lastName, lastLogin",
+		SelectFields: "userId, nickName, firstName, lastName, birthDate, email, password, aboutMe, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var user User
-			err := rows.Scan(&user.UserId, &user.NickName, &user.Email, &user.Pass, &user.CreationTime, &user.Age, &user.Gender, &user.FirstName, &user.LastName, &user.LastLogin)
+			err := rows.Scan(&user.UserId, &user.NickName, &user.FirstName, &user.LastName, &user.BirthDate, &user.Email, &user.Password, &user.AboutMe, &user.CreationTime)
 			return user, err
 		},
 	},
 	"posts": {
-		SelectFields: "postId, userId, topicId, title, content, creationTime",
+		SelectFields: "postId, userId, title, content, creationTime, status, groupId",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var post Post
-			err := rows.Scan(&post.PostId, &post.UserId, &post.TopicId, &post.Title, &post.Content, &post.CreationTime)
+			err := rows.Scan(&post.PostId, &post.UserId, &post.Title, &post.Content, &post.CreationTime, &post.Status, &post.GroupId)
 			return post, err
 		},
 	},
@@ -163,28 +163,60 @@ var FetchRules = map[string]struct {
 			return comment, err
 		},
 	},
-	"reactions": {
-		SelectFields: "reactionId, userId, postId, commentId, reaction",
+	"groups": {
+		SelectFields: "groupId, creatorId, title, description",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
-			var reaction Reaction
-			err := rows.Scan(&reaction.ReactionId, &reaction.UserId, &reaction.PostId, &reaction.CommentId, &reaction.Reaction)
-			return reaction, err
+			var group Group
+			err := rows.Scan(&group.GroupId, &group.CreatorId, &group.Title, &group.Description)
+			return group, err
 		},
 	},
-	"topics": {
-		SelectFields: "topicId, topicName",
+	"follow": {
+		SelectFields: "followerId, followeeId, status",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
-			var topic Topic
-			err := rows.Scan(&topic.TopicId, &topic.TopicName)
-			return topic, err
+			var follow Follow
+			err := rows.Scan(&follow.FollowerId, &follow.FolloweeId, &follow.Status)
+			return follow, err
+		},
+	},
+	"group_member": {
+		SelectFields: "userId, groupId, status",
+		ScanFields: func(rows *sql.Rows) (interface{}, error) {
+			var groupMember GroupMember
+			err := rows.Scan(&groupMember.UserId, &groupMember.GroupId, &groupMember.Status)
+			return groupMember, err
 		},
 	},
 	"messages": {
-		SelectFields: "messageId, senderId, receiverId, content, creationTime",
+		SelectFields: "messageId, senderId, receiverId, messageContent, sendTime, seen",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var message Message
-			err := rows.Scan(&message.MessageId, &message.SenderId, &message.ReceiverId, &message.Content, &message.CreationTime)
+			err := rows.Scan(&message.MessageId, &message.SenderId, &message.ReceiverId, &message.MessageContent, &message.SendTime, &message.Seen)
 			return message, err
+		},
+	},
+	"semiPrivate": {
+		SelectFields: "postId, userId",
+		ScanFields: func(rows *sql.Rows) (interface{}, error) {
+			var semiPrivate SemiPrivate
+			err := rows.Scan(&semiPrivate.PostId, &semiPrivate.UserId)
+			return semiPrivate, err
+		},
+	},
+	"notifications": {
+		SelectFields: "notificationId, receiverId, senderId, type, content, creationTime",
+		ScanFields: func(rows *sql.Rows) (interface{}, error) {
+			var notification Notification
+			err := rows.Scan(&notification.NotificationId, &notification.ReceiverId, &notification.SenderId, &notification.Type, &notification.Content, &notification.CreationTime)
+			return notification, err
+		},
+	},
+	"events": {
+		SelectFields: "eventId, creatorId, receiverId, groupId, title, content, creationTime, option",
+		ScanFields: func(rows *sql.Rows) (interface{}, error) {
+			var event Event
+			err := rows.Scan(&event.EventId, &event.CreatorId, &event.ReceiverId, &event.GroupId, &event.Title, &event.Content, &event.CreationTime, &event.Option)
+			return event, err
 		},
 	},
 }
