@@ -58,11 +58,15 @@ CREATE TABLE comments
 -- follower and followee relationship
 CREATE TABLE follow
 (
+  followId  INTEGER NULL,
   followerId INTEGER NOT NULL,
   followeeId INTEGER NOT NULL,
   -- follower, pending
   status     TEXT    NOT NULL,
+  PRIMARY KEY (followId AUTOINCREMENT),
   FOREIGN KEY (followerId) REFERENCES users (userId)
+  FOREIGN KEY (followeeId) REFERENCES users (userId)
+
 );
 
 -- group-members is an N-to-N relationship, so we use a third table for it
