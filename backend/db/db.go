@@ -1,4 +1,4 @@
-package database
+package db
 
 import (
 	"database/sql"
@@ -8,6 +8,7 @@ import (
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
+	migrate "github.com/rubenv/sql-migrate"
 )
 
 /*
@@ -52,6 +53,26 @@ func initialise(databasePathAndName, sqlFilePathAndName string) error {
 }
 
 /*
+executeMigration is a function used to migrate the database to the latest version.
+It takes in a database connection and applies all the migrations in the
+./backend/db/migrations folder. It returns a non-nil error value if an error is
+encountered in applying the migrations.
+*/
+func executeMigration(DB *sql.DB) error {
+	fmt.Println("migrating...")
+	migrations := &migrate.FileMigrationSource{
+		Dir: "./db/migrations",
+	}
+	fmt.Println("migration:", migrations)
+	n, err := migrate.Exec(DB, "sqlite3", migrations, migrate.Up)
+	if err != nil {
+		return errors.New("error applying migrations: " + err.Error())
+	}
+	fmt.Println("applied migrations!\n", n)
+	return nil
+}
+
+/*
 openConnection is a helper function that opens a connection to the specified database.
 It takes the database name as a string and returns an error value, which is non-nil
 in the event that an error is encountered in opening the connection.
@@ -61,7 +82,7 @@ func openConnection(dataSourceName string) error {
 	// Connect global database variable to specified database
 	DB, err = sql.Open("sqlite3", dataSourceName)
 	if err != nil {
-		log.Printf("Error while opening database: %v", err)
+		log.Printf("error while opening database: %v", err)
 		return err
 	}
 	// Set max open connections to 1, although this may be redundant as the database
@@ -91,29 +112,36 @@ func openConnection(dataSourceName string) error {
 }
 
 /*
-Check is a global function that checks if the database file exists and if not, initialises it.
-It does this by calling the local initialise function. If an error is encountered in the process,
-it is logged and the program exits. It then calls the local openConnection function to open a
-connection to the database. If an error is encountered in the process, it is logged and the
-program exits. It takes the database file path and name and the sql database creation file path
-and name as strings.
+Check is a global function that takes a database file path and name and the sql
+database creation file path and name as string inputs. It first checks if the database
+file exists and if not, initialises it by calling the local initialise function. It
+then calls the local openConnection function to open a connection to the database and
+finally calls the local executeMigration function to migrate the database to the latest
+version. It returns a non-nil error value if an error is encountered in any of these
+steps.
 */
-func Check(dbFile, sqlFile string) {
+func Check(dbFile, sqlFile string) error {
 	_, err := os.Stat(dbFile)
 	if os.IsNotExist(err) {
 		// Initialise database if specified input does not already exist
 		fmt.Print(Colour.Yellow + "\ndatabase not found, initialising...\n\n" + Colour.Reset)
 		err = initialise(dbFile, sqlFile)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 	}
 
 	// Initialize the database connection, which is used throughout the application's lifetime
 	err = openConnection(dbFile)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	err = executeMigration(DB)
+	if err != nil {
+		return (errors.New("error migrating database: " + err.Error()))
+	}
+	return nil
 }
 
 /*
@@ -123,7 +151,7 @@ and returns the resulting id and an error value, which is non-nil in the event t
 an error is encountered in executing the query. It is called by the global
 InsertData() function.
 */
-func executeInsertionQuery(query string, args ...interface{}) (int64, error) {
+func executeInsertionQuery(query string, args ...any) (int64, error) {
 	// Prepare statement for inserting data
 	statement, err := DB.Prepare(query)
 	if err != nil {
@@ -152,7 +180,7 @@ table name, column name and value as strings, and returns an error value, which 
 non-nil in the event that the data already exists in the table. It is called by the
 global InsertData() function.
 */
-func CheckDataDoesNotExist(table, column string, value interface{}) error {
+func CheckDataDoesNotExist(table, column string, value any) error {
 	query := fmt.Sprintf("SELECT COUNT(1) FROM %s WHERE %s = ?", table, column)
 
 	// QueryRow executes a query that is expected to return at most one row.
@@ -199,7 +227,7 @@ Please note:
 
 the corresponding table schema.
 */
-func InsertData(tableName string, args ...interface{}) (int64, error) {
+func InsertData(tableName string, args ...any) (int64, error) {
 	rule, ok := InsertRules[tableName]
 	if !ok {
 		return -1, fmt.Errorf("unknown table name: %s", tableName)
@@ -235,7 +263,7 @@ the table does not exist, or if the keyValue does not exist). If no rows are
 affected by the DELETE operation, it returns an "item not found" error. If the
 operation is successful, it returns nil.
 */
-func DeleteData(tableName string, keyValue interface{}) error {
+func DeleteData(tableName string, keyValue any) error {
 	// Table validity check
 	key, ok := TableKeys[tableName]
 	if !ok {
@@ -282,7 +310,7 @@ with the values from the arguments. The last argument should always be the prima
 key of the row to be updated. The function returns an error value, which is non-nil
 if an error was encountered during the update process.
 */
-func UpdateData(tableName string, args ...interface{}) error {
+func UpdateData(tableName string, args ...any) error {
 	myQuery, ok := UpdateRules[tableName]
 	if !ok {
 		return fmt.Errorf("unknown table name: %s", tableName)
@@ -336,7 +364,7 @@ Note: This function does not sanitize inputs. Always ensure that input is saniti
 to prevent SQL injection attacks. Additionally, this function does not handle
 potential database errors like unavailability, so use it with proper error handling.
 */
-func FetchData(table string, condition string, args ...interface{}) ([]interface{}, error) {
+func FetchData(table string, condition string, args ...any) (any, error) {
 	// Check if the table exists in the FetchRules struct (databse_variables.go)
 	if _, ok := FetchRules[table]; !ok {
 		return nil, fmt.Errorf("unknown table: %s", table)
@@ -353,7 +381,7 @@ func FetchData(table string, condition string, args ...interface{}) ([]interface
 	defer rows.Close()
 
 	// Fetch rows
-	result := make([]interface{}, 0)
+	result := make([]any, 0)
 	for rows.Next() {
 		item, err := FetchRules[table].ScanFields(rows)
 		if err != nil {
@@ -370,18 +398,4 @@ func FetchData(table string, condition string, args ...interface{}) ([]interface
 	return result, nil
 }
 
-/*
-selectData is a helper function that executes a query and returns the resulting rows.
-It takes a query string and an optional variadic number of arguments, and returns
-the resulting rows and an error value, which is non-nil in the event that an error
-is encountered in executing the query.
-*/
-func selectData(myQuery string, args ...interface{}) (*sql.Rows, error) {
-	// Interfaces instead of "any" is used in golang to allow for any type
-	rows, err := DB.Query(myQuery, args...)
-	if err != nil {
-		log.Printf("Error while executing query: %v", err)
-		return nil, err
-	}
-	return rows, nil
-}
+// DEPRECATED CODE BELOW
