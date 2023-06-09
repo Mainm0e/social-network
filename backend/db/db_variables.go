@@ -19,10 +19,10 @@ Global database insertion rules for ease of maintenance, and simplifying of the 
 */
 var InsertRules = map[string]InsertRule{
 	"users": {
-		Query:      "INSERT INTO users(nickName, firstName, lastName, birthDate, email, password, privacy, creationTime) VALUES(?,?,?,?,?,?,?)",
+		Query:      "INSERT INTO users(nickName, firstName, lastName, birthDate, email, password, privacy, creationTime) VALUES(?,?,?,?,?,?,?,?)",
 		ExistTable: "users",
-		ExistField: "nickName",
-		ExistError: "nickname already exists",
+		ExistField: "email",
+		ExistError: "email already exists",
 	},
 	"posts": {
 		Query:          "INSERT INTO posts(userId, title, content, creationTime, status, groupId) VALUES(?,?,?,?,?,?)",

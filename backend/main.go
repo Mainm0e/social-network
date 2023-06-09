@@ -6,10 +6,8 @@ import (
 )
 
 func main() {
-	err := db.Check("./backend/database/database.db", "./backend/database/test.sql")
+	err := db.Check("./db/database.db", "./backend/database/test.sql")
 	if err != nil {
 		panic(errors.New("Error starting database: " + err.Error()))
 	}
 }
-
-//test main push
