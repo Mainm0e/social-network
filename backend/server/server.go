@@ -78,9 +78,28 @@ func setupHTTP(mux *http.ServeMux, serverCh chan<- *http.Server) {
 	// Send the server instance through the channel
 	serverCh <- srv
 
-	// Start the HTTP server with ListenAndServe (this will block)
+	// Start the HTTP server with ListenAndServe (blocking)
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 		log.Printf("ListenAndServe() error: %s", err)
+	}
+}
+
+func setupHTTPS(mux *http.ServeMux, serverCh chan<- *http.Server) {
+	// Create a new http.Server with properties
+	srv := &http.Server{
+		Addr:         HTTPS_PORT,
+		Handler:      mux,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		// IdleTimeout:  15 * time.Second,
+	}
+
+	// Send the server instance through the channel
+	serverCh <- srv
+
+	// Start the HTTPS server with ListenAndServeTLS (blocking)
+	if err := srv.ListenAndServeTLS(TLS_CERT_PATH, TLS_KEY_PATH); err != http.ErrServerClosed {
+		log.Printf("ListenAndServeTLS() error: %s", err)
 	}
 }
 
