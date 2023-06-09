@@ -1,2 +1,2 @@
 -- +migrate Up
-ALTER TABLE users ADD COLUMN private TEXT NOT NULL DEFAULT 'private' ;
+ALTER TABLE users ADD COLUMN privacy TEXT NOT NULL DEFAULT 'privacy' ;
