@@ -15,7 +15,7 @@ const (
 	TLS_CERT_PATH = "" // TODO
 	// The path to the TLS key
 	TLS_KEY_PATH = "" // TODO
-	// Pacth to log files
+	// Path to log files
 	LOG_PATH = "./backend/logs/"
 )
 
