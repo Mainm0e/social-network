@@ -35,3 +35,29 @@ func initiateLogging() {
 	// Set the output of the log package to the log file
 	log.SetOutput(logFile)
 }
+
+func initialiseRoutes() {
+	// TODO
+}
+
+func setupHTTP() {
+	// TODO
+}
+
+func setupHTTPS() {
+	// TODO
+}
+
+/*
+StartServer starts a server instance on a port number using the input protocol specified.
+The server package includes predefined constants for the HTTP and HTTPS ports, as well as
+the TLS certificate and key paths. The server will initialise a websocket manager, register
+websocket event handlers, and start the manager in a separate goroutine, whilst also registering
+handlers for the HTTP/S routes. Finally the server will start listening for requests on the
+specified port, with routes defined by the initiateRoutes() helper function.
+*/
+func StartServer(protocol string) {
+	if protocol != "http" && protocol != "https" {
+		log.Fatalf("Invalid protocol specified: %v", protocol)
+	}
+}
