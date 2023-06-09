@@ -1,6 +1,6 @@
 package handlers
 
-type login struct {
+type LoginData struct {
 	email    string
 	password string
 }
