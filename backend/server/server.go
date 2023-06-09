@@ -2,24 +2,29 @@ package server
 
 import (
 	"backend/db"
+	"context"
 	"errors"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
 const (
 	// The HTTP port that the server will listen on
-	HTTP_PORT = ":8080"
+	HTTP_PORT = "localhost:8080" // TODO: change for external hosting
 	// The HTTPS port that the server will listen on
-	HTTPS_PORT = ":8443"
+	HTTPS_PORT = "localhost:8443" // TODO: change for external hosting
 	// The path to the TLS certificate
 	TLS_CERT_PATH = "" // TODO
 	// The path to the TLS key
 	TLS_KEY_PATH = "" // TODO
 	// Path to log files
 	LOG_PATH = "./backend/logs/"
+	// Server shutdown timeout
+	SHUTDOWN_TIMEOUT = 5 * time.Second
 )
 
 /*
@@ -51,7 +56,7 @@ func initialiseRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// Register handler functions for various routes
-	// TODO: fix "handlers" package
+	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
 	mux.HandleFunc("/login", handlers.Login)
 	mux.HandleFunc("/register", handlers.Register)
 	mux.HandleFunc("/main", handlers.Main)
@@ -60,14 +65,23 @@ func initialiseRoutes() *http.ServeMux {
 	return mux
 }
 
-func setupHTTP() error {
-	// TODO
-	return nil
-}
+func setupHTTP(mux *http.ServeMux, serverCh chan<- *http.Server) {
+	// Create a new http.Server with properties
+	srv := &http.Server{
+		Addr:         HTTP_PORT,
+		Handler:      mux,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		// IdleTimeout:  15 * time.Second,
+	}
 
-func setupHTTPS() error {
-	// TODO
-	return nil
+	// Send the server instance through the channel
+	serverCh <- srv
+
+	// Start the HTTP server with ListenAndServe (this will block)
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		log.Printf("ListenAndServe() error: %s", err)
+	}
 }
 
 /*
@@ -97,20 +111,41 @@ func StartServer(protocol string) error {
 		return errors.New("StartServer() error: " + err.Error())
 	}
 
-	// If HTTP is specified, setup HTTP server
+	// Setup channel to receive the server instance, enabling graceful shutdown
+	serverCh := make(chan *http.Server)
+
+	// TODO: initialise websocket manager and associated event handlers
+
+	// Initialise routes
+	mux := initialiseRoutes()
+
+	// If HTTP is specified, setup HTTP server in a goroutine
 	if protocol == "http" {
-		err = setupHTTP()
-		if err != nil {
-			return errors.New("StartServer() error: " + err.Error())
-		}
+		go setupHTTP(mux, serverCh)
 	}
+
 	// If HTTPS is specified, setup HTTPS server
-	if protocol == "https" {
-		err = setupHTTPS()
-		if err != nil {
-			return errors.New("StartServer() error: " + err.Error())
-		}
+
+	// Receive the server instance from the channel (corresponding to code in setupHTTP() and setupHTTPS())
+	srv := <-serverCh
+
+	// Setup graceful shutdown
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+
+	// Reading from the stop channel, meaning it is blocking until a signal is received
+	<-stop
+
+	// Create a context to allow graceful shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), SHUTDOWN_TIMEOUT)
+	defer cancel()
+
+	// Perform the graceful shutdown
+	if err := srv.Shutdown(ctx); err != nil {
+		return errors.New("Graceful shutdown of server failed: " + err.Error())
 	}
+
+	log.Print("Server exited properly")
 
 	return nil
 }
