@@ -4,6 +4,7 @@ import (
 	"backend/db"
 	"errors"
 	"log"
+	"net/http"
 	"os"
 	"time"
 )
@@ -40,16 +41,33 @@ func initiateLogging() error {
 	return nil
 }
 
-func initialiseRoutes() error {
-	// TODO
+/*
+initialiseRoutes creates a new ServeMux and registers handler functions for various routes.
+The ServeMux is returned and used by the StartServer() function to register the handler
+functions for the HTTP/S routes.
+*/
+func initialiseRoutes() *http.ServeMux {
+	// Create a new ServeMux
+	mux := http.NewServeMux()
+
+	// Register handler functions for various routes
+	// TODO: fix "handlers" package
+	mux.HandleFunc("/login", handlers.Login)
+	mux.HandleFunc("/register", handlers.Register)
+	mux.HandleFunc("/main", handlers.Main)
+
+	// Return the mux
+	return mux
 }
 
 func setupHTTP() error {
 	// TODO
+	return nil
 }
 
 func setupHTTPS() error {
 	// TODO
+	return nil
 }
 
 /*
