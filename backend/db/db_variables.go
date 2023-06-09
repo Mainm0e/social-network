@@ -143,7 +143,7 @@ var FetchRules = map[string]struct {
 		SelectFields: "userId, nickName, firstName, lastName, birthDate, email, password, aboutMe, privacy, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var user User
-			err := rows.Scan(&user.UserId, &user.NickName, &user.FirstName, &user.LastName, &user.BirthDate, &user.Email, &user.Password, &user.AboutMe, &user.CreationTime)
+			err := rows.Scan(&user.UserId, &user.NickName, &user.FirstName, &user.LastName, &user.BirthDate, &user.Email, &user.Password, &user.AboutMe, &user.Privacy, &user.CreationTime)
 			return user, err
 		},
 	},
