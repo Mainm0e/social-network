@@ -65,6 +65,12 @@ func initialiseRoutes() *http.ServeMux {
 	return mux
 }
 
+/*
+setupHTTP creates a new http.Server instance with the specified properties, and starts
+the server with ListenAndServe. The server instance is sent through the serverCh channel
+to be used by the StartServer() function. If an error occurs, it is logged. The function
+is blocking and will run until the server is closed.
+*/
 func setupHTTP(mux *http.ServeMux, serverCh chan<- *http.Server) {
 	// Create a new http.Server with properties
 	srv := &http.Server{
@@ -84,6 +90,12 @@ func setupHTTP(mux *http.ServeMux, serverCh chan<- *http.Server) {
 	}
 }
 
+/*
+setupHTTPS creates a new HTTPS http.Server instance with the specified properties, and starts
+the server with ListenAndServeTLS. The server instance is sent through the serverCh channel
+to be used by the StartServer() function. If an error occurs, it is logged. The function is
+blocking and will run until the server is closed.
+*/
 func setupHTTPS(mux *http.ServeMux, serverCh chan<- *http.Server) {
 	// Create a new http.Server with properties
 	srv := &http.Server{
