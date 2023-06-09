@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Info1 from "./Info1/info1";
 import Info2 from "./Info2/info2";
+import Info3 from "./Info3/info3";
 import "./RegisterPage.css";
 import WelcomeBox from "../Common/WelcomeBox/WelcomeBox";
 import AlertBox from "../Common/AlertBox/AlertBox";
@@ -16,10 +17,12 @@ function RegisterPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [birthdate, setBirthdate] = useState("");
-  const [avatar, setAvatar] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [aboutme, setAboutme] = useState("");
+  const [avatar, setAvatar] = useState(null);
 
   // handleOptionChange function
   // This function is used to change the form state
@@ -42,6 +45,10 @@ function RegisterPage() {
       setPassword(values.password);
       setConfirmPassword(values.confirmPassword);
       setAvatar(values.avatar);
+    } else if (values.type === "info3") {
+      setNickname(values.nickname);
+      setAboutme(values.aboutme);
+      setAvatar(values.avatar);
     }
   };
 
@@ -57,15 +64,17 @@ function RegisterPage() {
     lastName,
     email,
     birthdate,
-    avatar,
     username,
     matchPassword,
+    nickname,
+    aboutme,
+    avatar,
   };
 
   // register function
   // this function is main function of the register page
   const register = () => {
-    console.log(selectedOption);
+    console.log(data);
     const response = checkData(data);
     setAlertTitle(response.title);
     setAlertMessage(response.message);
@@ -122,6 +131,11 @@ function RegisterPage() {
           onChange={handleInfoChange}
           registerStatus={registerStatus}
         />{" "}
+        <Info3
+          selectedOption={selectedOption}
+          onChange={handleInfoChange}
+          registerStatus={registerStatus}
+        />{" "}
         <div className="select-container">
           <input
             type="radio"
@@ -133,6 +147,12 @@ function RegisterPage() {
             type="radio"
             value="info2"
             checked={selectedOption === "info2"}
+            onChange={handleOptionChange}
+          />{" "}
+          <input
+            type="radio"
+            value="info3"
+            checked={selectedOption === "info3"}
             onChange={handleOptionChange}
           />{" "}
         </div>{" "}
