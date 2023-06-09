@@ -42,9 +42,9 @@ func initialiseRoutes() *http.ServeMux {
 
 	// Register handler functions for various routes
 	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
-	mux.HandleFunc("/login", handlers.Login)
-	mux.HandleFunc("/register", handlers.Register)
-	mux.HandleFunc("/main", handlers.Main)
+	mux.HandleFunc("/login", handlers.LoginPage)
+	mux.HandleFunc("/register", handlers.RegisterPage)
+	mux.HandleFunc("/main", handlers.MainPage)
 
 	// Return the mux
 	return mux
