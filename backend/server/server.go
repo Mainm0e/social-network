@@ -12,21 +12,6 @@ import (
 	"time"
 )
 
-const (
-	// The HTTP port that the server will listen on
-	HTTP_PORT = "localhost:8080" // TODO: change for external hosting
-	// The HTTPS port that the server will listen on
-	HTTPS_PORT = "localhost:8443" // TODO: change for external hosting
-	// The path to the TLS certificate
-	TLS_CERT_PATH = "" // TODO
-	// The path to the TLS key
-	TLS_KEY_PATH = "" // TODO
-	// Path to log files
-	LOG_PATH = "./backend/logs/"
-	// Server shutdown timeout
-	SHUTDOWN_TIMEOUT = 5 * time.Second
-)
-
 /*
 initiateLogging creates a log file with each instance of server startup, and sets
 the output of the log package to the log file. All log messages will be written to
@@ -120,8 +105,10 @@ StartServer starts a server instance on a port number using the input protocol s
 The server package includes predefined constants for the HTTP and HTTPS ports, as well as
 the TLS certificate and key paths. The server will initialise a websocket manager, register
 websocket event handlers, and start the manager in a separate goroutine, whilst also registering
-handlers for the HTTP/S routes. Finally the server will start listening for requests on the
-specified port, with routes defined by the initiateRoutes() helper function.
+handlers for the HTTP/S routes. Finally the server will start a relevant HTTP/S server instance
+in a separate goroutine, and wait for a signal to shutdown the server. The server will then
+gracefully shutdown and close all connections. The function returns an error, which is non-nil
+if an error occurs at any point during the server setup.
 */
 func StartServer(protocol string) error {
 	// Initiate logging
@@ -155,7 +142,10 @@ func StartServer(protocol string) error {
 		go setupHTTP(mux, serverCh)
 	}
 
-	// If HTTPS is specified, setup HTTPS server
+	// If HTTPS is specified, setup HTTPS server in a goroutine
+	if protocol == "https" {
+		go setupHTTPS(mux, serverCh)
+	}
 
 	// Receive the server instance from the channel (corresponding to code in setupHTTP() and setupHTTPS())
 	srv := <-serverCh
