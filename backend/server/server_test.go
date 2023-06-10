@@ -2,10 +2,15 @@ package server
 
 import (
 	"bufio"
+	"context"
+	"crypto/tls"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestInitiateLogging(t *testing.T) {
@@ -63,4 +68,120 @@ func TestInitiateLogging(t *testing.T) {
 	if !strings.Contains(logFileContent, logMessage) {
 		t.Fatal("Log message not written to log file")
 	}
+}
+
+func TestSetupHTTP(t *testing.T) {
+	// Subtest for server setup
+	t.Run("Server Setup", func(t *testing.T) {
+		// Specify the address the server should listen on
+		testPort := "localhost:8081"
+
+		// Create a new ServeMux
+		mux := http.NewServeMux()
+
+		// Register a test handler function
+		mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("Test Passed"))
+		})
+
+		// Channel to receive server instance
+		serverCh := make(chan *http.Server, 1)
+
+		// Start setupHTTP in a separate goroutine
+		go setupHTTP(mux, serverCh, testPort)
+
+		// Give the server time to start
+		time.Sleep(1 * time.Second)
+
+		// Subtest for making GET request
+		t.Run("GET Request", func(t *testing.T) {
+			// Making an HTTP GET request to the test endpoint
+			response, err := http.Get("http://localhost:8081/test")
+			if err != nil {
+				t.Fatalf("Error making GET request: %v", err)
+			}
+			defer response.Body.Close()
+
+			// Reading the response body
+			body, err := io.ReadAll(response.Body)
+			if err != nil {
+				t.Fatalf("Error reading response body: %v", err)
+			}
+
+			// Check if the response body matches the expected response
+			if string(body) != "Test Passed" {
+				t.Fatalf("Expected 'Test Passed', got '%s'", string(body))
+			}
+		})
+
+		// Subtest for server shutdown
+		t.Run("Server Shutdown", func(t *testing.T) {
+			// Clean up - Shutdown the server
+			srv := <-serverCh
+			if err := srv.Shutdown(context.TODO()); err != nil {
+				t.Fatalf("Error shutting down server: %v", err)
+			}
+		})
+	})
+}
+
+func TestSetupHTTPS(t *testing.T) {
+	// Subtest for server setup
+	t.Run("Server Setup", func(t *testing.T) {
+		// Specify the address the server should listen on
+		testPort := "localhost:8444"
+
+		// Create a new ServeMux
+		mux := http.NewServeMux()
+
+		// Register a test handler function
+		mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("Test Passed"))
+		})
+
+		// Channel to receive server instance
+		serverCh := make(chan *http.Server, 1)
+
+		// Start setupHTTPS in a separate goroutine
+		go setupHTTPS(mux, serverCh, testPort)
+
+		// Give the server time to start
+		time.Sleep(1 * time.Second)
+
+		// Subtest for making GET request
+		t.Run("GET Request", func(t *testing.T) {
+			// Specify to skip verification of certificates (because we're using a self-signed cert)
+			tr := &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			}
+			client := &http.Client{Transport: tr}
+
+			// Making an HTTPS GET request to the test endpoint
+			response, err := client.Get("https://localhost:8444/test")
+			if err != nil {
+				t.Fatalf("Error making GET request: %v", err)
+			}
+			defer response.Body.Close()
+
+			// Reading the response body
+			body, err := io.ReadAll(response.Body)
+			if err != nil {
+				t.Fatalf("Error reading response body: %v", err)
+			}
+
+			// Check if the response body matches the expected response
+			if string(body) != "Test Passed" {
+				t.Fatalf("Expected 'Test Passed', got '%s'", string(body))
+			}
+		})
+
+		// Subtest for server shutdown
+		t.Run("Server Shutdown", func(t *testing.T) {
+			// Clean up - Shutdown the server
+			srv := <-serverCh
+			if err := srv.Shutdown(context.TODO()); err != nil {
+				t.Fatalf("Error shutting down server: %v", err)
+			}
+		})
+	})
 }
