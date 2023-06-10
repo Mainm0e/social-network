@@ -9,7 +9,7 @@ import (
 func main() {
 	err := server.AaaawwwwwSheeeetttttItsAboutToGoDown("http")
 	if err != nil {
-		fmt.Printf("Error: %s", err) // Keep this line for during development, for debugging using terminal
+		fmt.Printf("Error: %s", err) // Keep this line during development, for debugging using terminal
 		log.Printf("Error: %s", err)
 	}
 }
