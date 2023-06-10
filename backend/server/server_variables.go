@@ -12,7 +12,7 @@ const (
 	// The path to the TLS key
 	TLS_KEY_PATH = "" // TODO
 	// Path to log files
-	LOG_PATH = "./backend/logs/"
+	LOG_PATH = "./logs/"
 	// Server shutdown timeout
 	SHUTDOWN_TIMEOUT = 5 * time.Second
 )
