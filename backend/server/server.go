@@ -18,6 +18,14 @@ the output of the log package to the log file. All log messages will be written 
 the log file which allows for easier debugging and a less cluttered terminal.
 */
 func initiateLogging(logPath string) error {
+	// Check if the log directory exists
+	if _, err := os.Stat(logPath); os.IsNotExist(err) {
+		// If it doesn't exist, create it
+		if err := os.Mkdir(logPath, 0755); err != nil {
+			return errors.New("Error creating log directory: " + err.Error())
+		}
+	}
+
 	// Create a logfile with the name "log_YYYMMDD_HHMMSS.log" in the :/backend/logs directory
 	logFile, err := os.OpenFile(logPath+"log_"+time.Now().Format("20060102_150405")+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
