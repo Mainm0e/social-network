@@ -101,16 +101,23 @@ func setupHTTPS(mux *http.ServeMux, serverCh chan<- *http.Server) {
 }
 
 /*
-StartServer starts a server instance on a port number using the input protocol specified.
-The server package includes predefined constants for the HTTP and HTTPS ports, as well as
-the TLS certificate and key paths. The server will initialise a websocket manager, register
-websocket event handlers, and start the manager in a separate goroutine, whilst also registering
-handlers for the HTTP/S routes. Finally the server will start a relevant HTTP/S server instance
-in a separate goroutine, and wait for a signal to shutdown the server. The server will then
-gracefully shutdown and close all connections. The function returns an error, which is non-nil
-if an error occurs at any point during the server setup.
+AaaawwwwwSheeeetttttItsAboutToGoDown is the the function to end all functions, a work of
+pure alchemical wizardry. Using 3 pieces of Adi's hair, two spoonfuls of Steve's toejam, a small
+piece of Maryams rubber lizard, seventeen of Rick's tears and the inner lining of Salam's bike
+tyre, this function mixes it all in a cauldron of nightmares, and turns iron into gold, success
+into calamity, and robs all who read its code of at least 3 years of their life. Use with caution.
 */
-func StartServer(protocol string) error {
+func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string) error {
+	/* 	OLD DESCRIPTION
+	StartServer starts a server instance on a port number using the input protocol specified.
+	The server package includes predefined constants for the HTTP and HTTPS ports, as well as
+	the TLS certificate and key paths. The server will initialise a websocket manager, register
+	websocket event handlers, and start the manager in a separate goroutine, whilst also registering
+	handlers for the HTTP/S routes. Finally the server will start a relevant HTTP/S server instance
+	in a separate goroutine, and wait for a signal to shutdown the server. The server will then
+	gracefully shutdown and close all connections. The function returns an error, which is non-nil
+	if an error occurs at any point during the server setup.
+	*/
 	// Initiate logging
 	err := initiateLogging()
 	if err != nil {
