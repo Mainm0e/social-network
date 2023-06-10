@@ -4,6 +4,7 @@ import (
 	"backend/db"
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -139,7 +140,7 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	// Check / migrate database
 	// TEMP: use first migration file as initial schema for now
-	err = db.Check("./backend/db/database.db", "./backend/db/migrations/01_initial_schema.sql")
+	err = db.Check("./db/database.db", "./db/migrations/01_initial_schema.sql")
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
 	}
@@ -181,6 +182,7 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 		return errors.New("Graceful shutdown of server failed: " + err.Error())
 	}
 
+	fmt.Println("\nServer shutdown gracefully... like a rabid five-winged swan!") // Keep this during development, for debugging via terminal
 	log.Print("Server exited properly")
 
 	return nil
