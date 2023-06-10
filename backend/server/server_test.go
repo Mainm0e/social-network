@@ -2,7 +2,6 @@ package server
 
 import (
 	"bufio"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -10,14 +9,22 @@ import (
 )
 
 func TestInitiateLogging(t *testing.T) {
+	// Make sure the directory exists
+	if _, err := os.Stat(TEST_LOG_PATH); os.IsNotExist(err) {
+		err = os.MkdirAll(TEST_LOG_PATH, 0755)
+		if err != nil {
+			t.Fatalf("Failed to create log directory: %v", err)
+		}
+	}
+
 	// Call the initiateLogging function
-	err := initiateLogging()
+	err := initiateLogging(TEST_LOG_PATH)
 	if err != nil {
 		t.Fatalf("initiateLogging() failed: %v", err)
 	}
 
 	// List all files in the LOG_PATH directory
-	files, err := ioutil.ReadDir(LOG_PATH)
+	files, err := os.ReadDir(TEST_LOG_PATH)
 	if err != nil {
 		t.Fatalf("Error reading log directory: %v", err)
 	}
@@ -26,7 +33,7 @@ func TestInitiateLogging(t *testing.T) {
 	var logFilePath string
 	for _, file := range files {
 		if strings.HasPrefix(file.Name(), "log_") {
-			logFilePath = LOG_PATH + file.Name()
+			logFilePath = TEST_LOG_PATH + file.Name()
 			break
 		}
 	}

@@ -17,9 +17,9 @@ initiateLogging creates a log file with each instance of server startup, and set
 the output of the log package to the log file. All log messages will be written to
 the log file which allows for easier debugging and a less cluttered terminal.
 */
-func initiateLogging() error {
+func initiateLogging(logPath string) error {
 	// Create a logfile with the name "log_YYYMMDD_HHMMSS.log" in the :/backend/logs directory
-	logFile, err := os.OpenFile(LOG_PATH+"log_"+time.Now().Format("20060102_150405")+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile(logPath+"log_"+time.Now().Format("20060102_150405")+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return errors.New("Error opening log file: " + err.Error())
 	}
@@ -42,9 +42,9 @@ func initialiseRoutes() *http.ServeMux {
 
 	// Register handler functions for various routes
 	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
-	mux.HandleFunc("/login", handlers.LoginPage)
-	mux.HandleFunc("/register", handlers.RegisterPage)
-	mux.HandleFunc("/main", handlers.MainPage)
+	// mux.HandleFunc("/login", handlers.LoginPage)
+	// mux.HandleFunc("/register", handlers.RegisterPage)
+	// mux.HandleFunc("/main", handlers.MainPage)
 
 	// Return the mux
 	return mux
@@ -107,7 +107,7 @@ piece of Maryams rubber lizard, seventeen of Rick's tears and the inner lining o
 tyre, this function mixes it all in a cauldron of nightmares, and turns iron into gold, success
 into calamity, and robs all who read its code of at least 3 years of their life. Use with caution.
 */
-func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string) error {
+func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error {
 	/* 	OLD DESCRIPTION
 	StartServer starts a server instance on a port number using the input protocol specified.
 	The server package includes predefined constants for the HTTP and HTTPS ports, as well as
@@ -119,7 +119,7 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string) error {
 	if an error occurs at any point during the server setup.
 	*/
 	// Initiate logging
-	err := initiateLogging()
+	err := initiateLogging(logPath)
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
 	}

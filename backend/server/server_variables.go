@@ -11,8 +11,10 @@ const (
 	TLS_CERT_PATH = "" // TODO
 	// The path to the TLS key
 	TLS_KEY_PATH = "" // TODO
-	// Path to log files
+	// Path to log files (from root directory)
 	LOG_PATH = "./logs/"
+	// Path to test log files (from server subdirectory)
+	TEST_LOG_PATH = "./_test_logs/"
 	// Server shutdown timeout
 	SHUTDOWN_TIMEOUT = 5 * time.Second
 )
