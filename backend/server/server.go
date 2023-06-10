@@ -56,10 +56,10 @@ the server with ListenAndServe. The server instance is sent through the serverCh
 to be used by the StartServer() function. If an error occurs, it is logged. The function
 is blocking and will run until the server is closed.
 */
-func setupHTTP(mux *http.ServeMux, serverCh chan<- *http.Server) {
+func setupHTTP(mux *http.ServeMux, serverCh chan<- *http.Server, portAddress string) {
 	// Create a new http.Server with properties
 	srv := &http.Server{
-		Addr:         HTTP_PORT,
+		Addr:         portAddress,
 		Handler:      mux,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -81,10 +81,10 @@ the server with ListenAndServeTLS. The server instance is sent through the serve
 to be used by the StartServer() function. If an error occurs, it is logged. The function is
 blocking and will run until the server is closed.
 */
-func setupHTTPS(mux *http.ServeMux, serverCh chan<- *http.Server) {
+func setupHTTPS(mux *http.ServeMux, serverCh chan<- *http.Server, portAddress string) {
 	// Create a new http.Server with properties
 	srv := &http.Server{
-		Addr:         HTTPS_PORT,
+		Addr:         portAddress,
 		Handler:      mux,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -146,12 +146,12 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	// If HTTP is specified, setup HTTP server in a goroutine
 	if protocol == "http" {
-		go setupHTTP(mux, serverCh)
+		go setupHTTP(mux, serverCh, HTTP_PORT)
 	}
 
 	// If HTTPS is specified, setup HTTPS server in a goroutine
 	if protocol == "https" {
-		go setupHTTPS(mux, serverCh)
+		go setupHTTPS(mux, serverCh, HTTPS_PORT)
 	}
 
 	// Receive the server instance from the channel (corresponding to code in setupHTTP() and setupHTTPS())
