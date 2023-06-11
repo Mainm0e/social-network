@@ -52,7 +52,6 @@ func register(data []byte) (bool, error) {
 	if err != nil {
 		return false, errors.New("Error unmarshalling data" + err.Error())
 	}
-
 	// Fetch user data from the database based on the provided email.
 	user, err := db.FetchData("users", "email", register.Email)
 	if err != nil {
@@ -62,7 +61,7 @@ func register(data []byte) (bool, error) {
 	// Check if a user with the specified email already exists.
 	if len(user) == 0 {
 		// Insert the new user data into the database.
-		_, err := db.InsertData("users", register.NickName, register.FirstName, register.LastName, register.BirthDate, register.Email, register.Password, register.Privacy, register.CreationTime)
+		_, err := db.InsertData("users", register.NickName, register.FirstName, register.LastName, register.BirthDate, register.Email, register.Password, register.AboutMe, register.Avatar, register.Privacy, register.CreationTime)
 		if err != nil {
 			return false, errors.New("Error inserting user" + err.Error())
 		}

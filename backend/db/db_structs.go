@@ -5,19 +5,18 @@ import (
 )
 
 type User struct {
-	UserId       int            `json:"userId"`
-	NickName     sql.NullString `json:"nickName"`
-	FirstName    string         `json:"firstName"`
-	LastName     string         `json:"lastName"`
-	BirthDate    string         `json:"birthDate"`
-	Email        string         `json:"email"`
-	Password     string         `json:"password"`
-	AboutMe      sql.NullString `json:"aboutMe"`
-	Avatar       string         `json:"avatar"`
-	Privacy      string         `json:"privacy"`
-	CreationTime string         `json:"creationTime"`
+	UserId       int             `json:"userId"`             // auto increment
+	NickName     *sql.NullString `json:"nickName,omitempty"` // optional
+	FirstName    string          `json:"firstName"`
+	LastName     string          `json:"lastName"`
+	BirthDate    string          `json:"birthDate"`
+	Email        string          `json:"email"`
+	Password     string          `json:"password"`
+	AboutMe      *sql.NullString `json:"aboutMe,omitempty"` // optional
+	Avatar       *string         `json:"avatar,omitempty"`  // optional
+	Privacy      string          `json:"privacy"`           // default: public
+	CreationTime string          `json:"creationTime"`
 }
-
 type Post struct {
 	PostId       int    `json:"postId"`
 	UserId       int    `json:"userId"`
