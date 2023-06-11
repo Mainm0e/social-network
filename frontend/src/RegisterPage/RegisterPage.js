@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from 'axios';
 import Info1 from "./Info1/info1";
 import Info2 from "./Info2/info2";
 import Info3 from "./Info3/info3";
@@ -6,6 +7,7 @@ import "./RegisterPage.css";
 import WelcomeBox from "../Common/WelcomeBox/WelcomeBox";
 import AlertBox from "../Common/AlertBox/AlertBox";
 import { checkData } from "./checkdata";
+
 
 // RegisterPage component
 // Props: none
@@ -87,10 +89,7 @@ function RegisterPage() {
     }
 
     if (username !== "" && password !== "" && firstName !== "" && lastName !== "" && email !== "" && birthdate !== "" && avatar !== ""){
-                  const axios = require("axios");
     const FormData = require("form-data");
-    const fs = require("fs");
-
     const formData = new FormData();
     formData.append("firstName", firstName);
     formData.append("lastName", lastName);
@@ -100,11 +99,11 @@ function RegisterPage() {
     formData.append("password", password);
     formData.append("nickname", nickname);
     formData.append("aboutme", aboutme);
-    formData.append("avatar", avatar, "avatar.jpg");
+    formData.append("avatar", avatar);
 
-    
-    // Make a POST request to the Golang endpoint
-    axios.post('http://localhost:8080/upload', formData, {
+    console.log(formData);
+   // Make a POST request to the Golang endpoint
+ /*    axios.post('http://localhost:8080/upload', formData, {
       headers: formData.getHeaders()
     })
     .then((response) => {
@@ -112,9 +111,9 @@ function RegisterPage() {
     })
     .catch((error) => {
       console.log(error);
-    });
-
-    } 
+    }); */
+ 
+  };
   };
 
   return (

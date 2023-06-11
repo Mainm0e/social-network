@@ -24,6 +24,7 @@ const Info3 = ({selectedOption, onChange, registerStatus}) => {
       setPreviewSource(reader.result);
       // Do something with the file data, such as storing it in state or sending it to a server
       const fileData = reader.result;
+
       setAvatar(fileData);
     };
   };
