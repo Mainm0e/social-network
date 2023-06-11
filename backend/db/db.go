@@ -125,10 +125,10 @@ func Check(dbFile, sqlFile string) error {
 	if os.IsNotExist(err) {
 		// Initialise database if specified input does not already exist
 		fmt.Print(Colour.Yellow + "\ndatabase not found, initialising...\n\n" + Colour.Reset)
-		err = initialise(dbFile, sqlFile)
+		/* err = initialise(dbFile, sqlFile)
 		if err != nil {
 			return err
-		}
+		} */
 	}
 
 	// Initialize the database connection, which is used throughout the application's lifetime
@@ -364,15 +364,13 @@ Note: This function does not sanitize inputs. Always ensure that input is saniti
 to prevent SQL injection attacks. Additionally, this function does not handle
 potential database errors like unavailability, so use it with proper error handling.
 */
-func FetchData(table string, condition string, args ...any) (any, error) {
+func FetchData(table string, condition string, args ...any) ([]any, error) {
 	// Check if the table exists in the FetchRules struct (databse_variables.go)
 	if _, ok := FetchRules[table]; !ok {
 		return nil, fmt.Errorf("unknown table: %s", table)
 	}
-
 	// Prepare the SQL query
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s", FetchRules[table].SelectFields, table, condition)
-
+	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s=? ", FetchRules[table].SelectFields, table, condition)
 	// Execute the query
 	rows, err := DB.Query(query, args...)
 	if err != nil {

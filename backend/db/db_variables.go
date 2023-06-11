@@ -19,10 +19,10 @@ Global database insertion rules for ease of maintenance, and simplifying of the 
 */
 var InsertRules = map[string]InsertRule{
 	"users": {
-		Query:      "INSERT INTO users(nickName, firstName, lastName, birthDate, email, password, creationTime) VALUES(?,?,?,?,?,?,?)",
+		Query:      "INSERT INTO users(nickName, firstName, lastName, birthDate, email, password, aboutMe, avatar, privacy, creationTime) VALUES(?,?,?,?,?,?,?,?,?,?)",
 		ExistTable: "users",
-		ExistField: "nickName",
-		ExistError: "nickname already exists",
+		ExistField: "email",
+		ExistError: "email already exists",
 	},
 	"posts": {
 		Query:          "INSERT INTO posts(userId, title, content, creationTime, status, groupId) VALUES(?,?,?,?,?,?)",
@@ -100,7 +100,7 @@ var TableKeys = map[string]string{
 Global update rules for ease of maintenance, and simplifying of the UpdateData function.
 */
 var UpdateRules = map[string]string{
-	"users":         "UPDATE users SET nickName=?, firstName=?, lastName=?, birthDate=?, email=?, password=?, aboutMe=? WHERE userId=?",
+	"users":         "UPDATE users SET nickName=?, firstName=?, lastName=?, birthDate=?, email=?, password=?, aboutMe=?,avatar=?, privacy=? WHERE userId=?",
 	"posts":         "UPDATE posts SET userId=?, title=?, content=?, status=?, groupId=? WHERE postId=?",
 	"comments":      "UPDATE comments SET userId=?, postId=?, content=? WHERE commentId=?",
 	"groups":        "UPDATE groups SET creatorId=?, title=?, description=? WHERE groupId=?",
@@ -140,10 +140,10 @@ var FetchRules = map[string]struct {
 	ScanFields func(rows *sql.Rows) (any, error)
 }{
 	"users": {
-		SelectFields: "userId, nickName, firstName, lastName, birthDate, email, password, aboutMe, creationTime",
+		SelectFields: "userId, nickName, firstName, lastName, birthDate, email, password, aboutMe, avatar, privacy, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var user User
-			err := rows.Scan(&user.UserId, &user.NickName, &user.FirstName, &user.LastName, &user.BirthDate, &user.Email, &user.Password, &user.AboutMe, &user.CreationTime)
+			err := rows.Scan(&user.UserId, &user.NickName, &user.FirstName, &user.LastName, &user.BirthDate, &user.Email, &user.Password, &user.AboutMe, &user.Avatar, &user.Privacy, &user.CreationTime)
 			return user, err
 		},
 	},
