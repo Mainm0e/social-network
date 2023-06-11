@@ -86,29 +86,35 @@ function RegisterPage() {
       document.querySelector(".alert-box").style.display = "block";
     }
 
-    /*    if (username !== "" && password !== "" && firstName !== "" && lastName !== "" && email !== "" && birthdate !== "" && avatar !== ""){
-                fetch('http://localhost:5000/api/register', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify(data),
-                  })
-                  .then(response => response.json())
-                  .then(data => {
-                    console.log('Success:', data);
-                    if (data.success){
-                      alert('Registration successful');
-                      window.location.href = '/login';
-                    }
-                    else {
-                      alert('Registration failed');
-                    }
-                  })
-                  .catch((error) => {
-                    console.error('Error:', error);
-                  });
-                } */
+    if (username !== "" && password !== "" && firstName !== "" && lastName !== "" && email !== "" && birthdate !== "" && avatar !== ""){
+                  const axios = require("axios");
+    const FormData = require("form-data");
+    const fs = require("fs");
+
+    const formData = new FormData();
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    formData.append("email", email);
+    formData.append("birthdate", birthdate);
+    formData.append("username", username);
+    formData.append("password", password);
+    formData.append("nickname", nickname);
+    formData.append("aboutme", aboutme);
+    formData.append("avatar", avatar, "avatar.jpg");
+
+    
+    // Make a POST request to the Golang endpoint
+    axios.post('http://localhost:8080/upload', formData, {
+      headers: formData.getHeaders()
+    })
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+    } 
   };
 
   return (
