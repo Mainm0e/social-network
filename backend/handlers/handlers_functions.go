@@ -4,7 +4,6 @@ import (
 	"backend/db"
 	"encoding/json"
 	"errors"
-	"fmt"
 )
 
 /*
@@ -48,7 +47,6 @@ func register(data []byte) (bool, error) {
 	// Unmarshal the data into a RegisterData struct.
 	var register RegisterData
 	err := json.Unmarshal(data, &register)
-	fmt.Println(register)
 	if err != nil {
 		return false, errors.New("Error unmarshalling data" + err.Error())
 	}
