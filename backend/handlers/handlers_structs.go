@@ -1,8 +1,8 @@
 package handlers
 
 type LoginData struct {
-	Email    string
-	Password string
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 type RegisterData struct {
 	NickName     string `json:"nickName"`
