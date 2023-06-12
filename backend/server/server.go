@@ -2,6 +2,7 @@ package server
 
 import (
 	"backend/db"
+	"backend/sessions"
 	"context"
 	"errors"
 	"fmt"
@@ -41,11 +42,92 @@ func initiateLogging(logPath string) error {
 }
 
 /*
+loggerMiddleware is a middleware function which logs the URL path of each request
+to the server. It takes an input of an http.Handler and returns an http.Handler. It
+can be coupled with various other middleware functions to create a middleware chain
+implemented by the wrapCORS() function.
+*/
+func loggerMiddleware(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("Request received at: %s\n", r.URL.Path) // ** ONLY FOR DEVELOPMENT, REMOVE LATER **
+		log.Println("Request received at: ", r.URL.Path)
+		handler.ServeHTTP(w, r)
+	})
+}
+
+/*
+authenticationMiddleware is a middleware function which handles authentication logic
+for each request to the server. It takes an input of an http.Handler and returns an
+http.Handler, calling the sessions.CheckAuthentication() function to check if the user
+is authenticated. It can be coupled with various other middleware functions to create a
+middleware chain implemented by the wrapCORS() function.
+*/
+func authenticationMiddleware(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// TODO: Authentication logic, handler calls etc. in sessions.CheckAuthentication(r)
+		isAuthenticated, err := sessions.CheckAuthentication(r)
+		if err != nil {
+			log.Println("Error checking authentication: ", err.Error())
+
+			// Respond with 500 Internal Server Error
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if !isAuthenticated {
+			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
+
+			// Respond with 401 Unauthorized
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		// If authenticated, pass to the next middleware or handler
+		handler.ServeHTTP(w, r)
+	})
+}
+
+/*
+wrapCORS is a function which takes an http.Handler as an input and returns an http.Handler.
+This pattern is used to allow for various logic steps to be chained prior to the end handler
+filling the request, with each step being self-contained and responsible for either handling
+off the request to the next link in the chain or finalising the response itself in the event
+that:
+  - It is the final link in the chain
+  - It encounters an error or any other condition that prevents further processing.
+
+This pattern facilitates ease of maintenance should additional middleware functions be required.
+*/
+func wrapCORS(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Allow requests from the specific origin of the frontend application
+		w.Header().Set("Access-Control-Allow-Origin", FRONTEND_ORIGIN) // Change this to your frontend origin
+		// Allow specific HTTP methods, which provides some protection against CSRF attacks
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		// Allow the Content-Type header, which is required to be sent with POST requests
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		// Handle preflight requests, which is another way of saying "handle OPTIONS requests"
+		// OPTIONS requests are sent by the browser to check if the server will allow a request
+		// with the specified method and headers. If the server responds with a 200 OK, the
+		// browser will send the actual request. If the server responds with a 403 Forbidden,
+		// the browser will not send the actual request.
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Begin wrapping, call the next handler in the chain
+		handler.ServeHTTP(w, r)
+	})
+}
+
+/*
 initialiseRoutes creates a new ServeMux and registers handler functions for various routes.
 The ServeMux is returned and used by the StartServer() function to register the handler
 functions for the HTTP/S routes.
 */
-func initialiseRoutes() *http.ServeMux {
+func initialiseRoutes() http.Handler {
 	// Create a new ServeMux
 	mux := http.NewServeMux()
 
@@ -55,8 +137,10 @@ func initialiseRoutes() *http.ServeMux {
 	// mux.HandleFunc("/register", handlers.RegisterPage)
 	// mux.HandleFunc("/main", handlers.MainPage)
 
-	// Return the mux
-	return mux
+	// Wrap the mux with the CORS middleware and return it
+	// Although the return type is an http.Handler, it is actually a wrapped *mux.Router which
+	// has been chained with the CORS middleware
+	return wrapCORS(loggerMiddleware(authenticationMiddleware(mux)))
 }
 
 /*
@@ -65,11 +149,14 @@ the server with ListenAndServe. The server instance is sent through the serverCh
 to be used by the StartServer() function. If an error occurs, it is logged. The function
 is blocking and will run until the server is closed.
 */
-func setupHTTP(mux *http.ServeMux, serverCh chan<- *http.Server, portAddress string) {
+func setupHTTP(serverCh chan<- *http.Server, portAddress string) {
+	// Initialise routes with middlewares
+	handler := initialiseRoutes()
+
 	// Create a new http.Server with properties
 	srv := &http.Server{
 		Addr:         portAddress,
-		Handler:      mux,
+		Handler:      handler,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		// IdleTimeout:  15 * time.Second,
@@ -90,11 +177,14 @@ the server with ListenAndServeTLS. The server instance is sent through the serve
 to be used by the StartServer() function. If an error occurs, it is logged. The function is
 blocking and will run until the server is closed.
 */
-func setupHTTPS(mux *http.ServeMux, serverCh chan<- *http.Server, portAddress string) {
+func setupHTTPS(serverCh chan<- *http.Server, portAddress string) {
+	// Initialise routes with middlewares
+	handler := initialiseRoutes()
+
 	// Create a new http.Server with properties
 	srv := &http.Server{
 		Addr:         portAddress,
-		Handler:      mux,
+		Handler:      handler,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		// IdleTimeout:  15 * time.Second,
@@ -113,7 +203,7 @@ func setupHTTPS(mux *http.ServeMux, serverCh chan<- *http.Server, portAddress st
 AaaawwwwwSheeeetttttItsAboutToGoDown is the the function to end all functions, a work of
 pure alchemical wizardry. Using 3 pieces of Adi's hair, two spoonfuls of Steve's toejam, a small
 piece of Maryams rubber lizard, seventeen of Rick's tears and the inner lining of Salam's bike
-tyre, this function mixes it all in a cauldron of nightmares, and turns iron into gold, success
+tyre, this function mixes it all in a cauldron of nightmares, and turns gold into iron, success
 into calamity, and robs all who read its code of at least 3 years of their life. Use with caution.
 */
 func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error {
@@ -150,17 +240,14 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	// TODO: initialise websocket manager and associated event handlers
 
-	// Initialise routes
-	mux := initialiseRoutes()
-
 	// If HTTP is specified, setup HTTP server in a goroutine
 	if protocol == "http" {
-		go setupHTTP(mux, serverCh, HTTP_PORT)
+		go setupHTTP(serverCh, HTTP_PORT)
 	}
 
 	// If HTTPS is specified, setup HTTPS server in a goroutine
 	if protocol == "https" {
-		go setupHTTPS(mux, serverCh, HTTPS_PORT)
+		go setupHTTPS(serverCh, HTTPS_PORT)
 	}
 
 	// Receive the server instance from the channel (corresponding to code in setupHTTP() and setupHTTPS())
