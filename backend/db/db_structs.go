@@ -1,37 +1,39 @@
 package db
 
-import "time"
+import (
+	"database/sql"
+)
 
 type User struct {
-	UserId       int       `json:"userId"`
-	NickName     string    `json:"nickName"`
-	FirstName    string    `json:"firstName"`
-	LastName     string    `json:"lastName"`
-	BirthDate    string    `json:"birthDate"`
-	Email        string    `json:"email"`
-	Password     string    `json:"password"`
-	AboutMe      string    `json:"aboutMe"`
-	Avatar       string    `json:"avatar"`
-	CreationTime time.Time `json:"creationTime"`
+	UserId       int             `json:"userId"`             // auto increment
+	NickName     *sql.NullString `json:"nickName,omitempty"` // optional
+	FirstName    string          `json:"firstName"`
+	LastName     string          `json:"lastName"`
+	BirthDate    string          `json:"birthDate"`
+	Email        string          `json:"email"`
+	Password     string          `json:"password"`
+	AboutMe      *sql.NullString `json:"aboutMe,omitempty"` // optional
+	Avatar       *string         `json:"avatar,omitempty"`  // optional
+	Privacy      string          `json:"privacy"`           // default: public
+	CreationTime string          `json:"creationTime"`
 }
-
 type Post struct {
-	PostId       int       `json:"postId"`
-	UserId       int       `json:"userId"`
-	Title        string    `json:"title"`
-	Content      string    `json:"content"`
-	CreationTime time.Time `json:"creationTime"`
-	Status       string    `json:"status"`
-	Image        string    `json:"image"`
-	GroupId      int       `json:"groupId"`
+	PostId       int    `json:"postId"`
+	UserId       int    `json:"userId"`
+	Title        string `json:"title"`
+	Content      string `json:"content"`
+	CreationTime string `json:"creationTime"`
+	Status       string `json:"status"`
+	Image        string `json:"image"`
+	GroupId      int    `json:"groupId"`
 }
 
 type Comment struct {
-	CommentId    int       `json:"commentId"`
-	UserId       int       `json:"userId"`
-	PostId       int       `json:"postId"`
-	Content      string    `json:"content"`
-	CreationTime time.Time `json:"creationTime"`
+	CommentId    int    `json:"commentId"`
+	UserId       int    `json:"userId"`
+	PostId       int    `json:"postId"`
+	Content      string `json:"content"`
+	CreationTime string `json:"creationTime"`
 }
 
 type Reaction struct {
@@ -43,12 +45,12 @@ type Reaction struct {
 }
 
 type Message struct {
-	MessageId      int       `json:"messageId"`
-	SenderId       int       `json:"senderId"`
-	ReceiverId     int       `json:"receiverId"`
-	MessageContent string    `json:"messageContent"`
-	SendTime       time.Time `json:"sendTime"`
-	Seen           int       `json:"seen"`
+	MessageId      int    `json:"messageId"`
+	SenderId       int    `json:"senderId"`
+	ReceiverId     int    `json:"receiverId"`
+	MessageContent string `json:"messageContent"`
+	SendTime       string `json:"sendTime"`
+	Seen           int    `json:"seen"`
 }
 
 type Follow struct {
@@ -76,23 +78,23 @@ type SemiPrivate struct {
 }
 
 type Notification struct {
-	NotificationId int       `json:"notificationId"`
-	ReceiverId     int       `json:"receiverId"`
-	SenderId       int       `json:"senderId"`
-	Type           string    `json:"type"`
-	Content        string    `json:"content"`
-	CreationTime   time.Time `json:"creationTime"`
+	NotificationId int    `json:"notificationId"`
+	ReceiverId     int    `json:"receiverId"`
+	SenderId       int    `json:"senderId"`
+	Type           string `json:"type"`
+	Content        string `json:"content"`
+	CreationTime   string `json:"creationTime"`
 }
 
 type Event struct {
-	EventId      int       `json:"eventId"`
-	CreatorId    int       `json:"creatorId"`
-	ReceiverId   int       `json:"receiverId"`
-	GroupId      int       `json:"groupId"`
-	Title        string    `json:"title"`
-	Content      string    `json:"content"`
-	CreationTime time.Time `json:"creationTime"`
-	Option       string    `json:"option"`
+	EventId      int    `json:"eventId"`
+	CreatorId    int    `json:"creatorId"`
+	ReceiverId   int    `json:"receiverId"`
+	GroupId      int    `json:"groupId"`
+	Title        string `json:"title"`
+	Content      string `json:"content"`
+	CreationTime string `json:"creationTime"`
+	Option       string `json:"option"`
 }
 
 type InsertRule struct {
