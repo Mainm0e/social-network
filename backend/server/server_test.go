@@ -88,7 +88,7 @@ func TestSetupHTTP(t *testing.T) {
 		serverCh := make(chan *http.Server, 1)
 
 		// Start setupHTTP in a separate goroutine
-		go setupHTTP(mux, serverCh, testPort)
+		go setupHTTP(serverCh, testPort)
 
 		// Give the server time to start
 		time.Sleep(1 * time.Second)
@@ -143,7 +143,7 @@ func TestSetupHTTPS(t *testing.T) {
 		serverCh := make(chan *http.Server, 1)
 
 		// Start setupHTTPS in a separate goroutine
-		go setupHTTPS(mux, serverCh, testPort)
+		go setupHTTPS(serverCh, testPort)
 
 		// Give the server time to start
 		time.Sleep(1 * time.Second)
