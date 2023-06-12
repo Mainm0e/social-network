@@ -18,10 +18,7 @@ const LeftBox = ({user}) => {
                     </div>
                 </div>
             </div>
-            <NavList type={"Nav"} links={navGroupLinkData[0]} />
-            <NavList type={"Nav"} links={navGroupLinkData[0]} />
-            <NavList type={"Nav"} links={navGroupLinkData[0]} />
-            <NavList type={"Nav"} links={navGroupLinkData[0]} />
+            <NavList type={"Post"} links={navGroupLinkData[1]} />
             <NavList type={"Nav"} links={navGroupLinkData[0]} />
 
         </div>

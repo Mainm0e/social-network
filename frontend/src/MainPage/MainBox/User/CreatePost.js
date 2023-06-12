@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState  } from 'react';
 import "./Post.css"
 const CreatePost = ({ id,onSubmit }) => {
   const [title, setTitle] = useState('');

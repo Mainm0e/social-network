@@ -5,6 +5,10 @@ let link1 = {
     following: "/following",
     explore: "/explore",
     }
+let link2 = {
+    create : "#createpost",
+    postlist : "#postlist",
+}
 
 export const user1 = {
     username: "kettu",
@@ -17,4 +21,4 @@ export const user1 = {
     following: 0,
     followers: 0,
 }
-export const navGroupLinkData = [link1]
+export const navGroupLinkData = [link1,link2]

@@ -1,22 +1,29 @@
 .create_post {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    margin: 20px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    max-width: 500px;
+    padding: 10px;
   }
   
   .create_post_title {
     width: 100%;
+    margin-bottom: 10px;
     padding: 10px;
     font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
   }
   
   .create_post_content {
     width: 100%;
     height: 200px;
+    margin-bottom: 10px;
     padding: 10px;
-    font-size: 14px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     resize: none;
   }
   
@@ -44,29 +51,76 @@
     background-color: #45a049;
   }
   
-  .post-list {
-    display: flex;
-    flex-wrap: wrap;
+  .post_list {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px;
   }
   
   .post {
-    width: 300px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .post .content {
+    word-wrap: break-word; /* Allow long words to break and wrap onto the next line */
   }
   
-  .post h2 {
-    font-size: 1.5rem;
+  .post_image {
+    text-align: center;
     margin-bottom: 10px;
   }
   
-  .post p {
-    margin-bottom: 10px;
-  }
-  
-  .post img {
+  .post_image img {
     max-width: 100%;
-    height: auto;
+    max-height: 300px;
+    border-radius: 4px;
+  }
+  
+  .post_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .post_header_info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .post_header_info h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .post_header_info p {
+    margin: 0;
+    color: #888;
+  }
+  
+  .post_header_user {
+    display: flex;
+    align-items: center;
+  }
+  
+  .post_header_user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .post_header_user p {
+    margin: 0;
+    font-weight: bold;
+  }
+  
+  .post_body p {
+    margin: 0;
+    color: #555;
+    line-height: 1.5;
   }
   

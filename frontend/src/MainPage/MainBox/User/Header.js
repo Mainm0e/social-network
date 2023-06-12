@@ -28,9 +28,6 @@ const Header = (profile) => {
                         <span>{user.following}</span>
                     </div>
                 </div>
-                <div className="info_bio">
-                    <span>{user.bio}</span>
-                </div>
             </div>
         </div>
     )

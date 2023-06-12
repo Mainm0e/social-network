@@ -1,6 +1,6 @@
 .main_body{
     display: flex;
     flex-direction: column;
-    background: yellowgreen;
+    align-items: center;
     position: relative;
 }

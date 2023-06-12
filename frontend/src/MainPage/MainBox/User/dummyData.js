@@ -2,7 +2,7 @@ export const PostData =[
     {
         id: 1,
         title: "Post 1",
-        content: "This is the first post",
+        content: "This is the first postaksdjflöaksdjfölaksjdfölaksjdflaksjdflakjsdfölakjsdfajsdflkajsöflkjasöflkjasdölfkjasdöflkjasdölfkjasdölfkjasdfkjaödlskfjöalsdkjföalskjdföoaiwjeöfkajödoifjaöodijföaijfölaskdjfölaksjdfölkedjf",
         image: "https://picsum.photos/200",
         time: "01.01.1970 00:00",
         user:{
@@ -55,7 +55,7 @@ export const PostData =[
         id: 5,
         title: "Post 5",
         content: "This is the fifth post",
-        image: "https://picsum.photos/200",
+        image: "",
         time: "01.01.1970 00:00",
         user:{
             username: "kettu",
@@ -69,7 +69,6 @@ export const PostData =[
         id: 6,
         title: "Post 6",
         content: "This is the sixth post",
-        image: "https://picsum.photos/200",
         time: "01.01.1970 00:00",
         user:{
             username: "kettu",

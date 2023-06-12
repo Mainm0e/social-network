@@ -3,6 +3,7 @@
     max-width: 1000px;
     max-height: 1000px;
     overflow: scroll;
+    scroll-behavior: smooth;
 }
 
 .main_header{
@@ -27,28 +28,29 @@
     border-radius: 50%;
     border: 2px solid #e0e0e0;
 }
+
 .info_box{
+    z-index: 0;
     display: flex;
-    justify-content: flex-start;
-    max-height: 150px;
-    height: 150px;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
     width: 100%;
-    align-items: flex-start;
-    flex-direction: row-reverse;
-    border-bottom: 1px solid #e0e0e0;
-    position: relative;
-    background-color: red;
+    height: 150px;
+    background-color: #58b07d;
+    border-radius: 0 0 20px  20px;
 }
-.info_bio{
-    position: absolute;
-    left: 50px;
-    top: 50px;
+.info_box .user_info{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px;
 }
-.user_info label{
+.info_box .user_info label{
+    font-size: 20px;
+    color: #333;
+}
+.info_box .user_info span{
     font-size: 15px;
-    font-family: myFancyFont;
-}
-.user_info span{
-    font-size: 15px;
-    font-family: myFancyFont;
+    color: #333;
 }
