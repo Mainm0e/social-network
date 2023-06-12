@@ -1,6 +1,9 @@
 package server
 
-import "time"
+import (
+	"os"
+	"time"
+)
 
 const (
 	// The HTTP port that the server will listen on
@@ -19,4 +22,9 @@ const (
 	SHUTDOWN_TIMEOUT = 5 * time.Second
 	// Origin of frontend server / app
 	FRONTEND_ORIGIN = "http://localhost:3000" // TODO: change for external hosting
+)
+
+var (
+	// Make logfile a package-wide variable
+	logFile *os.File
 )
