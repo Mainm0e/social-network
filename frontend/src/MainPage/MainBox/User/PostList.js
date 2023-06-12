@@ -1,5 +1,6 @@
 import React from 'react';
 import { PostData } from './dummyData';
+import Comment from './CommentBox';
 import './Post.css';
 
 const PostList = () => {
@@ -35,8 +36,8 @@ const Post = ({ id, title, content, image, time, user}) => {
       return  <div className="post_image"> <img src={image} alt="content" /> </div>;
     }
   };
-    console.log(id)
   return (
+    <>
     <div className="post">
           {checkImage()}
       <div className="post_header">
@@ -57,8 +58,9 @@ const Post = ({ id, title, content, image, time, user}) => {
       <p className="content">{content}</p>
       </div>
       {/* button for comment and create comment */}
-      
     </div>
+      <Comment id={id} />
+      </>
   );
 };
 
