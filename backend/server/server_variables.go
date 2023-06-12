@@ -25,6 +25,6 @@ const (
 )
 
 var (
-	// Make logfile a package-wide variable
-	logFile *os.File
+	// Make logfile a global variable
+	LogFile *os.File
 )

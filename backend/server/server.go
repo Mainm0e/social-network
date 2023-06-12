@@ -21,7 +21,8 @@ the log file which allows for easier debugging and a less cluttered terminal.
 */
 func initiateLogging(logPath string) error {
 	// Check if the log directory exists
-	if _, err := os.Stat(logPath); os.IsNotExist(err) {
+	_, err := os.Stat(logPath)
+	if os.IsNotExist(err) {
 		// If it doesn't exist, create it
 		if err := os.Mkdir(logPath, 0755); err != nil {
 			return errors.New("Error creating log directory: " + err.Error())
@@ -29,23 +30,29 @@ func initiateLogging(logPath string) error {
 	}
 
 	// Create a logfile with the name "log_YYYMMDD_HHMMSS.log" in the :/backend/logs directory
-	logFile, err := os.OpenFile(logPath+"log_"+time.Now().Format("20060102_150405")+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	LogFile, err = os.OpenFile(logPath+"log_"+time.Now().Format("20060102_150405")+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return errors.New("Error opening log file: " + err.Error())
 	}
 	// Do not defer close as this will prevent the log file from being written to!
 
 	// Set the output of the log package to the log file
-	log.SetOutput(logFile)
+	log.SetOutput(LogFile)
 
 	return nil
 }
 
 /*
-loggerMiddleware is a middleware function which logs the URL path of each request
-to the server. It takes an input of an http.Handler and returns an http.Handler. It
-can be coupled with various other middleware functions to create a middleware chain
-implemented by the wrapCORS() function.
+loggerMiddleware is a middleware function which logs the URL path of each request to the
+server. It takes an input of an http.Handler and returns an http.Handler. It can be coupled
+with various other middleware functions to create a middleware chain. This pattern is used
+to allow for various logic steps to be chained prior to the end handler filling the request,
+with each step being self-contained and responsible for either handling off the request to
+the next link in the chain or finalising the response itself in the event that:
+  - It is the final link in the chain
+  - It encounters an error or any other condition that prevents further processing.
+
+This pattern facilitates ease of maintenance should additional middleware functions be required.
 */
 func loggerMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +67,7 @@ authenticationMiddleware is a middleware function which handles authentication l
 for each request to the server. It takes an input of an http.Handler and returns an
 http.Handler, calling the sessions.CheckAuthentication() function to check if the user
 is authenticated. It can be coupled with various other middleware functions to create a
-middleware chain implemented by the wrapCORS() function.
+middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -69,8 +76,8 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 		if err != nil {
 			log.Println("Error checking authentication: ", err.Error())
 
-			// Respond with 500 Internal Server Error
-			w.WriteHeader(http.StatusInternalServerError)
+			// Respond with 500 Internal Server Error with a message
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
@@ -78,7 +85,7 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
 
 			// Respond with 401 Unauthorized
-			w.WriteHeader(http.StatusUnauthorized)
+			http.Error(w, "Unauthorized access", http.StatusUnauthorized)
 			return
 		}
 
@@ -88,17 +95,17 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 }
 
 /*
-wrapCORS is a function which takes an http.Handler as an input and returns an http.Handler.
-This pattern is used to allow for various logic steps to be chained prior to the end handler
-filling the request, with each step being self-contained and responsible for either handling
-off the request to the next link in the chain or finalising the response itself in the event
-that:
-  - It is the final link in the chain
-  - It encounters an error or any other condition that prevents further processing.
-
-This pattern facilitates ease of maintenance should additional middleware functions be required.
+corsMiddleware is a function which takes an http.Handler as an input and returns an http.Handler.
+It is used to handle CORS (Cross-Origin Resource Sharing) requests. CORS is a mechanism that
+uses additional HTTP headers to tell browsers to give a web application running at one origin,
+access to selected resources from a different origin. A web application executes a cross-origin
+HTTP request when it requests a resource that has a different origin (domain, protocol, or port)
+from its own. CORS allows web applications to bypass a browser's same-origin policy, allowing
+for the safe use of resources from multiple sources. corsMiddleware() can be coupled with various
+other middleware functions to create a middleware chain implemented by the loggerMiddleware()
+function.
 */
-func wrapCORS(handler http.Handler) http.Handler {
+func corsMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Allow requests from the specific origin of the frontend application
 		w.Header().Set("Access-Control-Allow-Origin", FRONTEND_ORIGIN) // Change this to your frontend origin
@@ -106,6 +113,8 @@ func wrapCORS(handler http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		// Allow the Content-Type header, which is required to be sent with POST requests
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		// Set the Access-Control-Max-Age header to cache preflight request (600 seconds = 10 minutes)
+		w.Header().Set("Access-Control-Max-Age", "600")
 
 		// Handle preflight requests, which is another way of saying "handle OPTIONS requests"
 		// OPTIONS requests are sent by the browser to check if the server will allow a request
@@ -123,9 +132,10 @@ func wrapCORS(handler http.Handler) http.Handler {
 }
 
 /*
-initialiseRoutes creates a new ServeMux and registers handler functions for various routes.
-The ServeMux is returned and used by the StartServer() function to register the handler
-functions for the HTTP/S routes.
+initialiseRoutes creates a new http.ServeMux and registers handler functions for various
+routes. It then wraps the mux with the CORS, authentication and logging middleware functions
+and returns the wrapped mux. The wrapped mux is then passed to the http.Server instance
+created by setupHTTP() or setupHTTPS() to be used as the server's handler.
 */
 func initialiseRoutes() http.Handler {
 	// Create a new ServeMux
@@ -140,7 +150,7 @@ func initialiseRoutes() http.Handler {
 	// Wrap the mux with the CORS middleware and return it
 	// Although the return type is an http.Handler, it is actually a wrapped *mux.Router which
 	// has been chained with the CORS middleware
-	return wrapCORS(loggerMiddleware(authenticationMiddleware(mux)))
+	return loggerMiddleware(corsMiddleware(authenticationMiddleware(mux)))
 }
 
 /*
@@ -263,6 +273,11 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 	// Create a context to allow graceful shutdown
 	ctx, cancel := context.WithTimeout(context.Background(), SHUTDOWN_TIMEOUT)
 	defer cancel()
+
+	// Close log file (package level variable)
+	if LogFile != nil {
+		LogFile.Close()
+	}
 
 	// Perform the graceful shutdown
 	if err := srv.Shutdown(ctx); err != nil {
