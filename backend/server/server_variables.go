@@ -17,8 +17,6 @@ const (
 	TEST_LOG_PATH = "./_test_logs/"
 	// Server shutdown timeout
 	SHUTDOWN_TIMEOUT = 5 * time.Second
-	// HTTP origin of frontend server / app
+	// Origin of frontend server / app
 	FRONTEND_ORIGIN = "http://localhost:3000" // TODO: change for external hosting
-	// HTTPS origin of frontend server / app
-	FRONTEND_ORIGIN_SECURE = "https://localhost:3000" // TODO: change for external hosting
 )
