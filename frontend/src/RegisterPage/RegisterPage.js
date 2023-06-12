@@ -103,7 +103,7 @@ function RegisterPage() {
 
     console.log(formData);
    // Make a POST request to the Golang endpoint
- /*    axios.post('http://localhost:8080/upload', formData, {
+   axios.post('http://localhost:8080/upload', formData, {
       headers: formData.getHeaders()
     })
     .then((response) => {
@@ -111,7 +111,7 @@ function RegisterPage() {
     })
     .catch((error) => {
       console.log(error);
-    }); */
+    }); 
  
   };
   };
