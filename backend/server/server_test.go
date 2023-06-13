@@ -88,7 +88,7 @@ func TestSetupHTTP(t *testing.T) {
 		serverCh := make(chan *http.Server, 1)
 
 		// Start setupHTTP in a separate goroutine
-		go setupHTTP(mux, serverCh, testPort)
+		go setupHTTP(serverCh, testPort)
 
 		// Give the server time to start
 		time.Sleep(1 * time.Second)
@@ -96,11 +96,24 @@ func TestSetupHTTP(t *testing.T) {
 		// Subtest for making GET request
 		t.Run("GET Request", func(t *testing.T) {
 			// Making an HTTP GET request to the test endpoint
-			response, err := http.Get("http://localhost:8081/test")
+			client := &http.Client{}
+			req, err := http.NewRequest("GET", "http://localhost:8081/test", nil)
+			if err != nil {
+				t.Fatalf("Error creating GET request: %v", err)
+			}
+			// Bypassing authentication by adding a simulated valid session header
+			req.Header.Set("Authorization", "SimulatedValidSession")
+
+			response, err := client.Do(req)
 			if err != nil {
 				t.Fatalf("Error making GET request: %v", err)
 			}
 			defer response.Body.Close()
+
+			// Check CORS header
+			if corsHeader := response.Header.Get("Access-Control-Allow-Origin"); corsHeader != FRONTEND_ORIGIN {
+				t.Fatalf("Expected CORS header '%s', got '%s'", FRONTEND_ORIGIN, corsHeader)
+			}
 
 			// Reading the response body
 			body, err := io.ReadAll(response.Body)
@@ -143,7 +156,7 @@ func TestSetupHTTPS(t *testing.T) {
 		serverCh := make(chan *http.Server, 1)
 
 		// Start setupHTTPS in a separate goroutine
-		go setupHTTPS(mux, serverCh, testPort)
+		go setupHTTPS(serverCh, testPort)
 
 		// Give the server time to start
 		time.Sleep(1 * time.Second)
@@ -157,11 +170,23 @@ func TestSetupHTTPS(t *testing.T) {
 			client := &http.Client{Transport: tr}
 
 			// Making an HTTPS GET request to the test endpoint
-			response, err := client.Get("https://localhost:8444/test")
+			req, err := http.NewRequest("GET", "https://localhost:8444/test", nil)
+			if err != nil {
+				t.Fatalf("Error creating GET request: %v", err)
+			}
+			// Bypassing authentication by adding a simulated valid session header
+			req.Header.Set("Authorization", "SimulatedValidSession")
+
+			response, err := client.Do(req)
 			if err != nil {
 				t.Fatalf("Error making GET request: %v", err)
 			}
 			defer response.Body.Close()
+
+			// Check CORS header
+			if corsHeader := response.Header.Get("Access-Control-Allow-Origin"); corsHeader != FRONTEND_ORIGIN {
+				t.Fatalf("Expected CORS header '%s', got '%s'", FRONTEND_ORIGIN, corsHeader)
+			}
 
 			// Reading the response body
 			body, err := io.ReadAll(response.Body)
