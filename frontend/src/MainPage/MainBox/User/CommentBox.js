@@ -2,22 +2,33 @@ import React, {useState} from 'react';
 import "./CommentBox.css"
 const CommentBox = ({id}) => {
 // return createcomment and commentlist button and default commentlist
-const onSubmit = (commentData) => {
-    console.log(commentData);
-  };
+    const [boxState, setBoxState] = useState(null);
+    const changeState = (e) => {
+       if (e.target.innerText === "Create Comment"){
+           setBoxState(<CreateComment id={id} showComment={showComment}/>)
+       } else if (e.target.innerText === "Comment List"){
+            setBoxState(<CommentList id={id}/>)
+       }
+    }
+    const showComment = () => {
+        setBoxState(<CommentList id={id}/>)
+    }
+
+
+   
     return(
         <div className="comment">
-            <div className="comment-button">
-           <button>Create Comment</button>
-           <button>Comment List</button>
-              </div>
-            <CommentList id={id}/>
-            <CreateComment id={id} onSubmit={onSubmit}/>
+        <div className="comment-button">
+            <button onClick={changeState}>Create Comment</button>
+            <button onClick={changeState}>Comment List</button>
+        </div>
+       {boxState}
+        
         </div>
     )
 }
 
-const CreateComment = ({ id, onSubmit }) => {
+const CreateComment = ({ id , showComment }) => {
     const [comment, setComment] = useState('');
     const [image, setImage] = useState(null);
 
@@ -39,7 +50,13 @@ const CreateComment = ({ id, onSubmit }) => {
     onSubmit(commentData);
     setComment('');
     setImage(null);
+    showComment();
   };
+
+const onSubmit = (commentData) => {
+    console.log(commentData);
+  };
+
        return(
         <div className="create_comment">
             <form onSubmit={handleSubmit}>
@@ -71,8 +88,24 @@ const CreateComment = ({ id, onSubmit }) => {
 
 const CommentList = ({id}) => {
     return(
-        <>
-        </>
+        <div className="comment_list">
+            <div className="comment_list_top">
+                <div className="comment_list_top_left">
+                    <img src="https://i.imgur.com/1qkK1Q6.jpg" alt="profile" />
+                </div>
+                <div className="comment_list_top_right">
+                    <div className="comment_list_top_right_name">
+                        <span>name</span>
+                    </div>
+                    <div className="comment_list_top_right_date">
+                        <span>date</span>
+                    </div>
+                </div>
+            </div>
+            <div className="comment_list_content">
+
+            </div>
+        </div>
     )
 } 
 
