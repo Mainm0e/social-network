@@ -4,6 +4,7 @@ import (
 	"backend/db"
 	"backend/handlers"
 	"backend/sessions"
+	"backend/utils"
 	"context"
 	"errors"
 	"fmt"
@@ -232,6 +233,10 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 	err := initiateLogging(logPath)
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
+	}
+	error := utils.InitiateImagesPath()
+	if error != nil {
+		return errors.New("StartServer() error: " + error.Error())
 	}
 
 	// Check input protocol (only HTTP and HTTPS are supported, no quantum entanglement yet)

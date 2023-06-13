@@ -22,7 +22,7 @@ function RegisterPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [nickname, setNickname] = useState("");
+  const [nickName, setNickname] = useState("");
   const [aboutme, setAboutme] = useState("");
   const [avatar, setAvatar] = useState(null);
 
@@ -66,11 +66,11 @@ function RegisterPage() {
     lastName,
     email,
     birthdate,
-    username,
     matchPassword,
-    nickname,
+    nickName,
     aboutme,
     avatar,
+
   };
 
   // register function
@@ -92,9 +92,6 @@ function RegisterPage() {
   if (username !== "" && password !== "" && firstName !== "" && lastName !== "" && email !== "" && birthdate !== "" && avatar !== ""){
     fetch('http://localhost:8080/register', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(data),
       })
       .then(response => response.json())

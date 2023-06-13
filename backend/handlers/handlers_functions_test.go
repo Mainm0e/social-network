@@ -2,8 +2,7 @@ package handlers
 
 import (
 	"backend/db"
-	"backend/util"
-	"database/sql"
+	"backend/utils"
 	"errors"
 	"fmt"
 	"testing"
@@ -13,40 +12,35 @@ import (
 createRandomUser generates random user data for testing purposes. It creates a user with random values for db.User struct fields (expect for UserId,nickname and avatar)
 It returns the created user as a db.User struct and any error encountered during the process.
 */
-func createRandomUser(t *testing.T) (db.User, error) {
-	firstName, err := util.RandomString(6)
+func createRandomUser(t *testing.T) (RegisterData, error) {
+	firstName, err := utils.RandomString(6)
 	if err != nil {
 		t.Fatalf("error in random name")
 	}
-	lastName, err := util.RandomString(6)
+	lastName, err := utils.RandomString(6)
 	if err != nil {
 		t.Fatalf("error in random name")
 	}
-	email, err := util.GenerateRandomEmail()
+	email, err := utils.GenerateRandomEmail()
 	if err != nil {
 		t.Fatalf("error in random email")
 	}
-	password, err := util.RandomPassword(8)
+	password, err := utils.RandomPassword(8)
 	if err != nil {
 		t.Fatalf("error in random password")
 	}
-	aboutMe, err := util.RandomString(100)
+	aboutMe, err := utils.RandomString(100)
 	if err != nil {
 		t.Fatalf("error in random about me")
 	}
 
-	user := db.User{
+	user := RegisterData{
 		FirstName: firstName,
 		LastName:  lastName,
-		BirthDate: util.RandomDateBeforeNow(),
+		BirthDate: utils.RandomDateBeforeNow(),
 		Email:     email,
 		Password:  password,
-		AboutMe: &sql.NullString{
-			String: aboutMe,
-			Valid:  true,
-		},
-		CreationTime: util.RandomDateTimeAfterNow(),
-		Privacy:      "public",
+		AboutMe:   aboutMe,
 	}
 	return user, nil
 }
@@ -55,24 +49,22 @@ func createRandomUser(t *testing.T) (db.User, error) {
 insertRandomUser generates a random user using createRandomUser and inserts it into the database for testing purposes.
 It returns the inserted user as a db.User struct and any error encountered during the process.
 */
-func insertRandomUser(t *testing.T) (db.User, error) {
+func insertRandomUser(t *testing.T) (RegisterData, error) {
 	user, err := createRandomUser(t)
 	if err != nil {
 		return user, errors.New("createRandomUser got error: " + err.Error())
 	}
 	data := RegisterData{
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
-		BirthDate:    user.BirthDate,
-		Email:        user.Email,
-		Password:     user.Password,
-		AboutMe:      user.AboutMe,
-		Avatar:       user.Avatar,
-		Privacy:      user.Privacy,
-		CreationTime: user.CreationTime,
-		NickName:     user.NickName,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		BirthDate: user.BirthDate,
+		Email:     user.Email,
+		Password:  user.Password,
+		AboutMe:   user.AboutMe,
+		Avatar:    user.Avatar,
+		NickName:  user.NickName,
 	}
-	_, err = data.register()
+	err = data.register()
 	if err != nil {
 		return user, errors.New("register got error: " + err.Error())
 	}
@@ -90,11 +82,11 @@ func TestLogin(t *testing.T) {
 	if err != nil {
 		t.Errorf("insertRandomUser got error: %v:", err)
 	}
-	randomEmail, err := util.GenerateRandomEmail()
+	randomEmail, err := utils.GenerateRandomEmail()
 	if err != nil {
 		t.Errorf("GenerateRandomEmail got error: %v:", err)
 	}
-	randomPassword, err := util.RandomPassword(8)
+	randomPassword, err := utils.RandomPassword(8)
 	if err != nil {
 		t.Errorf("RandomPassword got error: %v:", err)
 	}
@@ -143,13 +135,14 @@ func TestRegister(t *testing.T) {
 		t.Errorf("createRandomUser got error: %v:", err)
 	}
 	var tests = []struct {
-		user db.User
-		want bool
+		user RegisterData
+		want error
 	}{
 		//test correct input
-		{randomUserInfo, true},
+		{randomUserInfo, nil},
 		//test incorrect input (user already exists)
-		{user, false},
+		//want not nil error
+		{user, errors.New("user with this email already exists")},
 	}
 	for _, tt := range tests {
 
@@ -157,21 +150,19 @@ func TestRegister(t *testing.T) {
 		t.Run(testName, func(t *testing.T) {
 			// marshal the email and password into json base on LoginData struct and some random data
 			data := RegisterData{
-				FirstName:    tt.user.FirstName,
-				LastName:     tt.user.LastName,
-				BirthDate:    tt.user.BirthDate,
-				Email:        tt.user.Email,
-				Password:     tt.user.Password,
-				AboutMe:      tt.user.AboutMe,
-				Avatar:       tt.user.Avatar,
-				Privacy:      tt.user.Privacy,
-				CreationTime: tt.user.CreationTime,
-				NickName:     tt.user.NickName,
+				FirstName: tt.user.FirstName,
+				LastName:  tt.user.LastName,
+				BirthDate: tt.user.BirthDate,
+				Email:     tt.user.Email,
+				Password:  tt.user.Password,
+				AboutMe:   tt.user.AboutMe,
+				Avatar:    tt.user.Avatar,
+				NickName:  tt.user.NickName,
 			}
-			bo, err := data.register()
+			err := data.register()
 
-			if bo != tt.want {
-				t.Errorf("register failed got: %v, want: %v error:%v.", bo, tt.want, err)
+			if err != nil {
+				t.Errorf("register failed got error: %v, want: %v ", err, tt.want)
 			}
 		})
 

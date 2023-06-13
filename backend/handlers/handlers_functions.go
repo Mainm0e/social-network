@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/db"
 	"errors"
+	"time"
 )
 
 /*
@@ -36,22 +37,22 @@ register is a function that attempts to register a new user based on the provide
 It takes in a byte slice `data` containing the registration information.
 It returns a boolean value indicating whether the registration was successful, and an error if any occurred.
 */
-func (regData *RegisterData) register() (bool, error) {
+func (regData *RegisterData) register() error {
 	// Fetch user data from the database based on the provided email.
 	user, err := db.FetchData("users", "email", regData.Email)
 	if err != nil {
-		return false, errors.New("Error fetching data" + err.Error())
+		return errors.New("Error fetching data" + err.Error())
 	}
 
 	// Check if a user with the specified email already exists.
 	if len(user) == 0 {
 		// Insert the new user data into the database.
-		_, err := db.InsertData("users", regData.NickName, regData.FirstName, regData.LastName, regData.BirthDate, regData.Email, regData.Password, regData.AboutMe, regData.Avatar, regData.Privacy, regData.CreationTime)
+		_, err := db.InsertData("users", regData.NickName, regData.FirstName, regData.LastName, regData.BirthDate, regData.Email, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
 		if err != nil {
-			return false, errors.New("Error inserting user" + err.Error())
+			return errors.New("Error inserting user" + err.Error())
 		}
-		return true, nil
+		return nil
 	} else {
-		return false, errors.New("user with this email already exists")
+		return errors.New("user with this email already exists")
 	}
 }

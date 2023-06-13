@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Buffer } from 'buffer';
 import defaultAvatar from "../avatar/default-avatar.png";
 import "./info3.css";
 
@@ -12,7 +13,9 @@ const Info3 = ({selectedOption, onChange, registerStatus}) => {
   const handleFileChange = (event) => {
     console.log(event.target.files);
     const file = event.target.files[0];
-    setSelectedFile(file);
+    const base64Image = btoa(file)
+    /* const base64Image = Buffer.from(file).toString('base64'); */
+    setSelectedFile(base64Image);
     previewFile(file);
     onChange(event); // Call the onChange prop
   };
