@@ -24,6 +24,11 @@ type Response struct {
 	Message    string `json:"message"`
 	StatusCode int    `json:"statusCode"`
 }
+type event struct {
+	Event_type string `json:"event_type"`
+	Payload    any    `json:"payload"`
+}
+
 type NullableString struct {
 	sql.NullString
 }
