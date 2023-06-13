@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 import AlertBox from '../Common/AlertBox/AlertBox';
-import ChatBox from '../Common/ChatBox/ChatBox';
 
 // LoginPage component
 // This component is used to render the login page
@@ -124,7 +123,6 @@ function LoginPage() {
         <a href='/register'>Register</a>
       </div>
     </div>
-    <ChatBox />
     </div>
   );
   

@@ -1,0 +1,28 @@
+.error-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  
+  .error-heading {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .back-link {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  
+  .back-link a {
+    color: blue;
+    text-decoration: none;
+  }
+  
+  .back-link a:hover {
+    text-decoration: underline;
+  }
+  
