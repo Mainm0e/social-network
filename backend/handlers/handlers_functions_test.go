@@ -4,7 +4,6 @@ import (
 	"backend/db"
 	"backend/util"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"testing"
@@ -61,12 +60,19 @@ func insertRandomUser(t *testing.T) (db.User, error) {
 	if err != nil {
 		return user, errors.New("createRandomUser got error: " + err.Error())
 	}
-	//marshal the user into json
-	data, err := json.Marshal(user)
-	if err != nil {
-		return user, errors.New("marshaling got error: %v: " + err.Error())
+	data := RegisterData{
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		BirthDate:    user.BirthDate,
+		Email:        user.Email,
+		Password:     user.Password,
+		AboutMe:      user.AboutMe,
+		Avatar:       user.Avatar,
+		Privacy:      user.Privacy,
+		CreationTime: user.CreationTime,
+		NickName:     user.NickName,
 	}
-	_, err = register(data)
+	_, err = data.register()
 	if err != nil {
 		return user, errors.New("register got error: " + err.Error())
 	}
@@ -102,18 +108,16 @@ func TestLogin(t *testing.T) {
 		{user.Email, randomPassword, false},
 		//test incorrect email (user not found)
 		{randomEmail, user.Password, false},
-		//test incorrect input format
-		{23234, randomPassword, false},
 	}
 
 	for _, tt := range tests {
 		testname := fmt.Sprintf("%s,%s", tt.Email, tt.Password)
 		t.Run(testname, func(t *testing.T) {
-			data, err := json.Marshal(tt)
-			if err != nil {
-				t.Errorf("marshaling got error: %v:", err)
-			}
-			bo, err := login(data)
+			var data LoginData
+			data.Email = tt.Email.(string)
+			data.Password = tt.Password.(string)
+
+			bo, err := data.login()
 
 			if bo != tt.want {
 				t.Errorf("login got: %v, want: %v error:%v.", bo, tt.want, err)
@@ -152,11 +156,19 @@ func TestRegister(t *testing.T) {
 		testName := fmt.Sprintf("email: %s, password:%s", tt.user.Email, tt.user.Password)
 		t.Run(testName, func(t *testing.T) {
 			// marshal the email and password into json base on LoginData struct and some random data
-			data, err := json.Marshal(tt.user)
-			if err != nil {
-				t.Errorf("marshaling got error: %v:", err)
+			data := RegisterData{
+				FirstName:    tt.user.FirstName,
+				LastName:     tt.user.LastName,
+				BirthDate:    tt.user.BirthDate,
+				Email:        tt.user.Email,
+				Password:     tt.user.Password,
+				AboutMe:      tt.user.AboutMe,
+				Avatar:       tt.user.Avatar,
+				Privacy:      tt.user.Privacy,
+				CreationTime: tt.user.CreationTime,
+				NickName:     tt.user.NickName,
 			}
-			bo, err := register(data)
+			bo, err := data.register()
 
 			if bo != tt.want {
 				t.Errorf("register failed got: %v, want: %v error:%v.", bo, tt.want, err)

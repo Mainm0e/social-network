@@ -40,6 +40,31 @@ function LoginPage() {
   };
   let msg = [];
   const checkUsername = (username, password) => {
+
+    fetch('http://localhost:8080/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({email: username, password: password}),
+
+    }).then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+      if (data.success){
+        alert('Login successful');
+        window.location.href = '/';
+        return true;
+      }
+      else {
+        setAlertTitle("Error");
+        msg.push(data.message);
+        setAlertMessage(msg);
+        return false;
+      }
+    })
+
+/* 
     if (username === "admin" && password === "admin") {
       return true;
     } else {
@@ -47,7 +72,7 @@ function LoginPage() {
       msg.push("Username or password is incorrect");
       setAlertMessage(msg);
       return false;
-    }
+    } */
   }
 
   const [loginStatus, setLoginStatus] = useState(true);

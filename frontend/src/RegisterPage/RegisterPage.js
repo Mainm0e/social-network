@@ -54,7 +54,7 @@ function RegisterPage() {
   // matchPassword is used to check if the password and confirmPassword are the same
   // if they are the same, {matchPassword = password} else {matchPassword = ""}
   let matchPassword = password === confirmPassword ? password : "";
-  const data = {firstName, lastName, email, birthdate, avatar,username, matchPassword};
+  const data = {firstName, lastName, email, birthdate, avatar, matchPassword};
   
   // register function
   // this function is main function of the register page
@@ -72,8 +72,8 @@ function RegisterPage() {
     }
 
     
-/*    if (username !== "" && password !== "" && firstName !== "" && lastName !== "" && email !== "" && birthdate !== "" && avatar !== ""){
-    fetch('http://localhost:5000/api/register', {
+  if (username !== "" && password !== "" && firstName !== "" && lastName !== "" && email !== "" && birthdate !== "" && avatar !== ""){
+    fetch('http://localhost:8080/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ function RegisterPage() {
       .catch((error) => {
         console.error('Error:', error);
       });
-    } */
+    } 
   }
 
   return (

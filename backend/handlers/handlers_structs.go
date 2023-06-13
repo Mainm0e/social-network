@@ -18,3 +18,7 @@ type RegisterData struct {
 	Privacy      string          `json:"privacy"`           // default: public
 	CreationTime string          `json:"creationTime"`
 }
+type Response struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
