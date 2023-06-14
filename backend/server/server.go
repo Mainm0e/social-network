@@ -145,7 +145,7 @@ func initialiseRoutes() http.Handler {
 
 	// Register handler functions for various routes
 	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
-	mux.HandleFunc("/api", handlers.ApiHandler)
+	mux.HandleFunc("/api", handlers.HTTPEventRouter)
 	//mux.HandleFunc("/login", handlers.LoginPage)
 	//mux.HandleFunc("/register", handlers.RegisterPage)
 	// mux.HandleFunc("/main", handlers.MainPage)

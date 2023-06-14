@@ -6,7 +6,12 @@ import (
 	"net/http"
 )
 
-func ApiHandler(w http.ResponseWriter, r *http.Request) {
+/*
+ApiHandler is the handler function for all endpoints. it's going to handle all the events that are sent through http requests. it's only function deal with http requests.
+it decode the request body to an Event struct, then get the corresponding handler function for the event type and call it with the event payload as a parameter and get the response and error from it.
+if there is an error, it will return a response with the error message and status code 400.
+*/
+func HTTPEventRouter(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		var event Event
 		err := json.NewDecoder(r.Body).Decode(&event)
