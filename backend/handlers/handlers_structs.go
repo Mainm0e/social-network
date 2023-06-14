@@ -39,11 +39,11 @@ func (s *NullableString) UnmarshalJSON(data []byte) error {
 }
 
 type Event struct {
-	Event_type string      `json:"event_type"`
-	Payload    interface{} `json:"payload"`
+	Event_type string         `json:"event_type"`
+	Payload    map[string]any `json:"payload"`
 }
 
-var Events = map[string]func(interface{}) (Response, error){
-	"login": LoginPage,
-	//"register": RegisterPage,
+var Events = map[string]func(map[string]any) (Response, error){
+	"login":    LoginPage,
+	"register": RegisterPage,
 }

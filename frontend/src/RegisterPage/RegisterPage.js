@@ -72,7 +72,6 @@ function RegisterPage() {
     avatar,
 
   };
-
   // register function
   // this function is main function of the register page
   const register = () => {
@@ -90,9 +89,10 @@ function RegisterPage() {
 
     
   if (username !== "" && password !== "" && firstName !== "" && lastName !== "" && email !== "" && birthdate !== "" && avatar !== ""){
-    fetch('http://localhost:8080/register', {
+    const sendData ={"event_type": "register", "payload": data}
+    fetch('http://localhost:8080/api', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(sendData),
       })
       .then(response => response.json())
       .then(data => {
