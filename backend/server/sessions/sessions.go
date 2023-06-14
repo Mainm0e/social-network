@@ -1,6 +1,49 @@
 package sessions
 
-import "net/http"
+import (
+	"errors"
+	"net/http"
+	"sync"
+	"time"
+
+	"github.com/gofrs/uuid"
+)
+
+/*
+Initialise is a method for the *SessionStore struct, which allows for initialisation of the
+sessions map from an external calling file (from server package for instance, or the main file).
+*/
+func (store *SessionStore) Initialise() {
+	store.Data = sync.Map{
+		// Initialise the sessions map
+	}
+	// Must use the following in calling file / function:
+	// sessions.Store.Initialise() // Store is a variable of type SessionStore, declared in sessions.go
+}
+
+/*
+GenerateSessionID is a method for the *SessionStore struct, which generates a unique session
+ID for each user session. It is used when a user logs in to generate a session ID for the user
+session and store it in the sessions map, as well as return it to the frontend to be set as a
+cookie. It checks if the generated session ID already exists in the sessions map (no RWMutex is
+used as the *SessionStore struct uses a sync.Map data structure, which is thread-safe).
+*/
+func (store *SessionStore) GenerateSessionID() (string, error) {
+	// Check if *SessionStore struct has been initialised or is present (should have a Data field)
+	if store == nil {
+		return "", errors.New("error in sessions.<store>.GenerateSessionID(): " +
+			"sessions store (sync.Map) not initialised")
+	}
+
+	// Loop until a unique session ID is generated
+	for {
+		sessionID, _ := uuid.NewV4()
+		idString := sessionID.String()
+		if _, exists := store.Data.Load(idString); !exists {
+			return idString, nil
+		}
+	}
+}
 
 /*
 CheckAuthentication checks if the user is authenticated by checking the session cookie
@@ -9,7 +52,26 @@ not authenticated, the function returns false. The function also returns an erro
 is non-nil if an error occurs during the authentication check.
 */
 func CheckAuthentication(r *http.Request) (bool, error) {
-	// TODO: Authentication logic, handler calls etc.
-	isAuthenticated := true // Set to true to allow testing of other middleware functions
-	return isAuthenticated, nil
+	cookie, err := r.Cookie(COOKIE_NAME)
+	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			// if the cookie is not set, return false
+			return false, nil
+		}
+		// For any other type of error, return an error
+		return false, err
+	}
+
+	// Get the user session from the store
+	user, ok := Store.Data.Load(cookie.Value)
+	if !ok {
+		return false, nil
+	}
+
+	// Check if the session is expired
+	if cookie.Expires.Before(time.Now()) {
+		return false, nil
+	}
+
+	return user != "", nil
 }
