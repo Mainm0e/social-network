@@ -137,19 +137,19 @@ func (store *SessionStore) Get(sessionID string) (*Session, bool, error) {
 }
 
 /*
-CheckAuthentication checks if the user is authenticated by taking a session cookie
+Check() checks if the user is authenticated by taking a session cookie
 as input and checking if the session ID is present in the SessionStore sync.Map data
 structure by calling the *SessionStore Get() method. It returns a boolean indicating
 whether the user is authenticated or not, and an error, which is non-nil if an error
 occurs during the authentication check.
 */
-func CheckAuthentication(cookie *http.Cookie) (bool, error) {
+func Check(cookie *http.Cookie) (bool, error) {
 	_, isValidSession, err := Store.Get(cookie.Value)
 	return isValidSession, err
 }
 
 /*
-Login is a global function in the sessions package, which is used to create a new user
+Login() is a global function in the sessions package, which is used to create a new user
 session when a frontend login event has been authenticated. It takes the username and
 admin boolean as arguments and calls the *SessionStore Create() method to create a new
 user session. It returns the session ID as well as an error, which is non-nil if an error
@@ -164,7 +164,7 @@ func Login(userName string, admin bool) (string, error) {
 }
 
 /*
-Logout is a global function in the sessions package, which is used to delete a user
+Logout() is a global function in the sessions package, which is used to delete a user
 session when a frontend logout event has been received. It takes the session ID as an
 argument and calls the *SessionStore Delete() method to delete the associated user
 session. It returns an error, which is non-nil if an error occurs during the session

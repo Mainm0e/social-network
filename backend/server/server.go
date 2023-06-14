@@ -134,7 +134,7 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 			return
 		}
 
-		isAuthenticated, err := sessions.CheckAuthentication(cookie)
+		isAuthenticated, err := sessions.Check(cookie)
 		if err != nil {
 			log.Println("Error checking authentication: ", err.Error())
 
