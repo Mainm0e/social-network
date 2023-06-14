@@ -21,13 +21,14 @@ const PostList = () => {
             image={post.image}
             time={post.time}
             user={post.user}
+            comments={post.comments}
         />
         ))}
     </div>
   );
 };
 
-const Post = ({ id, title, content, image, time, user}) => {
+const Post = ({ id, title, content, image, time, user, comments}) => {
   const checkImage = () => {
     console.log(image)
     if (image === ''|| image === null|| image === undefined) {
@@ -59,7 +60,7 @@ const Post = ({ id, title, content, image, time, user}) => {
       </div>
       {/* button for comment and create comment */}
     </div>
-      <Comment id={id} />
+      <Comment id={id} comments={comments} />
       </>
   );
 };

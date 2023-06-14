@@ -74,3 +74,70 @@
     height: 100px;
     object-fit: cover;
 }
+
+.comment_list {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.comment_list_item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .comment_list_item_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .comment_list_item_header_left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .comment_list_item_header_info p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .comment_list_item_header_right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .comment_list_item_header_user p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .comment_list_item_body p.content {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .comment_list_item_image {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .comment_list_item_image img {
+    max-width: 100%;
+    height: auto;
+  }
+  

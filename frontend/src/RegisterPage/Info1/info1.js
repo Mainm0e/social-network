@@ -11,7 +11,6 @@ const Info1 = ({ selectedOption, onChange, registerStatus }) => {
   const type = "info1";
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
   const [birthdate, setBirthdate] = useState("");
 
   const handleInputChange = (event) => {
@@ -24,9 +23,6 @@ const Info1 = ({ selectedOption, onChange, registerStatus }) => {
         break;
       case "lastName":
         setLastName(value);
-        break;
-      case "email":
-        setEmail(value);
         break;
       case "birthdate":
         setBirthdate(value);
@@ -42,10 +38,9 @@ const Info1 = ({ selectedOption, onChange, registerStatus }) => {
       type,
       firstName,
       lastName,
-      email,
       birthdate,
     });
-  }, [type, firstName, lastName, email, birthdate, onChange]);
+  }, [type, firstName, lastName, birthdate, onChange]);
 
   return (
     <form>
@@ -57,10 +52,6 @@ const Info1 = ({ selectedOption, onChange, registerStatus }) => {
       <div className='input-container'>
         <label>Last Name:</label>
         <input type='text' style={{ background: registerStatus === false && lastName === "" ? "#FFEA00" : "" }} name='lastName' value={lastName} onChange={handleInputChange} />
-      </div>
-      <div className='input-container'>
-        <label>Email:</label>
-        <input type='text' style={{ background: registerStatus === false && email === "" ? "#FFEA00" : "" }} name='email' value={email} onChange={handleInputChange} />
       </div>
       <div className='input-container'>
         <label>Birthdate:</label>
