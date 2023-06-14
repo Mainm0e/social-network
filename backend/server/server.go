@@ -45,6 +45,20 @@ func initiateLogging(logPath string) error {
 }
 
 /*
+extractCookie is a function which takes an http.Request as an input and returns a pointer
+to an http.Cookie and an error. It is used to extract the session cookie from the request
+header. It returns an error which is non-nil if a cookie with the sessions.COOKIE_NAME is
+not present in the request header.
+*/
+func extractCookie(r *http.Request) (*http.Cookie, error) {
+	cookie, err := r.Cookie(sessions.COOKIE_NAME)
+	if err != nil {
+		return nil, errors.New("error in server.extractCookie(): " + err.Error())
+	}
+	return cookie, nil
+}
+
+/*
 loggerMiddleware is a middleware function which logs the URL path of each request to the
 server. It takes an input of an http.Handler and returns an http.Handler. It can be coupled
 with various other middleware functions to create a middleware chain. This pattern is used
