@@ -65,38 +65,6 @@ func loggerMiddleware(handler http.Handler) http.Handler {
 }
 
 /*
-authenticationMiddleware is a middleware function which handles authentication logic
-for each request to the server. It takes an input of an http.Handler and returns an
-http.Handler, calling the sessions.CheckAuthentication() function to check if the user
-is authenticated. It can be coupled with various other middleware functions to create a
-middleware chain implemented by the loggerMiddleware() function.
-*/
-func authenticationMiddleware(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// TODO: Authentication logic, handler calls etc. in sessions.CheckAuthentication(r)
-		isAuthenticated, err := sessions.CheckAuthentication(r)
-		if err != nil {
-			log.Println("Error checking authentication: ", err.Error())
-
-			// Respond with 500 Internal Server Error with a message
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		if !isAuthenticated {
-			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
-
-			// Respond with 401 Unauthorized
-			http.Error(w, "Unauthorized access", http.StatusUnauthorized)
-			return
-		}
-
-		// If authenticated, pass to the next middleware or handler
-		handler.ServeHTTP(w, r)
-	})
-}
-
-/*
 corsMiddleware is a function which takes an http.Handler as an input and returns an http.Handler.
 It is used to handle CORS (Cross-Origin Resource Sharing) requests. CORS is a mechanism that
 uses additional HTTP headers to tell browsers to give a web application running at one origin,
@@ -129,6 +97,38 @@ func corsMiddleware(handler http.Handler) http.Handler {
 		}
 
 		// Begin wrapping, call the next handler in the chain
+		handler.ServeHTTP(w, r)
+	})
+}
+
+/*
+authenticationMiddleware is a middleware function which handles authentication logic
+for each request to the server. It takes an input of an http.Handler and returns an
+http.Handler, calling the sessions.CheckAuthentication() function to check if the user
+is authenticated. It can be coupled with various other middleware functions to create a
+middleware chain implemented by the loggerMiddleware() function.
+*/
+func authenticationMiddleware(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// TODO: Authentication logic, handler calls etc. in sessions.CheckAuthentication(r)
+		isAuthenticated, err := sessions.CheckAuthentication(r)
+		if err != nil {
+			log.Println("Error checking authentication: ", err.Error())
+
+			// Respond with 500 Internal Server Error with a message
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		if !isAuthenticated {
+			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
+
+			// Respond with 401 Unauthorized
+			http.Error(w, "Unauthorized access", http.StatusUnauthorized)
+			return
+		}
+
+		// If authenticated, pass to the next middleware or handler
 		handler.ServeHTTP(w, r)
 	})
 }
