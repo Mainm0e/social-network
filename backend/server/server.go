@@ -3,7 +3,7 @@ package server
 import (
 	"backend/db"
 	"backend/handlers"
-	"backend/sessions"
+	"backend/server/sessions"
 	"backend/utils"
 	"context"
 	"errors"
