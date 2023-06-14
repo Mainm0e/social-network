@@ -124,8 +124,17 @@ middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// TODO: Authentication logic, handler calls etc. in sessions.CheckAuthentication(r)
-		isAuthenticated, err := sessions.CheckAuthentication(r)
+		// Extract the session cookie from the request header
+		cookie, err := extractCookie(r)
+		if err != nil {
+			log.Println("Error extracting cookie: ", err.Error())
+
+			// Respond with 401 Unauthorized with a message
+			http.Error(w, "No session cookie found", http.StatusUnauthorized)
+			return
+		}
+
+		isAuthenticated, err := sessions.CheckAuthentication(cookie)
 		if err != nil {
 			log.Println("Error checking authentication: ", err.Error())
 
