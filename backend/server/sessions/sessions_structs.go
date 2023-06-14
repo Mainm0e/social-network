@@ -9,7 +9,7 @@ const (
 	// Cookie name for user session
 	COOKIE_NAME = "supercalafragalisticexpialadoshus"
 	// Session duration in seconds
-	DURATION = 3600 // 1 hour
+	SESSION_DURATION = 3600 // 1 hour
 )
 
 // Store of user sessions
@@ -28,7 +28,7 @@ type Session struct {
 	ID       string
 	Username string
 	Admin    bool
-	Expires  *time.Time
+	Expires  time.Time
 }
 
 /*
