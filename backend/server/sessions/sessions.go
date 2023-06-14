@@ -46,6 +46,34 @@ func (store *SessionStore) GenerateSessionID() (string, error) {
 }
 
 /*
+Create is a method for the *SessionStore struct, which creates a new user session and stores
+it in the SessionStore sync.Map data structure. It is used when a frontend login event is authenticated,
+and calls the local helper function GenerateSessionID() to generate a unique session ID for the
+user session. It then creates a new Session struct with the generated session ID, username, admin
+boolena and expiry date / time, and stores it in the SessionStore. It returns the session ID as well
+as an error, which is non-nil if an error occurs during the session creation.
+*/
+func (store *SessionStore) Create(username string, admin bool) (string, error) {
+	sessionID, err := store.GenerateSessionID()
+	if err != nil {
+		return "", errors.New("error in sessions.<store>.Create(): " + err.Error())
+	}
+
+	expires := time.Now().Add(time.Duration(SESSION_DURATION) * time.Second)
+
+	session := &Session{
+		ID:       sessionID,
+		Username: username,
+		Admin:    admin,
+		Expires:  expires,
+	}
+
+	store.Data.Store(sessionID, session)
+
+	return sessionID, nil
+}
+
+/*
 CheckAuthentication checks if the user is authenticated by checking the session cookie
 in the request. If the user is authenticated, the function returns true. If the user is
 not authenticated, the function returns false. The function also returns an error which
