@@ -1,17 +1,17 @@
 import React, {useState} from 'react';
 import "./CommentBox.css"
-const CommentBox = ({id}) => {
+const CommentBox = ({id,comments}) => {
 // return createcomment and commentlist button and default commentlist
     const [boxState, setBoxState] = useState(null);
     const changeState = (e) => {
        if (e.target.innerText === "Create Comment"){
            setBoxState(<CreateComment id={id} showComment={showComment}/>)
-       } else if (e.target.innerText === "Comment List"){
-            setBoxState(<CommentList id={id}/>)
+       } else if (e.target.innerText === "Comment List"&& comments !== undefined){
+            setBoxState(<CommentList comments={comments}/>)
        }
     }
     const showComment = () => {
-        setBoxState(<CommentList id={id}/>)
+        setBoxState(<CommentList comments={comments}/>)
     }
 
 
@@ -86,25 +86,44 @@ const onSubmit = (commentData) => {
     )
 }
 
-const CommentList = ({id}) => {
+const CommentList = ({comments}) => {
+    const loopComment = (comments) => {
+
+        return comments.map((comment) => (
+        <div className="comment_list_item" key={comment.id}>
+                <div className="comment_list_item_header">
+                    <div className="comment_list_item_header_left">
+                        <div className="comment_list_item_header_info">
+                            <p>{comment.time}</p>
+                        </div>
+                    </div>
+                    <div className="comment_list_item_header_right">
+                        <div className="comment_list_item_header_user">
+                          {/*   <img src={comment.user} alt="avatar" /> */}
+                            <p>{comment.user.email}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="comment_list_item_body">
+                    <p className="content">{comment.content}</p>
+                </div>
+                {checkImage(comment.image)}
+            </div>
+        ));
+        };
+
+    const checkImage = (image) => {
+        if (image === ''|| image === null|| image === undefined) {
+            return null;
+        } else {
+           return <div className="comment_list_item_image">
+                <img src={image} alt="content" />
+            </div>;
+        }
+    };
     return(
         <div className="comment_list">
-            <div className="comment_list_top">
-                <div className="comment_list_top_left">
-                    <img src="https://i.imgur.com/1qkK1Q6.jpg" alt="profile" />
-                </div>
-                <div className="comment_list_top_right">
-                    <div className="comment_list_top_right_name">
-                        <span>name</span>
-                    </div>
-                    <div className="comment_list_top_right_date">
-                        <span>date</span>
-                    </div>
-                </div>
-            </div>
-            <div className="comment_list_content">
-
-            </div>
+            {loopComment(comments)}
         </div>
     )
 } 

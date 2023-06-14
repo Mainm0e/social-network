@@ -10,7 +10,28 @@ export const PostData =[
             fName: "Kettu",
             lName: "Kettunen",
             avatar: "https://picsum.photos/200",
-        }
+        },
+         comments : [
+            {
+                id: 1,
+                content: "This is the first comment",
+                time: "01.01.1970 00:00",
+                user:{
+                    email : "kettu",
+                    fName: "Kettu",
+                }
+            },
+            {
+                id: 2,
+                content: "This is the second comment",
+                image: "https://picsum.photos/200",
+                time: "01.01.1970 00:00",
+                user:{
+                    email : "kettu",
+                    fName: "Kettu",
+                }
+            }
+        ]
     },
     {
         id: 2,
