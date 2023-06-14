@@ -156,5 +156,24 @@ user session. It returns the session ID as well as an error, which is non-nil if
 occurs during the session creation.
 */
 func Login(userName string, admin bool) (string, error) {
-	return Store.Create(userName, admin)
+	sessionID, err := Store.Create(userName, admin)
+	if err != nil {
+		return "", errors.New("error in sessions.Login(): " + err.Error())
+	}
+	return sessionID, nil
+}
+
+/*
+Logout is a global function in the sessions package, which is used to delete a user
+session when a frontend logout event has been received. It takes the session ID as an
+argument and calls the *SessionStore Delete() method to delete the associated user
+session. It returns an error, which is non-nil if an error occurs during the session
+deletion.
+*/
+func Logout(sessionID string) error {
+	err := Store.Delete(sessionID)
+	if err != nil {
+		return errors.New("error in sessions.Logout(): " + err.Error())
+	}
+	return nil
 }
