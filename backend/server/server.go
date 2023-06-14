@@ -2,7 +2,9 @@ package server
 
 import (
 	"backend/db"
+	"backend/handlers"
 	"backend/sessions"
+	"backend/utils"
 	"context"
 	"errors"
 	"fmt"
@@ -143,8 +145,8 @@ func initialiseRoutes() http.Handler {
 
 	// Register handler functions for various routes
 	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
-	// mux.HandleFunc("/login", handlers.LoginPage)
-	// mux.HandleFunc("/register", handlers.RegisterPage)
+	mux.HandleFunc("/login", handlers.LoginPage)
+	mux.HandleFunc("/register", handlers.RegisterPage)
 	// mux.HandleFunc("/main", handlers.MainPage)
 
 	// Wrap the mux with the CORS middleware and return it
@@ -231,6 +233,10 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 	err := initiateLogging(logPath)
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
+	}
+	error := utils.InitiateImagesPath()
+	if error != nil {
+		return errors.New("StartServer() error: " + error.Error())
 	}
 
 	// Check input protocol (only HTTP and HTTPS are supported, no quantum entanglement yet)

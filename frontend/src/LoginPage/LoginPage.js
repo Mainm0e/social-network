@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 import AlertBox from '../Common/AlertBox/AlertBox';
-import ChatBox from '../Common/ChatBox/ChatBox';
 
 // LoginPage component
 // This component is used to render the login page
 // Props: none
 function LoginPage() {
   
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState([]);
@@ -31,23 +30,48 @@ function LoginPage() {
     setTextColors(textColors);
   }, []); */
 
-  const handleUsernameChange = (event) => {
-    setUsername(event.target.value);
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
   };
 
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
   let msg = [];
-  const checkUsername = (username, password) => {
-    if (username === "admin" && password === "admin") {
+  const checkemail = (email, password) => {
+
+    fetch('http://localhost:8080/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({email: email, password: password}),
+
+    }).then(response => response.json())
+    .then(data => {
+      console.log('Success:', data);
+      if (data.success){
+        alert('Login successful');
+        window.location.href = '/';
+        return true;
+      }
+      else {
+        setAlertTitle("Error");
+        msg.push(data.message);
+        setAlertMessage(msg);
+        return false;
+      }
+    })
+
+/* 
+    if (email === "admin" && password === "admin") {
       return true;
     } else {
       setAlertTitle("Error");
-      msg.push("Username or password is incorrect");
+      msg.push("email or password is incorrect");
       setAlertMessage(msg);
       return false;
-    }
+    } */
   }
 
   const [loginStatus, setLoginStatus] = useState(true);
@@ -56,7 +80,7 @@ function LoginPage() {
   //  this function is main function of the login page
   const handleLogin = () => {
     // Perform login logic here
-    if (checkUsername(username, password)) {
+    if (checkemail(email, password)) {
       setLoginStatus(true);
       document.querySelector(".alert-box").style.display = "none";
     } else {
@@ -72,12 +96,12 @@ function LoginPage() {
       <h1 >Login Page</h1>
       <form>
         <div>
-          <label>Username:</label>
+          <label>email:</label>
           <input
             type="text"
-            value={username}
+            value={email}
             style={{ background: loginStatus === false ? "#FFEA00" : "" }}
-            onChange={handleUsernameChange}
+            onChange={handleEmailChange}
             required
           />
         </div>
@@ -99,7 +123,6 @@ function LoginPage() {
         <a href='/register'>Register</a>
       </div>
     </div>
-    <ChatBox />
     </div>
   );
   

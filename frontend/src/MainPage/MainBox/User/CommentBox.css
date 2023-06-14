@@ -1,0 +1,143 @@
+.comment {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 10px 0;
+}
+.comment .comment-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 30px;
+    margin: 0 0 10px 0;
+}
+.comment .comment-button button {
+    width: 100%;
+    height: 30px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ccc;
+    color: #fff;
+    cursor: pointer;
+}
+
+.comment .comment-button button:hover {
+    background-color: #aaa;
+}
+
+.create_comment {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 10px 0;
+    
+}
+
+.create_comment textarea {
+    width: 100%;
+    height: 100px;
+    resize: none;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 0 0 10px 0;
+}
+
+.create_comment button {
+    width: 100px;
+    height: 30px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ccc;
+    color: #fff;
+    cursor: pointer;
+}
+
+.create_comment button:hover {
+    background-color: #aaa;
+}
+
+.create_comment_image {
+    width: 100%;
+    height: 100px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 0 0 10px 0;
+}
+
+.create_comment_image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.comment_list {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.comment_list_item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .comment_list_item_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .comment_list_item_header_left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .comment_list_item_header_info p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .comment_list_item_header_right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .comment_list_item_header_user p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .comment_list_item_body p.content {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .comment_list_item_image {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .comment_list_item_image img {
+    max-width: 100%;
+    height: auto;
+  }
+  

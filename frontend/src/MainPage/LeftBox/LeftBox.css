@@ -1,0 +1,77 @@
+.left-box{
+    padding: 20px 10px;
+    position: sticky;
+    left: 0;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 800px;
+    width: 400px;
+    border-radius: 10px
+
+}
+.user_box{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    border-bottom: 1px solid #e0e0e0;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.img_box img{
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+}
+.user_info {
+    font-size: 20px;
+    font-family: myFancyFont;
+}
+.user_info button{
+    margin-top: 5px;
+    font-size: 15px;
+    font-family: myFancyFont;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.nav-list{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    align-items: flex-start;
+}
+.nav-list li{
+    list-style: none;
+    font-family: myFancyFont;
+    margin: 10px 0 0 10px;
+}
+.nav-list a{
+    text-decoration: none;
+    color: #000;
+    font-family: myFancyFont;
+    cursor: pointer;
+}
+.nav-list a:hover{
+    color: #e0e0e0;
+}
+.nav-list span{
+    font-family: myFancyFont;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    text-align: start;
+    padding: 5px 0;
+    font-size: 20px;
+    
+}
