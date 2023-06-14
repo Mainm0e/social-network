@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Buffer } from 'buffer';
 import defaultAvatar from "../avatar/default-avatar.png";
 import "./info3.css";
 

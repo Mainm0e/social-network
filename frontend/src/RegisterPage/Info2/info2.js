@@ -11,14 +11,14 @@ const Info2 = ({ selectedOption, onChange, registerStatus }) => {
   const type = "info2";
 
   // Call the onChange prop with the input values whenever they change
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleInputChanges = (event) => {
     const { name, value } = event.target;
-    if (name === "username") {
-      setUsername(value);
+    if (name === "email") {
+      setEmail(value);
     } else if (name === "password") {
       setPassword(value);
     } else if (name === "confirmPassword") {
@@ -27,15 +27,15 @@ const Info2 = ({ selectedOption, onChange, registerStatus }) => {
   };
 
   React.useEffect(() => {
-    onChange({ type, username, password, confirmPassword });
-  }, [type, username, password, confirmPassword]);
+    onChange({ type, email, password, confirmPassword });
+  }, [type, email, password, confirmPassword]);
 
   return (
     <form>
     <div className={`user-info2_${selectedOption !== 'info2' && 'hidden'}`}>
       <div className='input-container'>
-        <label>Username:</label>
-        <input type='text' name='username' style={{ background: registerStatus === false && username === "" ? "#FFEA00" : "" }} value={username} onChange={handleInputChanges} />
+        <label>Email:</label>
+        <input type='text' name='email' style={{ background: registerStatus === false && email === "" ? "#FFEA00" : "" }} value={email} onChange={handleInputChanges} />
       </div>
       <div className='input-container'>
         <label>Password:</label>
