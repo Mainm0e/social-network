@@ -137,32 +137,13 @@ func (store *SessionStore) Get(sessionID string) (*Session, bool, error) {
 }
 
 /*
-CheckAuthentication checks if the user is authenticated by checking the session cookie
-in the request. If the user is authenticated, the function returns true. If the user is
-not authenticated, the function returns false. The function also returns an error which
-is non-nil if an error occurs during the authentication check.
+CheckAuthentication checks if the user is authenticated by taking a session cookie
+as input and checking if the session ID is present in the SessionStore sync.Map data
+structure by calling the *SessionStore Get() method. It returns a boolean indicating
+whether the user is authenticated or not, and an error, which is non-nil if an error
+occurs during the authentication check.
 */
-func CheckAuthentication(r *http.Request) (bool, error) {
-	cookie, err := r.Cookie(COOKIE_NAME)
-	if err != nil {
-		if errors.Is(err, http.ErrNoCookie) {
-			// if the cookie is not set, return false
-			return false, nil
-		}
-		// For any other type of error, return an error
-		return false, err
-	}
-
-	// Get the user session from the store
-	user, ok := Store.Data.Load(cookie.Value)
-	if !ok {
-		return false, nil
-	}
-
-	// Check if the session is expired
-	if cookie.Expires.Before(time.Now()) {
-		return false, nil
-	}
-
-	return user != "", nil
+func CheckAuthentication(cookie *http.Cookie) (bool, error) {
+	_, isValidSession, err := Store.Get(cookie.Value)
+	return isValidSession, err
 }
