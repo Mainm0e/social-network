@@ -1,3 +1,22 @@
+/*
+The sessions package is used for general session management and authentication functionality.
+It has two primary struct types:
+
+  - Session: stores the session ID and username of the logged in user, an admin boolean to
+    indicate if the user is an admin or not, and the expiry date / time of the session.
+  - SessionStore: stores a thread-safe map of sessions. It stores the sessions map in a
+    sync.Map data structure, which allows for concurrent read / write access to the map.
+
+In addition the sessions package has a number of Global (outward-facing) functions, as well
+as methods for the *SessionStore struct mentioned above. The Global functions are the
+following:
+
+  - Login: creates a new user session and stores it in the Store.Data sync.Map data
+    structure.
+  - Logout: deletes the user session from the Store.Data sync.Map data structure.
+  - Check: checks if a corresponding valid user session exists in the Store.Data
+    sync.Map data structure.
+*/
 package sessions
 
 import (
