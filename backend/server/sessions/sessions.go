@@ -147,3 +147,14 @@ func CheckAuthentication(cookie *http.Cookie) (bool, error) {
 	_, isValidSession, err := Store.Get(cookie.Value)
 	return isValidSession, err
 }
+
+/*
+Login is a global function in the sessions package, which is used to create a new user
+session when a frontend login event has been authenticated. It takes the username and
+admin boolean as arguments and calls the *SessionStore Create() method to create a new
+user session. It returns the session ID as well as an error, which is non-nil if an error
+occurs during the session creation.
+*/
+func Login(userName string, admin bool) (string, error) {
+	return Store.Create(userName, admin)
+}
