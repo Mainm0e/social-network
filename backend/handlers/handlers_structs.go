@@ -24,10 +24,6 @@ type Response struct {
 	Message    string `json:"message"`
 	StatusCode int    `json:"statusCode"`
 }
-type event struct {
-	Event_type string `json:"event_type"`
-	Payload    any    `json:"payload"`
-}
 
 type NullableString struct {
 	sql.NullString
@@ -40,4 +36,14 @@ func (s *NullableString) UnmarshalJSON(data []byte) error {
 	}
 	s.Valid = true
 	return json.Unmarshal(data, &s.String)
+}
+
+type Event struct {
+	Event_type string      `json:"event_type"`
+	Payload    interface{} `json:"payload"`
+}
+
+var Events = map[string]func(interface{}) (Response, error){
+	"login": LoginPage,
+	//"register": RegisterPage,
 }
