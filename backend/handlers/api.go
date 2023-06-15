@@ -18,7 +18,7 @@ func HTTPEventRouter(w http.ResponseWriter, r *http.Request) {
 		log.Println("Event:", event)
 		if err != nil {
 			log.Println("Error decoding event:", err)
-			response := Response{false, "Error decoding event:" + err.Error(), Event{}, http.StatusBadRequest}
+			response := Response{"Error decoding event:" + err.Error(), Event{}, http.StatusBadRequest}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
@@ -26,21 +26,21 @@ func HTTPEventRouter(w http.ResponseWriter, r *http.Request) {
 		handlerFunc, ok := Events[event.Event_type]
 		if !ok {
 			log.Println("Event type not found:", event.Event_type)
-			response := Response{false, "Event type not found", Event{}, http.StatusBadRequest}
+			response := Response{"Event type not found", Event{}, http.StatusBadRequest}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
 		response, err := handlerFunc(event.Payload)
 		if err != nil {
 			log.Println("Error handling event:", err)
-			response := Response{false, "Error handling event:" + err.Error(), Event{}, http.StatusBadRequest}
+			response := Response{"Error handling event:" + err.Error(), Event{}, http.StatusBadRequest}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
 		testData, err := json.Marshal(response)
 		if err != nil {
 			log.Println("Error marshaling response to JSON:", err)
-			response = Response{false, err.Error(), Event{}, http.StatusBadRequest}
+			response = Response{err.Error(), Event{}, http.StatusBadRequest}
 		}
 		log.Println("Response before sending it :", string(testData))
 		json.NewEncoder(w).Encode(response)
