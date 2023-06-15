@@ -151,11 +151,26 @@ const CreatePost = ({ cookie ,onSubmit }) => {
 
 
 // !! Main Component !!
-const PostBox = () => {
+const PostBox = (user) => {
     const [body, setBody] = useState('');
+    const [data, setData] = useState(null);
     const dummyCookie = '123456abcdef';
-
+   
     useEffect(() => {
+      const fetchData = async () => {
+        const response = await fetch("http://localhost:8080/api", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ event_type: "post", payload: { user_id: user.id } }),
+        });
+        const responseData = await response.json();
+        setData(responseData);
+      };
+  
+      fetchData();
+      
       const handleHashChange = () => {
         const hash = window.location.hash.substring(1);
         setBody(hash);
@@ -169,6 +184,8 @@ const PostBox = () => {
       return () => {
         window.removeEventListener('hashchange', handleHashChange);
       };
+
+      
     }, []);
   
     const handleSubmitPost = (postData) => {

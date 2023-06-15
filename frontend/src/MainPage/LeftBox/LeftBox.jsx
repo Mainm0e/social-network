@@ -11,7 +11,7 @@ const LeftBox = ({user}) => {
                 </div>
                 <div className="user_info">
                     <div className="username">
-                        <span>{user.fName}</span>
+                        <span>{user.firstName}</span>
                     </div>
                     <div className="logout_btn">
                         <button>logout</button>
