@@ -8,15 +8,8 @@ import (
 )
 
 func LoginPage(payload json.RawMessage) (Response, error) {
-	jsonData, err := json.Marshal(payload)
-	log.Println("LoginPage payload:", string(jsonData))
-	if err != nil {
-		// handle the error
-		fmt.Println("Error marshaling payload to JSON:", err)
-
-	}
 	var loginData LoginData
-	err = json.Unmarshal(jsonData, &loginData)
+	err := json.Unmarshal(payload, &loginData)
 	if err != nil {
 		// handle the error
 		fmt.Println("Error unmarshaling JSON to LoginData:", err)
@@ -25,11 +18,11 @@ func LoginPage(payload json.RawMessage) (Response, error) {
 	log.Println("Login try by:", loginData)
 	_, err = loginData.login()
 	if err != nil {
-		response := Response{false, err.Error(), Event{}, http.StatusBadRequest}
+		response := Response{err.Error(), Event{}, http.StatusBadRequest}
 		log.Println("Error logging in:", err)
 		return response, err
 	} else {
-		response := Response{true, "Login approved", Event{}, 200}
+		response := Response{"Login approved", Event{}, 200}
 		log.Println("Login approved", loginData)
 		return response, nil
 	}

@@ -31,7 +31,7 @@ type RegisterData struct {
 
 // TODO: we could remove success and make message more general
 type Response struct {
-	Success    bool   `json:"success"`
+	//Success    bool   `json:"success"`
 	Message    string `json:"message"`
 	Event      Event  `json:"event"`
 	StatusCode int    `json:"statusCode"`
