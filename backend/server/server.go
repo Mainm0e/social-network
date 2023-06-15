@@ -145,8 +145,9 @@ func initialiseRoutes() http.Handler {
 
 	// Register handler functions for various routes
 	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
-	mux.HandleFunc("/login", handlers.LoginPage)
-	mux.HandleFunc("/register", handlers.RegisterPage)
+	mux.HandleFunc("/api", handlers.HTTPEventRouter)
+	//mux.HandleFunc("/login", handlers.LoginPage)
+	//mux.HandleFunc("/register", handlers.RegisterPage)
 	// mux.HandleFunc("/main", handlers.MainPage)
 
 	// Wrap the mux with the CORS middleware and return it
