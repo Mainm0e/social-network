@@ -7,8 +7,9 @@ import (
 	"net/http"
 )
 
-func LoginPage(payload map[string]any) (Response, error) {
+func LoginPage(payload json.RawMessage) (Response, error) {
 	jsonData, err := json.Marshal(payload)
+	log.Println("LoginPage payload:", string(jsonData))
 	if err != nil {
 		// handle the error
 		fmt.Println("Error marshaling payload to JSON:", err)
@@ -24,11 +25,11 @@ func LoginPage(payload map[string]any) (Response, error) {
 	log.Println("Login try by:", loginData)
 	_, err = loginData.login()
 	if err != nil {
-		response := Response{false, err.Error(), http.StatusBadRequest}
+		response := Response{false, err.Error(), Event{}, http.StatusBadRequest}
 		log.Println("Error logging in:", err)
 		return response, err
 	} else {
-		response := Response{true, "Login approvxed", 200}
+		response := Response{true, "Login approved", Event{}, 200}
 		log.Println("Login approved", loginData)
 		return response, nil
 	}

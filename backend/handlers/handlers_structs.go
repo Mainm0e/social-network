@@ -1,13 +1,16 @@
 package handlers
 
+import "encoding/json"
+
 type Event struct {
-	Event_type string         `json:"event_type"`
-	Payload    map[string]any `json:"payload"`
+	Event_type string          `json:"event_type"`
+	Payload    json.RawMessage `json:"payload"` // change this to
 }
 
-var Events = map[string]func(map[string]any) (Response, error){
+var Events = map[string]func(json.RawMessage) (Response, error){
 	"login":    LoginPage,
 	"register": RegisterPage,
+	"profile":  ProfilePage,
 	//"createPost": CreatePost,
 }
 
@@ -30,7 +33,25 @@ type RegisterData struct {
 type Response struct {
 	Success    bool   `json:"success"`
 	Message    string `json:"message"`
+	Event      Event  `json:"event"`
 	StatusCode int    `json:"statusCode"`
+}
+type Profile struct {
+	UserId       int            `json:"userId"` // become uuid later
+	NickName     string         `json:"nickName"`
+	FirstName    string         `json:"firstName"`
+	LastName     string         `json:"lastName"`
+	Avatar       *string        `json:"avatar"` //
+	FollowerNum  int            `json:"followerNum"`
+	FollowingNum int            `json:"followingNum"`
+	PrivateData  PrivateProfile `json:"privateProfile"`
+}
+type PrivateProfile struct {
+	BirthDate string `json:"birthdate"`
+	Email     string `json:"email"`
+	AboutMe   string `json:"aboutme"`
+	Followers []int  `json:"followers"` // become array of uuid
+	Following []int  `json:"following"` // become array of uuid
 }
 
 // add post struct coming from frontend
