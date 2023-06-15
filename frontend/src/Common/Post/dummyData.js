@@ -5,6 +5,8 @@ export const PostData =[
         content: "This is the first postaksdjflöaksdjfölaksjdfölaksjdflaksjdflakjsdfölakjsdfajsdflkajsöflkjasöflkjasdölfkjasdöflkjasdölfkjasdölfkjasdfkjaödlskfjöalsdkjföalskjdföoaiwjeöfkajödoifjaöodijföaijfölaskdjfölaksjdfölkedjf",
         image: "https://picsum.photos/200",
         time: "01.01.1970 00:00",
+        status: "public",
+        
         user:{
             username: "kettu",
             fName: "Kettu",
