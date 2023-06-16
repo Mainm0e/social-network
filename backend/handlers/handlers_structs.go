@@ -18,6 +18,10 @@ type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+type ProfileRequest struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"` // become uuid later
+}
 type RegisterData struct {
 	NickName  string `json:"nickName,omitempty"` // optional
 	FirstName string `json:"firstName"`
@@ -37,6 +41,7 @@ type Response struct {
 	StatusCode int    `json:"statusCode"`
 }
 type Profile struct {
+	//SessionId    string         `json:"sessionId"`
 	UserId       int            `json:"userId"` // become uuid later
 	NickName     string         `json:"nickName"`
 	FirstName    string         `json:"firstName"`
@@ -54,6 +59,7 @@ type PrivateProfile struct {
 	Following []int  `json:"following"` // become array of uuid
 }
 type Post struct {
+	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 	Title     string `json:"title"`
 	Content   string `json:"content"`

@@ -1,8 +1,9 @@
 package handlers
 
 import (
+	"backend/server/sessions"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"log"
 	"net/http"
 )
@@ -12,8 +13,7 @@ func LoginPage(payload json.RawMessage) (Response, error) {
 	err := json.Unmarshal(payload, &loginData)
 	if err != nil {
 		// handle the error
-		fmt.Println("Error unmarshaling JSON to LoginData:", err)
-
+		log.Println("Error unmarshaling JSON to LoginData:", err)
 	}
 	log.Println("Login try by:", loginData)
 	_, err = loginData.login()
@@ -23,6 +23,18 @@ func LoginPage(payload json.RawMessage) (Response, error) {
 		return response, err
 	} else {
 		response := Response{"Login approved", Event{}, 200}
+		sessionId, err := sessions.Login(loginData.Email, false)
+		if err != nil {
+			log.Println("Error logging in:", err)
+			response := Response{err.Error(), Event{}, http.StatusBadRequest}
+			return response, err
+		}
+		payload, err = json.Marshal(map[string]string{"sessionId": sessionId})
+		if err != nil {
+			response = Response{err.Error(), Event{}, http.StatusBadRequest}
+			return response, errors.New("Error marshaling profile to JSON: " + err.Error())
+		}
+		response.Event = Event{"Login approved", payload}
 		log.Println("Login approved", loginData)
 		return response, nil
 	}

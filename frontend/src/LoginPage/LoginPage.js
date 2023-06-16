@@ -39,7 +39,7 @@ function LoginPage() {
   };
   let msg = [];
   const checkemail = (email, password) => {
-
+    console.log("checkEmail",email, password);
     fetch('http://localhost:8080/api', {
       method: 'POST',
       headers: {
@@ -81,6 +81,7 @@ function LoginPage() {
   const handleLogin = () => {
     // Perform login logic here
     if (checkemail(email, password)) {
+      console.log("do login",email, password)
       setLoginStatus(true);
       document.querySelector(".alert-box").style.display = "none";
     } else {
