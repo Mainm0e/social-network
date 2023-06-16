@@ -58,7 +58,17 @@
           const [registerStatus, setRegisterStatus] = useState(true);
           // matchPassword is used to check if the password and confirmPassword are the same
           // if they are the same, {matchPassword = password} else {matchPassword = ""}
-          let data = {};
+          let data = {
+            firstName,
+            lastName,
+            email,
+            birthdate,
+            password,
+            nickName,
+            aboutme,
+            avatar,
+
+          };
           let matchPassword = password === confirmPassword ;
           if (matchPassword) {
             data = {
@@ -76,7 +86,6 @@
           // register function
           // this function is main function of the register page
           const register = () => {
-
             const response = checkData(data);
             setAlertTitle(response.title);
             setAlertMessage(response.message);
@@ -92,16 +101,16 @@
             console.log("check when send data",response.status)
           if (response.status){
             setRegisterStatus(false);
-            fetch('http://localhost:8080/register', {
+            fetch('http://localhost:8080/api', {
               method: 'POST',
-              body: JSON.stringify(data),
+              body: JSON.stringify({"event_type":"register", "payload":data}),
               })
               .then(response => response.json())
               .then(data => {
                 console.log('Success:', data);
                 if (data.success){
                   setRegisterStatus(true);
-                  window.location.href = '/login';
+                  /* window.location.href = '/login'; */
                 }
                 else {
                   setAlertTitle(data.message)

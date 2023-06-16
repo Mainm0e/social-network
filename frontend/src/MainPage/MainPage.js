@@ -8,17 +8,19 @@ import ChatBox from '../Common/ChatBox/ChatBox';
 import { user1 } from "./dummyData";
 
 
-function MainPage() {
-  return (
-    <div className="main-page">
-        <div className="main-page-container">
-        <LeftBox user={user1}/>
-        <MainBox user={user1}/>
-        <RightBox />
-        <ChatBox />
-        </div>
-    </div>
-
-  );
+function MainPage(name) {
+ 
+   fetch('http://localhost:8080/api', {
+     method: 'POST',
+     headers: {
+       'Content-Type': 'application/json',     },
+     body: JSON.stringify({event_type:'profile', payload: {user_id: 17}})
+   }).then((response) => {
+  console.log(response);
+     return response.json();
+     
+   }).then((data) => {
+     console.log(data);
+   })
 }
 export default MainPage;

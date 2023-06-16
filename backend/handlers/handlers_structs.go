@@ -1,9 +1,18 @@
 package handlers
 
-import (
-	"database/sql"
-	"encoding/json"
-)
+import "encoding/json"
+
+type Event struct {
+	Event_type string          `json:"event_type"`
+	Payload    json.RawMessage `json:"payload"` // change this to
+}
+
+var Events = map[string]func(json.RawMessage) (Response, error){
+	"login":    LoginPage,
+	"register": RegisterPage,
+	"profile":  ProfilePage,
+	//"createPost": CreatePost,
+}
 
 type LoginData struct {
 	Email    string `json:"email"`
@@ -19,20 +28,55 @@ type RegisterData struct {
 	AboutMe   string `json:"aboutme,omitempty"` // optional
 	Avatar    string `json:"avatar,omitempty"`  // optional
 }
+
+// TODO: we could remove success and make message more general
 type Response struct {
-	Success    bool   `json:"success"`
+	//Success    bool   `json:"success"`
 	Message    string `json:"message"`
+	Event      Event  `json:"event"`
 	StatusCode int    `json:"statusCode"`
 }
-type NullableString struct {
-	sql.NullString
+type Profile struct {
+	UserId       int            `json:"userId"` // become uuid later
+	NickName     string         `json:"nickName"`
+	FirstName    string         `json:"firstName"`
+	LastName     string         `json:"lastName"`
+	Avatar       *string        `json:"avatar"` //
+	FollowerNum  int            `json:"followerNum"`
+	FollowingNum int            `json:"followingNum"`
+	PrivateData  PrivateProfile `json:"privateProfile"`
+}
+type PrivateProfile struct {
+	BirthDate string `json:"birthdate"`
+	Email     string `json:"email"`
+	AboutMe   string `json:"aboutme"`
+	Followers []int  `json:"followers"` // become array of uuid
+	Following []int  `json:"following"` // become array of uuid
 }
 
-func (s *NullableString) UnmarshalJSON(data []byte) error {
-	if string(data) == "null" {
-		s.Valid = false
-		return nil
-	}
-	s.Valid = true
-	return json.Unmarshal(data, &s.String)
+// add post struct coming from frontend
+/* type Post struct {
+	UserId  int    `json:"userId"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Status  string `json:"status"` ------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
+	followers []int `json:"followers"`---> this one related to status
+	Image   string `json:"image"`
+	GroupId int    `json:"groupId"` ---> if post is a group post
 }
+	comment struct coming from frontend
+	type Comment struct {
+		PostId   int    `json:"postId"`
+		UserId   int    `json:"userId"`
+		Content  string `json:"content"`
+		ParentId int    `json:"parentId"`
+	}
+
+	send post struct to frontend
+	type SendPost struct {
+	PostId   int    `json:"postId"`
+	Post    Post   `json:"post"`
+	Comments []Comment `json:"comments"`
+	}
+
+*/
