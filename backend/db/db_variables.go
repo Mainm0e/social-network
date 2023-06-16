@@ -100,7 +100,7 @@ var TableKeys = map[string]string{
 Global update rules for ease of maintenance, and simplifying of the UpdateData function.
 */
 var UpdateRules = map[string]string{
-	"users":         "UPDATE users SET nickName=?, firstName=?, lastName=?, birthDate=?, email=?, password=?, aboutMe=?,avatar=?, privacy=? WHERE userId=?",
+	"users":         "UPDATE users SET  privacy=? WHERE userId=?",
 	"posts":         "UPDATE posts SET userId=?, title=?, content=?, status=?, groupId=? WHERE postId=?",
 	"comments":      "UPDATE comments SET userId=?, postId=?, content=? WHERE commentId=?",
 	"groups":        "UPDATE groups SET creatorId=?, title=?, description=? WHERE groupId=?",

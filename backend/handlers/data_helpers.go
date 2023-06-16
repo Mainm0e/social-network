@@ -35,8 +35,8 @@ func findFollowings(userId int) ([]int, error) {
 }
 
 /*
-this function check the online user and requested user profile relation
-if online user follow requested user then it return 'following' if they already request to follow then it return 'pending' else it return 'follow'
+this function check the current user and requested user profile relation
+if current user follow requested user then it return 'following' if they already request to follow then it return 'pending' else it return 'follow'
 if error occur then it return error
 */
 func checkUserRelation(userId int, profileId int) (string, error) {
@@ -54,6 +54,11 @@ func checkUserRelation(userId int, profileId int) (string, error) {
 	}
 	return "follow", nil
 }
+
+/*
+FillProfile function fill the profile struct with the data base on the relation between current user and requested user profile
+if error occur then it return error else it return profile struct and nil.
+*/
 func FillProfile(userId int, profileId int) (Profile, error) {
 
 	users, err := db.FetchData("users", "userId", profileId)
@@ -64,7 +69,7 @@ func FillProfile(userId int, profileId int) (Profile, error) {
 		return Profile{}, errors.New("user not found")
 	}
 	user := users[0].(db.User)
-	// check relation between online user and requested user
+	// check relation between current user and requested user
 	status, err := checkUserRelation(userId, profileId)
 	if err != nil {
 		return Profile{}, errors.New("Error CheckUserRelation: " + err.Error())
@@ -99,7 +104,6 @@ func FillProfile(userId int, profileId int) (Profile, error) {
 			followers,
 			followings,
 		}
-		log.Println("yay user is user", profile.PrivateData)
 	} else if status == "follow" || status == "pending" {
 		return profile, nil
 	} else {
@@ -168,5 +172,45 @@ func IsNotUser(email string) (bool, error) {
 }
 
 /*
-func updateProfile(email string,data any) error {
-} */
+UpdateProfile is a function that updates the privacy of a user with the specified email.
+returns error if any occurred.
+*/
+func UpdateProfile(email string, privacy string) error {
+	users, err := db.FetchData("users", "email", email)
+	if err != nil {
+		return errors.New("Error fetching user" + err.Error())
+	}
+	if len(users) == 0 {
+		return errors.New("user not found")
+	}
+	user := users[0].(db.User)
+	// if frontend guys were too lazy to check if privacy changed really or same thing is sent again check it here before updating
+
+	err = db.UpdateData("users", privacy, user.UserId)
+	if err != nil {
+		return errors.New("Error updating user" + err.Error())
+	}
+	return nil
+}
+
+/*
+ */
+func createPost(post Post) error {
+
+	id, err := db.InsertData("posts", post.Title, post.Content, time.Now(), post.Status, post.GroupId)
+	if err != nil {
+		return errors.New("Error inserting post" + err.Error())
+	}
+	if id == 0 {
+		return errors.New("error inserting post")
+	}
+	if post.Status == "semi-private" {
+		for followerId := range post.Followers {
+			_, err := db.InsertData("semiPrivate", id, followerId)
+			if err != nil {
+				return errors.New("Error inserting semiPrivate" + err.Error())
+			}
+		}
+	}
+	return nil
+}

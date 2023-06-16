@@ -9,10 +9,8 @@ import (
 func ProfilePage(payload json.RawMessage) (Response, error) {
 	userId := 1 // TODO: get user id from session
 	var response Response
-	type UserId struct {
-		UserID int `json:"user_id"`
-	}
-	var user UserId
+
+	var user ProfileRequest
 	err := json.Unmarshal(payload, &user)
 	if err != nil {
 		// handle the error
@@ -21,7 +19,7 @@ func ProfilePage(payload json.RawMessage) (Response, error) {
 	}
 
 	var profile Profile
-	profile, err = FillProfile(userId, user.UserID)
+	profile, err = FillProfile(userId, user.UserId)
 	if err != nil {
 		response = Response{err.Error(), Event{}, http.StatusBadRequest}
 		return response, err
