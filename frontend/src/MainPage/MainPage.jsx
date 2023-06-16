@@ -27,7 +27,7 @@ function MainPage() {
   }, []);
   if (!data) {
     return <div>Loading...</div>;
-  } else if (data.success){
+  } else{
   return (
     <div className="main-page">
       <div className="main-page-container">

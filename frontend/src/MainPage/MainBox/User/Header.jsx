@@ -21,7 +21,7 @@ const Header = (profile) => {
     }
   };
   return (
-    <div className="main_header" key={user.id}>
+    <div className="main_header" key={user.id}  >
       <div className="info_img">
         <img src={user.avatar} alt="user-img" />
       </div>
