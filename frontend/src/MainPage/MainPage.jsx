@@ -7,6 +7,7 @@ import ChatBox from "../Common/ChatBox/ChatBox";
 
 // dummy data
 function MainPage() {
+  
   const [data, setData] = useState(null);
   //get cookie from browser
   const getCookie = (name) => {
@@ -28,6 +29,7 @@ function MainPage() {
       });
       const responseData = await response.json();
       setData(responseData);
+      
     };
 
     fetchData();
@@ -39,7 +41,7 @@ function MainPage() {
     <div className="main-page">
       <div className="main-page-container">
         <LeftBox user={data.event.payload} />
-        <MainBox user={data.event.payload} />
+        <MainBox id={sessionId} />
         <RightBox />
         <ChatBox />
       </div>
