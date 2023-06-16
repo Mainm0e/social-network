@@ -35,7 +35,7 @@ type RegisterData struct {
 	LastName  string `json:"lastName"`
 	BirthDate string `json:"birthdate"`
 	Email     string `json:"email"`
-	Password  string `json:"matchPassword"`
+	Password  string `json:"password"`
 	AboutMe   string `json:"aboutme,omitempty"` // optional
 	Avatar    string `json:"avatar,omitempty"`  // optional
 }

@@ -51,6 +51,7 @@ It returns the inserted user as a db.User struct and any error encountered durin
 */
 func insertRandomUser(t *testing.T) (RegisterData, error) {
 	user, err := createRandomUser(t)
+	fmt.Println(user)
 	if err != nil {
 		return user, errors.New("createRandomUser got error: " + err.Error())
 	}

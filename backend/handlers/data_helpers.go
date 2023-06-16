@@ -4,10 +4,15 @@ import (
 	"backend/db"
 	"backend/utils"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 )
 
+/*
+fetchUser get a user from the database using the userId.
+It returns the user and any error encountered during the process.
+*/
 func fetchUser(userId int) (db.User, error) {
 	users, err := db.FetchData("users", "userId", userId)
 	if err != nil {
@@ -222,7 +227,8 @@ It takes in a byte slice `data` containing the registration information.
 It returns a boolean value indicating whether the registration was successful, and an error if any occurred.
 */
 func (regData *RegisterData) register() error {
-	_, err := db.InsertData("users", regData.NickName, regData.FirstName, regData.LastName, regData.BirthDate, regData.Email, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
+	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
+	fmt.Println("regData", regData)
 	if err != nil {
 		return errors.New("Error inserting user" + err.Error())
 	}
@@ -273,7 +279,7 @@ func UpdateProfile(email string, privacy string) error {
 
 /*
  */
-func createPost(post Post) error {
+func CreatePost(post Post) error {
 
 	id, err := db.InsertData("posts", post.Title, post.Content, time.Now(), post.Status, post.GroupId)
 	if err != nil {
