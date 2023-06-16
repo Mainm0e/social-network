@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 )
 
@@ -11,7 +12,9 @@ func ProfilePage(payload json.RawMessage) (Response, error) {
 	var response Response
 
 	var user ProfileRequest
+	log.Println("Payload: ", string(payload))
 	err := json.Unmarshal(payload, &user)
+	log.Println("User: ", user)
 	if err != nil {
 		// handle the error
 		response = Response{err.Error(), Event{}, http.StatusBadRequest}

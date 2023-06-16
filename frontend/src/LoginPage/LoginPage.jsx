@@ -50,8 +50,9 @@ function LoginPage() {
     }).then(response => response.json())
     .then(data => {
       console.log('Success:', data);
-      if (data.success){
-        alert('Login successful');
+      if (data.statusCode === 200){
+        // set cookie
+        document.cookie = "sessionId=" + data.event.payload.sessionId;
         window.location.href = '/';
         return true;
       }

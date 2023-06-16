@@ -8,8 +8,15 @@ import ChatBox from "../Common/ChatBox/ChatBox";
 // dummy data
 function MainPage() {
   const [data, setData] = useState(null);
-
-
+  //get cookie from browser
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2){
+      return parts[1]
+    }
+  };
+  const sessionId = getCookie("sessionId");
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch("http://localhost:8080/api", {
@@ -17,7 +24,7 @@ function MainPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ event_type: "profile", payload: { user_id: 1 } }),
+        body: JSON.stringify({ event_type: "profile", payload: {sessionId:sessionId, userId: 1 } }),
       });
       const responseData = await response.json();
       setData(responseData);
