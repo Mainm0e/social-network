@@ -146,6 +146,14 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 		if !isAuthenticated {
 			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
 
+			// Check for login event exception from the login url
+			if r.URL.Path == "/login" {
+				// If the user is not authenticated and the request is for the login page,
+				// pass to the next middleware or handler
+				handler.ServeHTTP(w, r)
+				return
+			}
+
 			// Respond with 401 Unauthorized
 			http.Error(w, "Unauthorized access", http.StatusUnauthorized)
 			return
