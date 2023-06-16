@@ -3,7 +3,7 @@ package server
 import (
 	"backend/db"
 	"backend/handlers"
-	"backend/sessions"
+	"backend/server/sessions"
 	"backend/utils"
 	"context"
 	"errors"
@@ -45,6 +45,20 @@ func initiateLogging(logPath string) error {
 }
 
 /*
+extractCookie is a function which takes an http.Request as an input and returns a pointer
+to an http.Cookie and an error. It is used to extract the session cookie from the request
+header. It returns an error which is non-nil if a cookie with the sessions.COOKIE_NAME is
+not present in the request header.
+*/
+func extractCookie(r *http.Request) (*http.Cookie, error) {
+	cookie, err := r.Cookie(sessions.COOKIE_NAME)
+	if err != nil {
+		return nil, errors.New("error in server.extractCookie(): " + err.Error())
+	}
+	return cookie, nil
+}
+
+/*
 loggerMiddleware is a middleware function which logs the URL path of each request to the
 server. It takes an input of an http.Handler and returns an http.Handler. It can be coupled
 with various other middleware functions to create a middleware chain. This pattern is used
@@ -60,38 +74,6 @@ func loggerMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Request received at: %s\n", r.URL.Path) // ** ONLY FOR DEVELOPMENT, REMOVE LATER **
 		log.Println("Request received at: ", r.URL.Path)
-		handler.ServeHTTP(w, r)
-	})
-}
-
-/*
-authenticationMiddleware is a middleware function which handles authentication logic
-for each request to the server. It takes an input of an http.Handler and returns an
-http.Handler, calling the sessions.CheckAuthentication() function to check if the user
-is authenticated. It can be coupled with various other middleware functions to create a
-middleware chain implemented by the loggerMiddleware() function.
-*/
-func authenticationMiddleware(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// TODO: Authentication logic, handler calls etc. in sessions.CheckAuthentication(r)
-		isAuthenticated, err := sessions.CheckAuthentication(r)
-		if err != nil {
-			log.Println("Error checking authentication: ", err.Error())
-
-			// Respond with 500 Internal Server Error with a message
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		if !isAuthenticated {
-			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
-
-			// Respond with 401 Unauthorized
-			http.Error(w, "Unauthorized access", http.StatusUnauthorized)
-			return
-		}
-
-		// If authenticated, pass to the next middleware or handler
 		handler.ServeHTTP(w, r)
 	})
 }
@@ -129,6 +111,55 @@ func corsMiddleware(handler http.Handler) http.Handler {
 		}
 
 		// Begin wrapping, call the next handler in the chain
+		handler.ServeHTTP(w, r)
+	})
+}
+
+/*
+authenticationMiddleware is a middleware function which handles authentication logic
+for each request to the server. It takes an input of an http.Handler and returns an
+http.Handler, calling the sessions.CheckAuthentication() function to check if the user
+is authenticated. It can be coupled with various other middleware functions to create a
+middleware chain implemented by the loggerMiddleware() function.
+*/
+func authenticationMiddleware(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Extract the session cookie from the request header
+		cookie, err := extractCookie(r)
+		if err != nil {
+			log.Println("Error extracting cookie: ", err.Error())
+
+			// Respond with 401 Unauthorized with a message
+			http.Error(w, "No session cookie found", http.StatusUnauthorized)
+			return
+		}
+
+		isAuthenticated, err := sessions.Check(cookie)
+		if err != nil {
+			log.Println("Error checking authentication: ", err.Error())
+
+			// Respond with 500 Internal Server Error with a message
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		if !isAuthenticated {
+			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
+
+			// Check for login event exception from the login url
+			if r.URL.Path == "/login" {
+				// If the user is not authenticated and the request is for the login page,
+				// pass to the next middleware or handler
+				handler.ServeHTTP(w, r)
+				return
+			}
+
+			// Respond with 401 Unauthorized
+			http.Error(w, "Unauthorized access", http.StatusUnauthorized)
+			return
+		}
+
+		// If authenticated, pass to the next middleware or handler
 		handler.ServeHTTP(w, r)
 	})
 }
