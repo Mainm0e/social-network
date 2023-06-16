@@ -53,17 +53,18 @@ type PrivateProfile struct {
 	Followers []int  `json:"followers"` // become array of uuid
 	Following []int  `json:"following"` // become array of uuid
 }
+type Post struct {
+	UserId    int    `json:"userId"`
+	Title     string `json:"title"`
+	Content   string `json:"content"`
+	Status    string `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
+	Followers []int  `json:"followers"` //---> this one related to status
+	Image     string `json:"image"`
+	GroupId   int    `json:"groupId"` // ---> if post is a group post
+}
 
 // add post struct coming from frontend
-/* type Post struct {
-	UserId  int    `json:"userId"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	Status  string `json:"status"` ------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
-	followers []int `json:"followers"`---> this one related to status
-	Image   string `json:"image"`
-	GroupId int    `json:"groupId"` ---> if post is a group post
-}
+/*
 	comment struct coming from frontend
 	type Comment struct {
 		PostId   int    `json:"postId"`
