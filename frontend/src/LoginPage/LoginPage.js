@@ -40,12 +40,12 @@ function LoginPage() {
   let msg = [];
   const checkemail = (email, password) => {
 
-    fetch('http://localhost:8080/login', {
+    fetch('http://localhost:8080/api', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({email: email, password: password}),
+      body: JSON.stringify({event_type:"login","payload":{email: email, password: password}}),
 
     }).then(response => response.json())
     .then(data => {
