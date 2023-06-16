@@ -8,9 +8,10 @@ type Event struct {
 }
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":    LoginPage,
-	"register": RegisterPage,
-	"profile":  ProfilePage,
+	"login":       LoginPage,
+	"register":    RegisterPage,
+	"profile":     ProfilePage,
+	"profileList": ProfileList,
 	//"createPost": CreatePost,
 }
 
@@ -18,9 +19,15 @@ type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+type ProfileListRequest struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	ListName  string `json:"listName"`
+}
+
 type ProfileRequest struct {
 	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"` // become uuid later
+	UserId    int    `json:"userId"`
 }
 type RegisterData struct {
 	NickName  string `json:"nickName,omitempty"` // optional
@@ -35,14 +42,19 @@ type RegisterData struct {
 
 // TODO: we could remove success and make message more general
 type Response struct {
-	//Success    bool   `json:"success"`
 	Message    string `json:"message"`
 	Event      Event  `json:"event"`
 	StatusCode int    `json:"statusCode"`
 }
+type SmallProfile struct {
+	UserId    int     `json:"userId"`
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
+	Avatar    *string `json:"avatar"`
+}
 type Profile struct {
-	//SessionId    string         `json:"sessionId"`
-	UserId       int            `json:"userId"` // become uuid later
+	SessionId    string         `json:"sessionId"`
+	UserId       int            `json:"userId"`
 	NickName     string         `json:"nickName"`
 	FirstName    string         `json:"firstName"`
 	LastName     string         `json:"lastName"`
