@@ -152,10 +152,9 @@ const CreatePost = ({ cookie ,onSubmit }) => {
 
 // !! Main Component !!
 const PostBox = (user) => {
+  console.log(user)
     const [body, setBody] = useState('');
     const [data, setData] = useState(null);
-    const dummyCookie = '123456abcdef';
-   
     useEffect(() => {
       const fetchData = async () => {
         const response = await fetch("http://localhost:8080/api", {
@@ -212,13 +211,13 @@ const PostBox = (user) => {
         <>
         {body === 'createpost' && (
         <section id="createpost">
-          <CreatePost cookie={dummyCookie} onSubmit={handleSubmitPost}/>
+          <CreatePost onSubmit={handleSubmitPost}/>
         </section>
         )}
 
         {body === 'postlist' && (
         <section id="postlist">
-          <PostList cookie={dummyCookie} />
+          <PostList />
         </section>
       )}
       </>

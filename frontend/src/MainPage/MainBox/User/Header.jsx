@@ -1,6 +1,7 @@
 import "../MainBox.css";
 const Header = (profile) => {
-  const user = profile.user;
+  const user = profile.profile;
+  console.log("user",user)
     /* console.log(user.privateProfile.followers, user.privateProfile.following); */
   const checkPrivacy = () => {
     if (true) {
