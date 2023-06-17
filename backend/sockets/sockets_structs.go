@@ -1,6 +1,7 @@
 package sockets
 
 import (
+	"backend/events"
 	"net/http"
 	"sync"
 	"time"
@@ -67,7 +68,7 @@ var websocketUpgrader = websocket.Upgrader{
 EventHandler type is a function that handles an event. It takes an Event and a Client
 as parameters and returns an error if the event cannot be handled successfully.
 */
-type EventHandler func(event Event, client *Client) error
+type EventHandler func(event events.Event, client *Client) error
 
 /*
 ClientList is a struct that represents a map of connected clients. It is a wrapper

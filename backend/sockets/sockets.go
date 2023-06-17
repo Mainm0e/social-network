@@ -1,6 +1,7 @@
 package sockets
 
 import (
+	"backend/events"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -77,12 +78,12 @@ func (c *Client) ReadData() {
 		}
 
 		// Unmarshal the received message into an event.
-		var event Event
+		var event events.Event
 		if err := json.Unmarshal(message, &event); err != nil {
 			log.Printf("Error unmarshalling event: %v", err)
 
 			// In case of an error unmarshalling, it sends back an error event to the client.
-			errorEvent := Event{
+			errorEvent := events.Event{
 				Type:    "", // TODO: Add error event type
 				Payload: json.RawMessage(fmt.Sprintf(`{"error": "Failed to parse event: %v"}`, err)),
 			}
