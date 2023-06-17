@@ -4,8 +4,29 @@ import (
 	"encoding/json"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
+)
+
+const (
+	// Maximum message size allowed from peer in bytes
+	MAX_DATA_SIZE = 1024
+
+	// Read Buffer Size
+	READ_BUFFER_SIZE = 1024
+
+	// Write Buffer Size
+	WRITE_BUFFER_SIZE = 1024
+
+	// Time allowed to read a reply pong message before timing out
+	PONG_WAIT = 10 * time.Second
+
+	// The interval at which ping messages are sent to the peer.
+	PING_INTERVAL = (PONG_WAIT * 9) / 10
+
+	// The maximum amount of time to wait for a peer to write a message.
+	WRITE_WAIT = 10 * time.Second
 )
 
 /*
@@ -30,8 +51,8 @@ initiate a WebSocket connection.
 var websocketUpgrader = websocket.Upgrader{
 	// Allow connections from any origin
 	CheckOrigin:     func(r *http.Request) bool { return true },
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+	ReadBufferSize:  READ_BUFFER_SIZE,
+	WriteBufferSize: WRITE_BUFFER_SIZE,
 }
 
 /*
