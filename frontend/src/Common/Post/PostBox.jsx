@@ -228,7 +228,7 @@ const PostBox = ({id}) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ type: "createPost", payload: {sessionId:sessionId,postId:0,userId: id, title: postData.title, content: postData.content, image: postData.image, status: postData.privecy, groupId: 1, comments: [],date:"",followers:[]}}),
+          body: JSON.stringify({ type: "createPost", payload: {sessionId:sessionId,postId:0,userId: id, title: postData.title, content: postData.content, image: postData.image, status: "semi-private", groupId: 0, comments: [],date:"",followers:[2,3,19]}}),
         });
         const responseData = await response.json();
       }

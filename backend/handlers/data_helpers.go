@@ -262,7 +262,7 @@ returns error if any occurred.
 func UpdateProfile(email string, privacy string) error {
 	users, err := db.FetchData("users", "email", email)
 	if err != nil {
-		return errors.New("Error fetching user" + err.Error())
+		return errors.New("Error fetching user " + err.Error())
 	}
 	if len(users) == 0 {
 		return errors.New("user not found")
@@ -272,7 +272,7 @@ func UpdateProfile(email string, privacy string) error {
 
 	err = db.UpdateData("users", privacy, user.UserId)
 	if err != nil {
-		return errors.New("Error updating user" + err.Error())
+		return errors.New("Error updating user " + err.Error())
 	}
 	return nil
 }
@@ -280,15 +280,15 @@ func UpdateProfile(email string, privacy string) error {
 /*
  */
 func InsertPost(post Post) error {
-	id, err := db.InsertData("posts", post.UserId, post.Title, post.Content, time.Now(), post.Status, post.GroupId)
+	id, err := db.InsertData("posts", post.UserId, post.GroupId, post.Title, post.Content, time.Now(), post.Status)
 	if err != nil {
-		return errors.New("Error inserting post" + err.Error())
+		return errors.New("Error inserting post " + err.Error())
 	}
 	if id == 0 {
-		return errors.New("error inserting post")
+		return errors.New("error inserting post ")
 	}
 	if post.Status == "semi-private" {
-		for followerId := range post.Followers {
+		for _, followerId := range post.Followers {
 			_, err := db.InsertData("semiPrivate", id, followerId)
 			if err != nil {
 				return errors.New("Error inserting semiPrivate" + err.Error())
