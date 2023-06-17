@@ -35,7 +35,6 @@ const PostList = (id) => {
       const responseData = await response.json();
       setPostData(responseData);
     };
-    console.log(postData);
     getPost();
   }, []);
   if (!postData) {
