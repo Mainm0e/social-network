@@ -2,10 +2,84 @@ package handlers
 
 import (
 	"backend/db"
+	"backend/utils"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 )
+
+/*
+fetchUser get a user from the database using the userId.
+It returns the user and any error encountered during the process.
+*/
+func fetchUser(userId int) (db.User, error) {
+	users, err := db.FetchData("users", "userId", userId)
+	if err != nil {
+		return db.User{}, errors.New("Error fetching user data" + err.Error())
+	}
+	if len(users) == 0 {
+		return db.User{}, errors.New("user not found")
+	}
+	return users[0].(db.User), nil
+}
+
+/*
+smallProfiles use for followers and followings list in profile page and maybe explore page in future
+*/
+
+/*
+fillSmallProfile fills a SmallProfile struct with data from a db.User struct.
+It returns the filled SmallProfile struct and any error encountered during the process.
+*/
+func fillSmallProfile(userId int) (SmallProfile, error) {
+	user, err := fetchUser(userId)
+	if err != nil {
+		return SmallProfile{}, errors.New("Error fetchingUser:" + err.Error())
+	}
+	smallProfile := SmallProfile{
+		UserId:    user.UserId,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Avatar:    user.Avatar,
+	}
+	if user.Avatar != nil {
+		avatar, err := utils.RetrieveAvatarImage(*user.Avatar)
+		if err != nil {
+			return SmallProfile{}, errors.New("Error retrieving avatar image: " + err.Error())
+		}
+		smallProfile.Avatar = &avatar
+	}
+	return smallProfile, nil
+}
+
+func SmallProfileList(userId int, listName string) ([]SmallProfile, error) {
+	var list []int
+	var err error
+	if listName == "followers" {
+		list, err = findFollowers(userId)
+		if err != nil {
+			return nil, errors.New("Error fetching followers data" + err.Error())
+		}
+	} else if listName == "followings" {
+		list, err = findFollowings(userId)
+		if err != nil {
+			return nil, errors.New("Error fetching followings data" + err.Error())
+		}
+	} else {
+		//TODO: if we need a small profile list for other things like explore page we should add it here
+		return nil, errors.New("invalid list name")
+	}
+	var smallProfiles []SmallProfile
+	for _, followerId := range list {
+		smallProfile, err := fillSmallProfile(followerId)
+		if err != nil {
+			return nil, errors.New("Error fetching followers data" + err.Error())
+		}
+		smallProfiles = append(smallProfiles, smallProfile)
+	}
+	return smallProfiles, nil
+}
 
 /*
 findFollowers and findFollowings function return the list of followers and followings of the desired user
@@ -59,7 +133,7 @@ func checkUserRelation(userId int, profileId int) (string, error) {
 FillProfile function fill the profile struct with the data base on the relation between current user and requested user profile
 if error occur then it return error else it return profile struct and nil.
 */
-func FillProfile(userId int, profileId int) (Profile, error) {
+func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 
 	users, err := db.FetchData("users", "userId", profileId)
 	if err != nil {
@@ -84,7 +158,16 @@ func FillProfile(userId int, profileId int) (Profile, error) {
 	if err != nil {
 		return Profile{}, errors.New("Error findFollowings: " + err.Error())
 	}
+	if user.Avatar != nil {
+
+		avatar, err := utils.RetrieveAvatarImage(*user.Avatar)
+		if err != nil {
+			return Profile{}, errors.New("Error retrieving avatar image: " + err.Error())
+		}
+		user.Avatar = &avatar
+	}
 	profile := Profile{
+		sessionId,
 		user.UserId,
 		user.NickName.String,
 		user.FirstName,
@@ -144,7 +227,8 @@ It takes in a byte slice `data` containing the registration information.
 It returns a boolean value indicating whether the registration was successful, and an error if any occurred.
 */
 func (regData *RegisterData) register() error {
-	_, err := db.InsertData("users", regData.NickName, regData.FirstName, regData.LastName, regData.BirthDate, regData.Email, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
+	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
+	fmt.Println("regData", regData)
 	if err != nil {
 		return errors.New("Error inserting user" + err.Error())
 	}
@@ -195,7 +279,7 @@ func UpdateProfile(email string, privacy string) error {
 
 /*
  */
-func createPost(post Post) error {
+func CreatePost(post Post) error {
 
 	id, err := db.InsertData("posts", post.Title, post.Content, time.Now(), post.Status, post.GroupId)
 	if err != nil {

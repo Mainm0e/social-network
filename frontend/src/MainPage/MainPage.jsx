@@ -25,11 +25,11 @@ function MainPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ event_type: "profile", payload: {sessionId:sessionId, userId: 1 } }),
+        body: JSON.stringify({ event_type: "profileList", payload: {sessionId:sessionId, userId: 1, listName:"followings"} }),
       });
       const responseData = await response.json();
       setData(responseData);
-      
+      console.log(responseData)
     };
 
     fetchData();

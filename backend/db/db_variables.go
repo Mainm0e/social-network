@@ -19,7 +19,7 @@ Global database insertion rules for ease of maintenance, and simplifying of the 
 */
 var InsertRules = map[string]InsertRule{
 	"users": {
-		Query:      "INSERT INTO users(nickName, firstName, lastName, birthDate, email, password, aboutMe, avatar, privacy, creationTime) VALUES(?,?,?,?,?,?,?,?,?,?)",
+		Query:      "INSERT INTO users(email, firstName, lastName, birthDate, nickName, password, aboutMe, avatar, privacy, creationTime) VALUES(?,?,?,?,?,?,?,?,?,?)",
 		ExistTable: "users",
 		ExistField: "email",
 		ExistError: "email already exists",
