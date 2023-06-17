@@ -167,3 +167,41 @@ func (c *Client) WriteData() {
 		}
 	}
 }
+
+/*
+Run is the main loop for the Manager. It listens for incoming actions
+such as client registrations, unregistrations, and broadcasting messages.
+*/
+func (m *Manager) Run() {
+	for {
+		select {
+		// A new client is registering: Store it in the clients map.
+		case client := <-m.Register:
+			// The true value is just a placeholder, since the map is used as a set.
+			m.Clients.Store(client, true)
+
+		// A client is unregistering: If it exists in the clients map, remove it.
+		case client := <-m.Unregister:
+			if _, ok := m.Clients.Load(client); ok {
+				m.Clients.Delete(client)
+				close(client.Egress)
+			}
+
+		// Data is being broadcast: Send it to all connected clients.
+		case data := <-m.Broadcast:
+			m.Clients.Range(func(key, value interface{}) bool {
+				client := key.(*Client)
+				select {
+				case client.Egress <- data:
+					// The data was sent successfully, continue to the next client.
+					return true
+				default:
+					// The client's send channel is unavailable. Remove it.
+					close(client.Egress)
+					m.Clients.Delete(client)
+					return false // Stop iteration.
+				}
+			})
+		}
+	}
+}
