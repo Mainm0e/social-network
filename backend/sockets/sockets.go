@@ -107,3 +107,63 @@ func (c *Client) ReadData() {
 		}
 	}
 }
+
+/*
+WriteData() is a method for a *Client struct, which starts a loop to
+continuously write data to the client's websocket connection. It also
+sends periodic pings to the client.
+*/
+func (c *Client) WriteData() {
+	// Ticker is a timer that goes off (ticks) at regular intervals.
+	ticker := time.NewTicker(PING_INTERVAL)
+
+	defer func() {
+		ticker.Stop()
+		c.Connection.Close()
+	}()
+
+	// Infinite loop to continuously write data to the websocket connection.
+	for {
+		// The select statement lets a goroutine wait on multiple communication
+		// operations (channels). A select blocks until one of its cases can run,
+		// then it executes that case. It chooses one at random if multiple are ready.
+		select {
+
+		// This case handles outgoing messages from the client to the websocket connection.
+		case data, ok := <-c.Egress:
+			if !ok {
+				c.Connection.WriteMessage(websocket.CloseMessage, []byte{})
+				return
+			}
+
+			// NextWriter returns a writer for the next message to send.
+			w, err := c.Connection.NextWriter(websocket.TextMessage)
+			if err != nil {
+				return
+			}
+
+			// The data from the channel is written to the connection.
+			w.Write(data)
+
+			// If there are more messages in the channel, they are written to the connection as well.
+			// This helps in flushing any queued messages in the channel.
+			n := len(c.Egress)
+			for i := 0; i < n; i++ {
+				w.Write(<-c.Egress)
+			}
+
+			// Close finalizes the message. The writer must be closed before the next call to
+			// NextWriter. Close returns an error if the message was not correctly formed.
+			if err := w.Close(); err != nil {
+				return
+			}
+
+		// This case handles the periodic sending of PingMessage to the client over the ws-connection.
+		case <-ticker.C:
+			c.Connection.SetWriteDeadline(time.Now().Add(WRITE_WAIT))
+			if err := c.Connection.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
+		}
+	}
+}
