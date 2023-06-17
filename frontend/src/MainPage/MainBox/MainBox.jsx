@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import Header from "./User/Header";
 import Body from "./User/Body";
 import "./MainBox.css";
-const MainBox = ({ id }) => {
+import { getCookie } from "../../tools/cookie";
+const MainBox = (user) => {
+  console.log(user)
     const [data, setData] = useState(null);
+    const sessionId = getCookie("sessionId");
     useEffect(() => {
         const fetchData = async () => {
           const response = await fetch("http://localhost:8080/api", {
@@ -11,7 +14,7 @@ const MainBox = ({ id }) => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ event_type: "profile", payload: {sessionId:id.sessionId, userId: 1 } }),
+            body: JSON.stringify({ event_type: "profile", payload: {sessionId:sessionId, userId: user.id } }),
           });
           const responseData = await response.json();
           setData(responseData);
@@ -25,7 +28,7 @@ const MainBox = ({ id }) => {
         return (
             <div className="main-box">
             <Header profile={data.event.payload} />
-            <Body user={data.userId} />
+            <Body id={user.id} />
         </div>
     );
 }

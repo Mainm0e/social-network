@@ -3,12 +3,12 @@ import PostBox from "../../../Common/Post/PostBox";
 
 import React from 'react';
 
-const Body = (id) => {
-  const postid = id.user;
+const Body = (user) => {
+  const postid = user.id;
   return (
     <div className="main_body">
       {/* Conditional rendering based on the body state */}
-      <PostBox id={id.user}/>
+      <PostBox id={postid}/>
     </div>
   );
 };

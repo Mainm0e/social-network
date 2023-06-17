@@ -46,7 +46,7 @@ function MainPage() {
     <div className="main-page">
       <div className="main-page-container">
         <LeftBox user={data.event.payload} />
-        <MainBox id={sessionId} />
+        <MainBox id={1}/>
         <RightBox />
         <ChatBox />
       </div>

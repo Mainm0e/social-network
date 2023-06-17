@@ -2,25 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { PostData } from './dummyData';
 import Comment from './CommentBox';
 import './Post.css';
+import { getCookie } from '../../tools/cookie';
+import { checkPostData } from '../../tools/checkdata';
 
-const PostList = (cookie) => {
+const PostList = (id) => {
+  console.log(id)
+  const [postData, setPostData] = useState(null);
   // request to get post data from backend
     const getPost = () => {
-/* 
-      fetch('http://localhost:8000/api/post/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${cookie.token}`
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          PostData = data;
-        }); */
-
-        return PostData;
+      const sessionId = getCookie("sessionId");
+      const requestpost = async () => {
+        const response = await fetch("http://localhost:8080/api", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ event_type: "request_post", payload: {sessionId:sessionId, userId: id} }),
+        });
+        const setPostData = await response.json();
+        console.log(setPostData);
+        }
+        requestpost();
         };
   return (
     <div className="post_list">
@@ -78,9 +80,10 @@ const Post = ({ id, title, content, image, time, user, comments}) => {
 };
 
 
-const CreatePost = ({ cookie ,onSubmit }) => {
+const CreatePost = ({ onSubmit }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [privecy, setPrivecy] = useState('public'); // ['public', 'private'
   const [image, setImage] = useState(null);
 
   const handleTitleChange = (e) => {
@@ -102,6 +105,7 @@ const CreatePost = ({ cookie ,onSubmit }) => {
       title: title,
       content: content,
       image: image,
+      privecy: privecy,
     };
     onSubmit(postData);
     setTitle('');
@@ -152,10 +156,11 @@ const CreatePost = ({ cookie ,onSubmit }) => {
 
 // !! Main Component !!
 const PostBox = (user) => {
-  console.log(user)
     const [body, setBody] = useState('');
     const [data, setData] = useState(null);
     useEffect(() => {
+      // fetch data from backend
+      // to get the post list
       const fetchData = async () => {
         const response = await fetch("http://localhost:8080/api", {
           method: "POST",
@@ -186,25 +191,32 @@ const PostBox = (user) => {
 
       
     }, []);
-  
+
+
+    // submit post
     const handleSubmitPost = (postData) => {
       // Logic to handle the submission of the post data
-      console.log('Submitted post:', postData);
+    const check = checkPostData(postData);
+    if
+     (check.status === true ){
+      const sessionId = getCookie("sessionId");
       // Make API requests or perform other operations here
       // request to create post
-      /* fetch('http://localhost:8000/api/post/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Token ${dummyCookie.token}`
-        },
-        body: JSON.stringify(postData),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-        }); */
-        setBody('postlist');
+      const createPost = async () => {
+        const response = await fetch("http://localhost:8080/api", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ event_type: "create_post", payload: {sessionId:sessionId,data:{user_id: user.id, title: postData.title, postData: data.content, image: postData.image, privecy: postData.privecy}}}),
+        });
+        const responseData = await response.json();
+        console.log(responseData);
+      }
+      createPost();
+    } else {
+      alert(check.message)
+    }
     };
 
     return (
@@ -217,7 +229,7 @@ const PostBox = (user) => {
 
         {body === 'postlist' && (
         <section id="postlist">
-          <PostList />
+          <PostList id={user} />
         </section>
       )}
       </>
