@@ -4,7 +4,6 @@ import Body from "./User/Body";
 import "./MainBox.css";
 import { getCookie } from "../../tools/cookie";
 const MainBox = (user) => {
-  console.log(user)
     const [data, setData] = useState(null);
     const sessionId = getCookie("sessionId");
     useEffect(() => {
@@ -18,7 +17,7 @@ const MainBox = (user) => {
           });
           const responseData = await response.json();
           setData(responseData);
-          console.log(responseData)
+
         };
         fetchData();
       }, []);

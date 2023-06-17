@@ -6,10 +6,9 @@ import { getCookie } from '../../tools/cookie';
 import { checkPostData } from '../../tools/checkdata';
 
 const PostList = (id) => {
-  console.log(id)
   const [postData, setPostData] = useState(null);
   // request to get post data from backend
-    const getPost = () => {
+   /*  const getPost = () => {
       const sessionId = getCookie("sessionId");
       const requestpost = async () => {
         const response = await fetch("http://localhost:8080/api", {
@@ -20,13 +19,32 @@ const PostList = (id) => {
           body: JSON.stringify({ event_type: "request_post", payload: {sessionId:sessionId, userId: id} }),
         });
         const setPostData = await response.json();
-        console.log(setPostData);
         }
         requestpost();
-        };
+        }; */
+  useEffect(() => {
+    const getPost = async () => {
+      const sessionId = getCookie('sessionId');
+      const response = await fetch('http://localhost:8080/api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ event_type: 'request_post', payload: { sessionId: sessionId, userId: id } }),
+      });
+      const responseData = await response.json();
+      setPostData(responseData);
+    };
+    console.log(postData);
+    getPost();
+  }, []);
+  if (!postData) {
+    return <div>Loading...</div>;
+  } else if (postData.event.payload !== null) {
+    console.log(postData.event.payload);
   return (
     <div className="post_list">
-      {getPost().map((post) => (
+      {postData.map((post) => (
         <Post
           key={post.id}
             id={post.id}
@@ -40,6 +58,7 @@ const PostList = (id) => {
         ))}
     </div>
   );
+  }
 };
 
 const Post = ({ id, title, content, image, time, user, comments}) => {
@@ -211,7 +230,6 @@ const PostBox = (user) => {
           body: JSON.stringify({ event_type: "create_post", payload: {sessionId:sessionId,data:{user_id: user.id, title: postData.title, postData: data.content, image: postData.image, privecy: postData.privecy}}}),
         });
         const responseData = await response.json();
-        console.log(responseData);
       }
       createPost();
     } else {

@@ -34,7 +34,6 @@ function MainPage() {
       });
       const responseData = await response.json();
       setData(responseData);
-      console.log(responseData)
     };
 
     fetchData();
