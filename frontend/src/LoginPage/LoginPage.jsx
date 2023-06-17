@@ -6,8 +6,7 @@ import AlertBox from '../Common/AlertBox/AlertBox';
 // LoginPage component
 // This component is used to render the login page
 // Props: none
-function LoginPage() {
-  
+function LoginPage() {  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [alertTitle, setAlertTitle] = useState('');

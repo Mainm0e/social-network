@@ -107,10 +107,9 @@
               })
               .then(response => response.json())
               .then(data => {
-                console.log('Success:', data);
-                if (data.success){
+                if (data.statusCode===200){
                   setRegisterStatus(true);
-                  /* window.location.href = '/login'; */
+                  window.location.href = '/login';
                 }
                 else {
                   setAlertTitle(data.message)

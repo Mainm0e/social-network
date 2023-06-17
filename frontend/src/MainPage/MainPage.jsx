@@ -7,7 +7,12 @@ import ChatBox from "../Common/ChatBox/ChatBox";
 
 // dummy data
 function MainPage() {
-  
+  // make url = localhost:3000/
+  const url = window.location.href;
+  const urlSplit = url.split("/");
+  const urlJoin = urlSplit.slice(0, 3).join("/");
+  window.history.pushState({}, null, urlJoin);
+
   const [data, setData] = useState(null);
   //get cookie from browser
   const getCookie = (name) => {
