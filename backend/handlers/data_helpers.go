@@ -279,7 +279,7 @@ func UpdateProfile(email string, privacy string) error {
 
 /*
  */
-func CreatePost(post Post) error {
+func InsertPost(post Post) error {
 
 	id, err := db.InsertData("posts", post.Title, post.Content, time.Now(), post.Status, post.GroupId)
 	if err != nil {
@@ -298,3 +298,30 @@ func CreatePost(post Post) error {
 	}
 	return nil
 }
+
+/* func GetPost(userId int) (Post, error) {
+	dbPosts, err := db.FetchData("posts", "userId", userId)
+	if err != nil {
+		return Post{}, errors.New("Error fetching post" + err.Error())
+	}
+	if len(dbPosts) == 0 {
+		return Post{}, errors.New("user doesn't have any post")
+	}
+	var posts []Post
+	for _, post := range dbPosts {
+		dbPost := post.(db.Post)
+		posts = append(posts, Post{
+			Post.PostId:  dbPost.PostId,
+			Post.UserId:  dbPost.UserId,
+			Post.Title:   dbPost.Title,
+			Post.Content: dbPost.Content,
+			Post.Status:  dbPost.Status,
+			Post.GroupId: dbPost.GroupId,
+			Post.Date:    dbPost.Date,
+		})
+		if dbPost.Status == "semi-private" {
+
+		}
+	}
+}
+*/

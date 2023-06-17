@@ -35,7 +35,7 @@ func LoginPage(payload json.RawMessage) (Response, error) {
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, errors.New("Error marshaling profile to JSON: " + err.Error())
 		}
-		response.Event = events.Event{"Login approved", payload}
+		response.Event = events.Event{Type: "Login approved", Payload: payload}
 		log.Println("Login approved", loginData)
 		return response, nil
 	}

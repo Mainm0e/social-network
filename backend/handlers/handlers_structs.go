@@ -10,9 +10,14 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"register":    RegisterPage,
 	"profile":     ProfilePage,
 	"profileList": ProfileList,
-	//"createPost": CreatePost,
+	"createPost":  CreatePost,
 }
 
+type Response struct {
+	Message    string       `json:"message"`
+	Event      events.Event `json:"event"`
+	StatusCode int          `json:"statusCode"`
+}
 type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -38,12 +43,6 @@ type RegisterData struct {
 	Avatar    string `json:"avatar,omitempty"`  // optional
 }
 
-// TODO: we could remove success and make message more general
-type Response struct {
-	Message    string       `json:"message"`
-	Event      events.Event `json:"event"`
-	StatusCode int          `json:"statusCode"`
-}
 type SmallProfile struct {
 	UserId    int     `json:"userId"`
 	FirstName string  `json:"firstName"`
@@ -68,15 +67,24 @@ type PrivateProfile struct {
 	Followers []int  `json:"followers"` // become array of uuid
 	Following []int  `json:"following"` // become array of uuid
 }
+type Comment struct {
+	PostId  int    `json:"postId"`
+	UserId  int    `json:"userId"`
+	Content string `json:"content"`
+	Time    string `json:"time"`
+}
 type Post struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-	Title     string `json:"title"`
-	Content   string `json:"content"`
-	Status    string `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
-	Followers []int  `json:"followers"` //---> this one related to status
-	Image     string `json:"image"`
-	GroupId   int    `json:"groupId"` // ---> if post is a group post
+	SessionId string    `json:"sessionId"`
+	PostId    int       `json:"postId"`
+	UserId    int       `json:"userId"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	Status    string    `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
+	Followers []int     `json:"followers"` //---> this one related to status
+	Image     string    `json:"image"`
+	GroupId   int       `json:"groupId"` // ---> if post is a group post
+	Comments  []Comment `json:"comments"`
+	Date      string    `json:"time"`
 }
 
 // add post struct coming from frontend
