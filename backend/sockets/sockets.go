@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -204,4 +205,30 @@ func (m *Manager) Run() {
 			})
 		}
 	}
+}
+
+/*
+ServeWS is an HTTP handler function that upgrades an HTTP(S)
+connection to a WebSocket connection. It creates a new client and then
+initiates the reading and writing goroutines for that client.
+Parameters:
+- w: The HTTP ResponseWriter that the handler will use to send HTTP responses.
+- r: The HTTP Request that has been received by the handler.
+*/
+func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
+	conn, err := websocketUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Printf("Failed to set websocket upgrade: %+v", err)
+		return
+	}
+
+	// Create a new client for the WebSocket connection.
+	client := NewClient(conn, m)
+
+	// Register the new client with the Manager.
+	m.Register <- client
+
+	// Starts the read and write goroutines for the client.
+	go client.ReadData()
+	go client.WriteData()
 }
