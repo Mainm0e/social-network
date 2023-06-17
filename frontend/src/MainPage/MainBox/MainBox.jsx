@@ -3,8 +3,7 @@ import Header from "./User/Header";
 import Body from "./User/Body";
 import "./MainBox.css";
 import { getCookie } from "../../tools/cookie";
-const MainBox = ({user,onDataReceived}) => {
-  console.log("in mainbox",user)
+const MainBox = ({user}) => {
     const [data, setData] = useState(null);
     const sessionId = getCookie("sessionId");
     useEffect(() => {
@@ -18,8 +17,6 @@ const MainBox = ({user,onDataReceived}) => {
           });
           const responseData = await response.json();
           setData(responseData);
-          console.log("in mainBox", responseData);
-          onDataReceived({profileId:user});
         };
         fetchData();
       }, []);

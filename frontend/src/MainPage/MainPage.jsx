@@ -4,9 +4,11 @@ import MainBox from "./MainBox/MainBox";
 import LeftBox from "./LeftBox/LeftBox";
 import RightBox from "./RightBox/RightBox";
 import ChatBox from "../Common/ChatBox/ChatBox";
+import { navGroupLinkData } from "./dummyData";
 
 // dummy data
 function MainPage() {
+  const testProfile_Id = 1;
   // make url = localhost:3000/
   const url = window.location.href;
   const urlSplit = url.split("/");
@@ -41,24 +43,15 @@ function MainPage() {
 
   }, []);
 
-  const [connectionData, setConnectionData] = useState(null);
-  // profile follower following data
-  const handleDataFromMainBox = (data) => {
-    // Do something with the data received from MainBox
-    setConnectionData(data);
-    console.log("Data received in MainPage:", data);
-  };
-
-
   if (!data) {
     return <div>Loading...</div>;
   } else{
   return (
     <div className="main-page">
       <div className="main-page-container">
-        <LeftBox user={data.event.payload} />
-        <MainBox user={1} onDataReceived={handleDataFromMainBox} />
-        <RightBox />
+        <LeftBox user={data.event.payload} link={navGroupLinkData}/>
+        <MainBox user={testProfile_Id}/>
+        <RightBox profileId={testProfile_Id}/>
         <ChatBox />
       </div>
     </div>

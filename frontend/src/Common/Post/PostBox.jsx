@@ -40,7 +40,6 @@ const PostList = (id) => {
   if (!postData) {
     return <div>Loading...</div>;
   } else if (postData.event.payload !== null) {
-    console.log(postData.event.payload);
   return (
     <div className="post_list">
       {postData.map((post) => (
@@ -174,7 +173,6 @@ const CreatePost = ({ onSubmit }) => {
 
 // !! Main Component !!
 const PostBox = ({id}) => {
-  console.log("postBox",id)
     const [body, setBody] = useState('');
     const [data, setData] = useState(null);
     useEffect(() => {

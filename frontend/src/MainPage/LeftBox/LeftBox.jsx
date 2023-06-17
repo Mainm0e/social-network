@@ -1,10 +1,10 @@
 
-import { navGroupLinkData } from "../dummyData";
+
 import {logout} from "../../tools/logout";
 import NavList from "./NavList";
 import "./LeftBox.css";
 
-const LeftBox = ({user}) => {
+const LeftBox = ({user,link}) => {
     const handleLogout = () => {
         logout();
     }
@@ -23,8 +23,8 @@ const LeftBox = ({user}) => {
                     </div>
                 </div>
             </div>
-            <NavList type={"Post"} links={navGroupLinkData[1]} />
-            <NavList type={"Nav"} links={navGroupLinkData[0]} />
+            <NavList type={"Post"} links={link[1]} />
+            <NavList type={"Nav"} links={link[0]} />
 
         </div>
     );

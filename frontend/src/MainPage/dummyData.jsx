@@ -9,6 +9,10 @@ let link2 = {
     create : "#createpost",
     postlist : "#postlist",
 }
+let link3 = {
+    followers: "#followers",
+    following: "#following",
+    }
 
 export const user1 = {
     fName: "Kettu",

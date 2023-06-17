@@ -1,9 +1,13 @@
 
 import "./RightBox.css";
-const RightBox = ({ type, onChange }) => {
+import UserList from "../../Common/UserList/UserList";
+
+const RightBox = ({profileId}) => {
+    //find section to render
+    // #follower or #following
     return (
         <div className="right-box">
-            right box
+            <UserList title={"followings"} id={profileId} />
         </div>
     );
 }
