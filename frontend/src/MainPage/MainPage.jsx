@@ -30,7 +30,7 @@ function MainPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ type: "profile", payload: {sessionId:null, userId: 1} }),
+        body: JSON.stringify({ type: "profile", payload: {sessionId:sessionId, userId: 1} }),
       });
       const responseData = await response.json();
       setData(responseData);
@@ -38,7 +38,18 @@ function MainPage() {
     };
 
     fetchData();
+
   }, []);
+
+  const [connectionData, setConnectionData] = useState(null);
+  // profile follower following data
+  const handleDataFromMainBox = (data) => {
+    // Do something with the data received from MainBox
+    setConnectionData(data);
+    console.log("Data received in MainPage:", data);
+  };
+
+
   if (!data) {
     return <div>Loading...</div>;
   } else{
@@ -46,7 +57,7 @@ function MainPage() {
     <div className="main-page">
       <div className="main-page-container">
         <LeftBox user={data.event.payload} />
-        <MainBox id={1}/>
+        <MainBox user={1} onDataReceived={handleDataFromMainBox} />
         <RightBox />
         <ChatBox />
       </div>

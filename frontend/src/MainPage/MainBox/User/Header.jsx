@@ -19,6 +19,7 @@ const Header = (profile) => {
       return <></>;
     }
   };
+  
   return (
     <div className="main_header" key={user.id}  >
       <div className="info_img">
