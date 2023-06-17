@@ -1,6 +1,13 @@
 package sockets
 
-import "github.com/gorilla/websocket"
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/gorilla/websocket"
+)
 
 /*
 NewManager is a function that creates a new Manager. This function doesn't take any
@@ -34,5 +41,69 @@ func NewClient(conn *websocket.Conn, wsManager *Manager) *Client {
 		Connection: conn,
 		Manager:    wsManager,
 		Egress:     make(chan []byte),
+	}
+}
+
+/*
+ReadData() is a method for a *Client struct, and starts a loop to continuously
+read data from the client's websocket connection and react to that data.
+*/
+func (c *Client) ReadData() {
+	defer func() {
+		c.Manager.Unregister <- c
+		c.Connection.Close()
+	}()
+
+	c.Connection.SetReadLimit(MAX_DATA_SIZE)
+
+	c.Connection.SetReadDeadline(time.Now().Add(PONG_WAIT))
+
+	c.Connection.SetPongHandler(func(string) error {
+		c.Connection.SetReadDeadline(time.Now().Add(PONG_WAIT))
+		return nil
+	})
+
+	// Infinite loop to continuously read data from the websocket connection
+	for {
+		// ReadMessage is a helper method that reads a message from the connection.
+		// It returns the type of the message and the message itself, which is a byte slice.
+		_, message, err := c.Connection.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("Unexpected close error: %v", err)
+			}
+			break
+		}
+
+		// Unmarshal the received message into an event.
+		var event Event
+		if err := json.Unmarshal(message, &event); err != nil {
+			log.Printf("Error unmarshalling event: %v", err)
+
+			// In case of an error unmarshalling, it sends back an error event to the client.
+			errorEvent := Event{
+				Type:    "", // TODO: Add error event type
+				Payload: json.RawMessage(fmt.Sprintf(`{"error": "Failed to parse event: %v"}`, err)),
+			}
+
+			eventBytes, _ := json.Marshal(errorEvent)
+
+			// Write the error event to the client's egress channel.
+			c.Egress <- eventBytes
+			continue
+		}
+
+		// If the event type exists in the map of handlers, execute the handler.
+		handler, ok := c.Manager.Handlers[event.Type]
+		if !ok {
+			log.Printf("No handler for event type %v", event.Type)
+			break
+		}
+
+		err = handler(event, c)
+		if err != nil {
+			log.Printf("Error handling event: %v", err)
+			break
+		}
 	}
 }
