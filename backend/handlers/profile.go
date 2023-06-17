@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/events"
 	"encoding/json"
 	"errors"
 	"log"
@@ -17,26 +18,26 @@ func ProfilePage(payload json.RawMessage) (Response, error) {
 	log.Println("User: ", user)
 	if err != nil {
 		// handle the error
-		response = Response{err.Error(), Event{}, http.StatusBadRequest}
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 
 	var profile Profile
 	profile, err = FillProfile(userId, user.UserId, user.SessionId)
 	if err != nil {
-		response = Response{err.Error(), Event{}, http.StatusBadRequest}
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 
 	// Convert the Profile struct to JSON byte array
 	payload, err = json.Marshal(profile)
 	if err != nil {
-		response = Response{err.Error(), Event{}, http.StatusBadRequest}
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, errors.New("Error marshaling profile to JSON: " + err.Error())
 	}
-	event := Event{
-		Event_type: "profile",
-		Payload:    payload,
+	event := events.Event{
+		Type:    "profile",
+		Payload: payload,
 	}
 	response = Response{"profile data", event, http.StatusOK} // TODO: change message
 	return response, nil
@@ -50,23 +51,23 @@ func ProfileList(payload json.RawMessage) (Response, error) {
 	log.Println("User: ", user)
 	if err != nil {
 		// handle the error
-		response = Response{err.Error(), Event{}, http.StatusBadRequest}
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 
-	list, err := SmallProfileList(user.UserId, user.ListName)
+	list, err := SmallProfileList(user.UserId, user.Request)
 	if err != nil {
-		response = Response{err.Error(), Event{}, http.StatusBadRequest}
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 	payload, err = json.Marshal(list)
 	if err != nil {
-		response = Response{err.Error(), Event{}, http.StatusBadRequest}
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, errors.New("Error marshaling profile to JSON: " + err.Error())
 	}
-	event := Event{
-		Event_type: "profileList",
-		Payload:    payload,
+	event := events.Event{
+		Type:    "profileList",
+		Payload: payload,
 	}
 
 	response = Response{"profile list", event, http.StatusOK}
