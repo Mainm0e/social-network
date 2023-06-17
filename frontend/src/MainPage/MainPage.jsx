@@ -30,7 +30,7 @@ function MainPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ type: "profileList", payload: {sessionId:sessionId, userId: 1, request:"followings"} }),
+        body: JSON.stringify({ type: "profile", payload: {sessionId:null, userId: 1} }),
       });
       const responseData = await response.json();
       setData(responseData);

@@ -30,7 +30,7 @@ const PostList = (id) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ event_type: 'request_post', payload: { sessionId: sessionId, userId: id } }),
+        body: JSON.stringify({type: 'get_posts', payload: { sessionId: sessionId, userId: id } }),
       });
       const responseData = await response.json();
       setPostData(responseData);
