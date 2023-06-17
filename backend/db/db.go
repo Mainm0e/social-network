@@ -181,9 +181,7 @@ non-nil in the event that the data already exists in the table. It is called by 
 global InsertData() function.
 */
 func CheckDataDoesNotExist(table, column string, value any) error {
-	if table == "posts" && column == "groupId" && value == 0 {
-		return nil
-	}
+
 	query := fmt.Sprintf("SELECT COUNT(1) FROM %s WHERE %s = ?", table, column)
 
 	// QueryRow executes a query that is expected to return at most one row.
@@ -244,6 +242,10 @@ func InsertData(tableName string, args ...any) (int64, error) {
 	}
 
 	for i := range rule.NotExistTables {
+		if tableName == "posts" && rule.NotExistFields[i] == "groupId" && args[i] == 0 {
+			continue
+		}
+		fmt.Println("rule.NotExistTables[i]", rule.NotExistTables[i], "rule.NotExistFields[i]", rule.NotExistFields[i], "args[i]", args[i])
 		err := CheckDataDoesNotExist(rule.NotExistTables[i], rule.NotExistFields[i], args[i])
 		if err == nil {
 			return -1, fmt.Errorf(rule.NotExistErrors[i])

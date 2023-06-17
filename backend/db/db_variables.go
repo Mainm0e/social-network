@@ -25,7 +25,7 @@ var InsertRules = map[string]InsertRule{
 		ExistError: "email already exists",
 	},
 	"posts": {
-		Query:          "INSERT INTO posts(userId, title, content, creationTime, status, groupId) VALUES(?,?,?,?,?,?)",
+		Query:          "INSERT INTO posts(userId, groupId, title, content, creationTime, status) VALUES(?,?,?,?,?,?)",
 		NotExistTables: []string{"users", "groups"},
 		NotExistFields: []string{"userId", "groupId"},
 		NotExistErrors: []string{"user does not exist", "group does not exist"},
