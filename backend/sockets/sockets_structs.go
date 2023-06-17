@@ -1,7 +1,6 @@
 package sockets
 
 import (
-	"encoding/json"
 	"net/http"
 	"sync"
 	"time"
@@ -55,14 +54,14 @@ var websocketUpgrader = websocket.Upgrader{
 	WriteBufferSize: WRITE_BUFFER_SIZE,
 }
 
-/*
-Event struct represents a single event that can occur within a WebSocket
-communication, such as a user sending or receiving a message.
-*/
-type Event struct {
-	Type    string          `json:"type"`
-	Payload json.RawMessage `json:"payload"`
-}
+// /*
+// Event struct represents a single event that can occur within a WebSocket
+// communication, such as a user sending or receiving a message.
+// */
+// type Event struct {
+// 	Type    string          `json:"type"`
+// 	Payload json.RawMessage `json:"payload"`
+// }
 
 /*
 EventHandler type is a function that handles an event. It takes an Event and a Client
