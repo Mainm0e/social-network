@@ -280,8 +280,7 @@ func UpdateProfile(email string, privacy string) error {
 /*
  */
 func InsertPost(post Post) error {
-
-	id, err := db.InsertData("posts", post.Title, post.Content, time.Now(), post.Status, post.GroupId)
+	id, err := db.InsertData("posts", post.UserId, post.Title, post.Content, time.Now(), post.Status, post.GroupId)
 	if err != nil {
 		return errors.New("Error inserting post" + err.Error())
 	}

@@ -29,7 +29,7 @@ const MainBox = ({user,onDataReceived}) => {
         return (
             <div className="main-box">
             <Header profile={data.event.payload} />
-            <Body user={user.id} />
+            <Body user={user} />
         </div>
     );
 }

@@ -84,7 +84,7 @@ type Post struct {
 	Image     string    `json:"image"`
 	GroupId   int       `json:"groupId"` // ---> if post is a group post
 	Comments  []Comment `json:"comments"`
-	Date      string    `json:"time"`
+	Date      string    `json:"date"`
 }
 
 // add post struct coming from frontend

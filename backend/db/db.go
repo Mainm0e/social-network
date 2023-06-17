@@ -181,6 +181,9 @@ non-nil in the event that the data already exists in the table. It is called by 
 global InsertData() function.
 */
 func CheckDataDoesNotExist(table, column string, value any) error {
+	if table == "posts" && column == "groupId" && value == 0 {
+		return nil
+	}
 	query := fmt.Sprintf("SELECT COUNT(1) FROM %s WHERE %s = ?", table, column)
 
 	// QueryRow executes a query that is expected to return at most one row.

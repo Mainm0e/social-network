@@ -173,7 +173,8 @@ const CreatePost = ({ onSubmit }) => {
 
 
 // !! Main Component !!
-const PostBox = (user) => {
+const PostBox = ({id}) => {
+  console.log("postBox",id)
     const [body, setBody] = useState('');
     const [data, setData] = useState(null);
     useEffect(() => {
@@ -185,7 +186,7 @@ const PostBox = (user) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ event_type: "post", payload: { user_id: user.id } }),
+          body: JSON.stringify({ event_type: "post", payload: { user_id: id} }),
         });
         const responseData = await response.json();
         setData(responseData);
@@ -213,6 +214,7 @@ const PostBox = (user) => {
 
     // submit post
     const handleSubmitPost = (postData) => {
+      console.log("submidPsot",postData)
       // Logic to handle the submission of the post data
     const check = checkPostData(postData);
     if
@@ -226,7 +228,7 @@ const PostBox = (user) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ event_type: "create_post", payload: {sessionId:sessionId,data:{user_id: user.id, title: postData.title, postData: data.content, image: postData.image, privecy: postData.privecy}}}),
+          body: JSON.stringify({ type: "createPost", payload: {sessionId:sessionId,postId:0,userId: id, title: postData.title, content: postData.content, image: postData.image, status: postData.privecy, groupId: 1, comments: [],date:"",followers:[]}}),
         });
         const responseData = await response.json();
       }
@@ -246,7 +248,7 @@ const PostBox = (user) => {
 
         {body === 'postlist' && (
         <section id="postlist">
-          <PostList id={user} />
+          <PostList id={id} />
         </section>
       )}
       </>
