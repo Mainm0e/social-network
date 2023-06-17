@@ -103,7 +103,7 @@
             setRegisterStatus(false);
             fetch('http://localhost:8080/api', {
               method: 'POST',
-              body: JSON.stringify({"event_type":"register", "payload":data}),
+              body: JSON.stringify({"type":"register", "payload":data}),
               })
               .then(response => response.json())
               .then(data => {

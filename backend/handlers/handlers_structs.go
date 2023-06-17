@@ -1,11 +1,9 @@
 package handlers
 
-import "encoding/json"
-
-type Event struct {
-	Event_type string          `json:"event_type"`
-	Payload    json.RawMessage `json:"payload"` // change this to
-}
+import (
+	"backend/events"
+	"encoding/json"
+)
 
 var Events = map[string]func(json.RawMessage) (Response, error){
 	"login":       LoginPage,
@@ -22,7 +20,7 @@ type LoginData struct {
 type ProfileListRequest struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
-	ListName  string `json:"listName"`
+	Request   string `json:"request"`
 }
 
 type ProfileRequest struct {
@@ -42,9 +40,9 @@ type RegisterData struct {
 
 // TODO: we could remove success and make message more general
 type Response struct {
-	Message    string `json:"message"`
-	Event      Event  `json:"event"`
-	StatusCode int    `json:"statusCode"`
+	Message    string       `json:"message"`
+	Event      events.Event `json:"event"`
+	StatusCode int          `json:"statusCode"`
 }
 type SmallProfile struct {
 	UserId    int     `json:"userId"`
