@@ -84,7 +84,7 @@ const Post = ({ id, title, content, image, time, user, comments}) => {
 const CreatePost = ({ onSubmit }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [privecy, setPrivecy] = useState('public'); // ['public', 'private'
+  const [privacy, setPrivacy] = useState('public');
   const [image, setImage] = useState(null);
 
   const handleTitleChange = (e) => {
@@ -106,7 +106,7 @@ const CreatePost = ({ onSubmit }) => {
       title: title,
       content: content,
       image: image,
-      privecy: privecy,
+      privacy: privacy,
     };
     onSubmit(postData);
     setTitle('');
@@ -155,6 +155,7 @@ const CreatePost = ({ onSubmit }) => {
 };
 
 
+
 // !! Main Component !!
 const PostBox = ({id}) => {
     const [body, setBody] = useState('');
@@ -196,7 +197,6 @@ const PostBox = ({id}) => {
 
     // submit post
     const handleSubmitPost = (postData) => {
-      console.log("submidPsot",postData)
       // Logic to handle the submission of the post data
     const check = checkPostData(postData);
     if

@@ -2,6 +2,7 @@
 /*
  */
 export function checkPostData(data){
+    console.log("incheck",data)
     if (data.title === "" || data.title === null || data.title === undefined) {
         return {
             title: "Error",
@@ -14,10 +15,10 @@ export function checkPostData(data){
             message: ["Content is empty"],
             status: false,
         };
-    } else if (data.privecy === "" || data.privecy === null || data.privecy === undefined) {
+    } else if (data.privacy === "" || data.privacy === null || data.privacy === undefined) {
         return {
             title: "Error",
-            message: ["Privecy is empty"],
+            message: ["Privacy is empty"],
             status: false,
         };
     } else {   
