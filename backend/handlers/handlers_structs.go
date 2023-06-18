@@ -11,6 +11,8 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"profile":     ProfilePage,
 	"profileList": ProfileList,
 	"createPost":  CreatePost,
+	"requestPost": GetPost,
+	//"requestPosts": GetPosts,
 }
 
 type Response struct {
@@ -81,10 +83,14 @@ type Post struct {
 	Content   string    `json:"content"`
 	Status    string    `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
 	Followers []int     `json:"followers"` //---> this one related to status
-	Image     string    `json:"image"`
+	Image     string    `json:"image,omitempty"`
 	GroupId   int       `json:"groupId"` // ---> if post is a group post
 	Comments  []Comment `json:"comments"`
 	Date      string    `json:"date"`
+}
+type RequestPost struct {
+	SessionId string `json:"sessionId"`
+	PostId    int    `json:"postId"`
 }
 
 // add post struct coming from frontend

@@ -44,7 +44,7 @@ func fillSmallProfile(userId int) (SmallProfile, error) {
 		Avatar:    user.Avatar,
 	}
 	if user.Avatar != nil {
-		avatar, err := utils.RetrieveAvatarImage(*user.Avatar)
+		avatar, err := utils.RetrieveImage(*user.Avatar)
 		if err != nil {
 			return SmallProfile{}, errors.New("Error retrieving avatar image: " + err.Error())
 		}
@@ -160,7 +160,7 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 	}
 	if user.Avatar != nil {
 
-		avatar, err := utils.RetrieveAvatarImage(*user.Avatar)
+		avatar, err := utils.RetrieveImage(*user.Avatar)
 		if err != nil {
 			return Profile{}, errors.New("Error retrieving avatar image: " + err.Error())
 		}
@@ -278,7 +278,9 @@ func UpdateProfile(email string, privacy string) error {
 }
 
 /*
- */
+InsertPost function insert the post into database and check if it is semi-private then it insert the followers that user selected to semiPrivate table
+if error occur then it return error
+*/
 func InsertPost(post Post) error {
 	id, err := db.InsertData("posts", post.UserId, post.GroupId, post.Title, post.Content, time.Now(), post.Status)
 	if err != nil {
@@ -298,29 +300,76 @@ func InsertPost(post Post) error {
 	return nil
 }
 
-/* func GetPost(userId int) (Post, error) {
-	dbPosts, err := db.FetchData("posts", "userId", userId)
+/*
+ReadPost function read the post from database and return it if user have permission to see it base on
+post status and user relation to the post creator.
+if error occur then it return error
+*/
+func ReadPost(postId int, userId int) (Post, error) {
+	dbPosts, err := db.FetchData("posts", "postId", postId)
 	if err != nil {
 		return Post{}, errors.New("Error fetching post" + err.Error())
 	}
 	if len(dbPosts) == 0 {
 		return Post{}, errors.New("user doesn't have any post")
 	}
-	var posts []Post
-	for _, post := range dbPosts {
-		dbPost := post.(db.Post)
-		posts = append(posts, Post{
-			Post.PostId:  dbPost.PostId,
-			Post.UserId:  dbPost.UserId,
-			Post.Title:   dbPost.Title,
-			Post.Content: dbPost.Content,
-			Post.Status:  dbPost.Status,
-			Post.GroupId: dbPost.GroupId,
-			Post.Date:    dbPost.Date,
-		})
-		if dbPost.Status == "semi-private" {
-
-		}
+	var post Post
+	dbPost := dbPosts[0].(db.Post)
+	post = Post{
+		PostId:  dbPost.PostId,
+		UserId:  dbPost.UserId,
+		Title:   dbPost.Title,
+		Content: dbPost.Content,
+		Status:  dbPost.Status,
+		GroupId: dbPost.GroupId,
+		Date:    dbPost.CreationTime,
 	}
+	if dbPost.Image != "" {
+		image, err := utils.RetrieveImage(dbPost.Image)
+		if err != nil {
+			return Post{}, errors.New("Error retrieving post image: " + err.Error())
+		}
+		post.Image = image
+	}
+	if dbPost.Status == "semi-private" {
+		semiPrivates, err := db.FetchData("semiPrivate", "postId", postId)
+		if err != nil {
+			return Post{}, errors.New("Error fetching semiPrivate" + err.Error())
+		}
+		if len(semiPrivates) == 0 {
+			return Post{}, errors.New("user doesn't have any post")
+		}
+		for _, semiPrivate := range semiPrivates {
+			if semiPrivate.(db.SemiPrivate).UserId == userId {
+				return post, nil
+			}
+		}
+	} else if dbPost.Status == "private" {
+		//check if userId is in followers of the post creator
+		followers, err := findFollowers(dbPost.UserId)
+		if err != nil {
+			return Post{}, errors.New("Error fetching followers data" + err.Error())
+		}
+		for _, follower := range followers {
+			if follower == userId {
+				return post, nil
+			}
+		}
+	} else if dbPost.Status == "group" {
+		groups, err := db.FetchData("group_memeber", "userId", userId)
+		if err != nil {
+			return Post{}, errors.New("Error fetching group" + err.Error())
+		}
+		if len(groups) == 0 {
+			return Post{}, errors.New("user is not a memeber of group")
+		}
+		for _, group := range groups {
+			if group.(db.GroupMember).GroupId == dbPost.GroupId {
+				return post, nil
+			}
+		}
+	} else if dbPost.Status == "public" {
+		return post, nil
+	}
+	return Post{}, errors.New("user doesn't have permission to this post")
 }
-*/
