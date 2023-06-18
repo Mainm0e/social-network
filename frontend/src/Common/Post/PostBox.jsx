@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { PostData } from './dummyData';
 import Comment from './CommentBox';
 import './Post.css';
 import { getCookie } from '../../tools/cookie';
@@ -7,21 +6,6 @@ import { checkPostData } from '../../tools/checkdata';
 
 const PostList = (id) => {
   const [postData, setPostData] = useState(null);
-  // request to get post data from backend
-   /*  const getPost = () => {
-      const sessionId = getCookie("sessionId");
-      const requestpost = async () => {
-        const response = await fetch("http://localhost:8080/api", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ event_type: "request_post", payload: {sessionId:sessionId, userId: id} }),
-        });
-        const setPostData = await response.json();
-        }
-        requestpost();
-        }; */
   useEffect(() => {
     const getPost = async () => {
       const sessionId = getCookie('sessionId');

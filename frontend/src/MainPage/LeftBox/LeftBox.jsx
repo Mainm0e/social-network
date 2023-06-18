@@ -25,6 +25,7 @@ const LeftBox = ({user,link}) => {
             </div>
             <NavList type={"Post"} links={link[1]} />
             <NavList type={"Nav"} links={link[0]} />
+            <NavList type={"Connection"} links={link[2]} />
 
         </div>
     );
