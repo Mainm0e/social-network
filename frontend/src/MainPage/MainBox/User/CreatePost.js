@@ -29,11 +29,13 @@ const CreatePost = ({ id,onSubmit }) => {
       title: title,
       content: content,
       image: image,
+      privacy: privacy,
     };
     onSubmit(postData);
     setTitle('');
     setContent('');
     setImage(null);
+    setPrivacy('public');
   };
 
   return (
