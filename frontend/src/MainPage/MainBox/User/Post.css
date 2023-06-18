@@ -123,4 +123,16 @@
     color: #555;
     line-height: 1.5;
   }
-  
+  .create_post_privacy select{
+    padding: 6px;
+    background: #4caf50;
+    color: white;
+    border-radius: 10px;
+    height: fit-content;
+    cursor: pointer;
+
+  }
+
+  .create_post_privacy select:hover{
+    background: #45a049;
+  }

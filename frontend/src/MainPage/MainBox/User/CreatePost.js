@@ -4,6 +4,7 @@ const CreatePost = ({ id,onSubmit }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
+  const [privacy, setPrivacy] = useState('public');
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
@@ -16,6 +17,10 @@ const CreatePost = ({ id,onSubmit }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
+  };
+
+  const handlePrivacyChange = (e) => { 
+    setPrivacy(e.target.value);
   };
 
   const handleSubmit = (e) => {
@@ -65,6 +70,12 @@ const CreatePost = ({ id,onSubmit }) => {
           <button type="submit" className="create_post_submit">
             Submit
           </button>
+        </div>
+        <div className="create_post_privacy">
+          <select value={privacy} onChange={handlePrivacyChange}>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
         </div>
       </form>
     </div>
