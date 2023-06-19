@@ -48,7 +48,7 @@ func reverseString(s string) string {
 }
 func GetPost(payload json.RawMessage) (Response, error) {
 	var response Response
-	request := map[string]any{}
+	var request RequestPost
 	err := json.Unmarshal(payload, &request)
 	log.Println("User: ", request)
 	if err != nil {
@@ -56,27 +56,27 @@ func GetPost(payload json.RawMessage) (Response, error) {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if request["sessionId"] == nil {
+	if request.SessionId == "" {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if request["postId"] == nil {
+	if request.PostId == 0 {
 		response = Response{"postId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 	// TODO: check if the userId is necessary to get from request
-	if request["userId"] == nil {
+	if request.UserId == 0 {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 
 	//get post from database
-	post, err := ReadPost(request["postId"].(int), request["userId"].(int))
+	post, err := ReadPost(request.PostId, request.UserId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	post.SessionId = request["sessionId"].(string)
+	post.SessionId = request.SessionId
 	payload, err = json.Marshal(post)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}

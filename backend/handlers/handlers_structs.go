@@ -92,6 +92,7 @@ type Post struct {
 }
 type RequestPost struct {
 	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
 	PostId    int    `json:"postId"`
 }
 
