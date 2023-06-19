@@ -404,9 +404,9 @@ func readComments(currentUserId, postId int) ([]Comment, error) {
 }
 
 /*
-ReadPost function read the post from database and return it if user have permission to see it base on
-post status and user relation to the post creator.
-if error occur then it return error
+checkPost function check if user has permission to see the post that pass to it base on post status.
+it used in readPost and readComments functions.
+it return true if user has permission and false if not. if error occur it return error.
 */
 func checkPost(dbPost db.Post, userId int) (bool, error) {
 
@@ -465,6 +465,11 @@ func checkPost(dbPost db.Post, userId int) (bool, error) {
 	return false, errors.New("user doesn't have permission to this post")
 
 }
+
+/*
+ReadPost function read post from database and check if current user has permission to see it, using checkPost function.
+it return post if user has permission, error if error occur or post not found.
+*/
 func ReadPost(postId int, userId int) (Post, error) {
 	dbPosts, err := db.FetchData("posts", "postId", postId)
 	if err != nil {
@@ -512,6 +517,12 @@ func ReadPost(postId int, userId int) (Post, error) {
 	return post, nil
 
 }
+
+/*
+ReadPostsByProfile function read all posts of a profile from database
+and returns it if user have permission to see it base on post status and user relation to the post creator.
+if error occur then it return error.
+*/
 func ReadPostsByProfile(currentUserId int, userId int) ([]Post, error) {
 	var posts []Post
 	dbPosts, err := db.FetchData("posts", "userId", userId)
@@ -530,6 +541,12 @@ func ReadPostsByProfile(currentUserId int, userId int) ([]Post, error) {
 	}
 	return posts, nil
 }
+
+/*
+ReadPostsByGroup function read all posts of a group from database
+and returns it if user have permission to see it if user is a member of the group
+if error occur then it return error.
+*/
 func ReadPostsByGroup(currentUserId int, groupId int) ([]Post, error) {
 	var posts []Post
 	dbPosts, err := db.FetchData("posts", "groupId", groupId)
@@ -548,5 +565,3 @@ func ReadPostsByGroup(currentUserId int, groupId int) ([]Post, error) {
 	}
 	return posts, nil
 }
-
-//func ProfilePost(currentUserId)
