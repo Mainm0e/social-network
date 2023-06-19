@@ -14,16 +14,16 @@ const PostList = ({id}) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(id), postId : 5 } }),
+        body: JSON.stringify({type: 'GetPosts', payload: { sessionId: sessionId, userId: parseInt(id), from:"profile",profileId:parseInt(id),groupId:0}}),
       });
       const responseData = await response.json();
       setPostData(responseData.event.payload);
-      console.log("in PostList",responseData)
     };
     getPost();
   }, []);
   const createPost = () => {
     if (postData !== null) {
+      console.log("in createPost",postData.length)
          return (
            <Post
              key={postData.userId}
