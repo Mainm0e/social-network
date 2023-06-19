@@ -7,6 +7,12 @@ import (
 	"net/http"
 )
 
+/*
+Here we have the handlers for the post requests
+- CreatePost: creates a new post in the database and returns the sessionId
+- GetPost: gets a post from the database and returns the post and the sessionId
+- GetPosts: gets all posts related to a user from the database and returns the posts and the sessionId
+*/
 func CreatePost(payload json.RawMessage) (Response, error) {
 	var response Response
 	var post Post
