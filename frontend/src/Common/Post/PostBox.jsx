@@ -24,18 +24,18 @@ const PostList = ({id}) => {
   const createPost = () => {
     if (postData !== null) {
       console.log("in createPost",postData.length)
-         return (
+         return postData.map((post) => (
            <Post
-             key={postData.userId}
-             id={postData.postId}
-             title={postData.title}
-             content={postData.content}
-             image={postData.image}
-             time={postData.date}
-             user={postData.creatorProfile}
-             comments={postData.comments}
+             key={post.postId}
+             id={post.postId}
+             title={post.title}
+             content={post.content}
+             image={post.image}
+             time={post.date}
+             user={post.creatorProfile}
+             comments={post.comments}
            />
-         ); 
+         ));
        }
      };
    
