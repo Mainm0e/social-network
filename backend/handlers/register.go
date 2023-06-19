@@ -34,7 +34,7 @@ func RegisterPage(payload json.RawMessage) (Response, error) {
 	if registerData.Avatar != "" {
 		// Process the image and save it to the local storage
 		url := "./images/avatars/" + registerData.Email
-		url, err = utils.ProcessAvatarImage(registerData.Avatar, url)
+		url, err = utils.ProcessImage(registerData.Avatar, url)
 		if err != nil {
 			log.Println("Error processing avatar image:", err)
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}

@@ -70,10 +70,11 @@ type PrivateProfile struct {
 	Following []int  `json:"following"` // become array of uuid
 }
 type Comment struct {
-	PostId  int    `json:"postId"`
-	UserId  int    `json:"userId"`
-	Content string `json:"content"`
-	Time    string `json:"time"`
+	CommentId int    `json:"commentId"`
+	PostId    int    `json:"postId"`
+	UserId    int    `json:"userId"`
+	Content   string `json:"content"`
+	Date      string `json:"Date"`
 }
 type Post struct {
 	SessionId string    `json:"sessionId"`

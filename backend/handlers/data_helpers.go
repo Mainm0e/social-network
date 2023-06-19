@@ -300,21 +300,118 @@ func InsertPost(post Post) error {
 	return nil
 }
 
+func readComments(currentUserId, postId int) ([]Comment, error) {
+	/* 	// check if user has permission to see this post
+	   	posts, err := db.FetchData("posts", "postId", postId)
+	   	if err != nil {
+	   		return []Comment{}, errors.New("Error fetching post" + err.Error())
+	   	}
+	   	if len(posts) == 0 {
+	   		return []Comment{}, errors.New("post not found")
+	   	}
+	   	post := posts[0].(db.Post)
+	   	ok, err := checkPost(post, currentUserId)
+	   	if err != nil {
+	   		return []Comment{}, errors.New("Error checking post" + err.Error())
+	   	}
+	   	if !ok {
+	   		return []Comment{}, errors.New("you don't have permission to see this post")
+	   	} */
+	// now that we know user has permission to see this post we can fetch comments
+	comments, err := db.FetchData("comments", "postId", postId)
+	if err != nil {
+		return []Comment{}, errors.New("Error fetching comments" + err.Error())
+	}
+	if len(comments) == 0 {
+		return []Comment{}, nil
+	}
+	var commentsList []Comment
+	for _, comment := range comments {
+		dbComment := comment.(db.Comment)
+		commentsList = append(commentsList, Comment{
+			CommentId: dbComment.CommentId,
+			PostId:    dbComment.PostId,
+			UserId:    dbComment.UserId,
+			Content:   dbComment.Content,
+			Date:      dbComment.CreationTime,
+		})
+	}
+	return commentsList, nil
+
+}
+
 /*
 ReadPost function read the post from database and return it if user have permission to see it base on
 post status and user relation to the post creator.
 if error occur then it return error
 */
+func checkPost(dbPost db.Post, userId int) (bool, error) {
+
+	if dbPost.UserId == userId {
+		return true, nil
+	}
+	switch dbPost.Status {
+	case "semi-private":
+		{
+			semiPrivates, err := db.FetchData("semiPrivate", "postId", dbPost.PostId)
+			if err != nil {
+				return false, errors.New("Error fetching semiPrivate" + err.Error())
+			}
+			if len(semiPrivates) == 0 {
+				return false, errors.New("no followers found")
+			}
+			for _, semiPrivate := range semiPrivates {
+				if semiPrivate.(db.SemiPrivate).UserId == userId {
+					return true, nil
+				}
+			}
+		}
+	case "private":
+		{
+			//check if userId is in followers of the post creator
+			followers, err := findFollowers(dbPost.UserId)
+			if err != nil {
+				return false, errors.New("Error fetching followers data" + err.Error())
+			}
+			for _, follower := range followers {
+				if follower == userId {
+					return true, nil
+				}
+			}
+		}
+	case "group":
+		{
+			groups, err := db.FetchData("group_memeber", "userId", userId)
+			if err != nil {
+				return false, errors.New("Error fetching group" + err.Error())
+			}
+			if len(groups) == 0 {
+				return false, errors.New("user is not a memeber of group")
+			}
+			for _, group := range groups {
+				if group.(db.GroupMember).GroupId == dbPost.GroupId {
+					return true, nil
+				}
+			}
+		}
+	case "public":
+		{
+			return true, nil
+		}
+	}
+	return false, errors.New("user doesn't have permission to this post")
+
+}
 func ReadPost(postId int, userId int) (Post, error) {
 	dbPosts, err := db.FetchData("posts", "postId", postId)
 	if err != nil {
 		return Post{}, errors.New("Error fetching post" + err.Error())
 	}
 	if len(dbPosts) == 0 {
-		return Post{}, errors.New("user doesn't have any post")
+		return Post{}, errors.New("post not found")
 	}
-	var post Post
 	dbPost := dbPosts[0].(db.Post)
+	var post Post
 	post = Post{
 		PostId:  dbPost.PostId,
 		UserId:  dbPost.UserId,
@@ -324,6 +421,13 @@ func ReadPost(postId int, userId int) (Post, error) {
 		GroupId: dbPost.GroupId,
 		Date:    dbPost.CreationTime,
 	}
+	comments, err := readComments(userId, postId)
+	if err != nil {
+		return Post{}, errors.New("Error reading comments" + err.Error())
+	}
+	post.Comments = comments
+	post.Followers = []int{}
+
 	if dbPost.Image != "" {
 		image, err := utils.RetrieveImage(dbPost.Image)
 		if err != nil {
@@ -331,45 +435,52 @@ func ReadPost(postId int, userId int) (Post, error) {
 		}
 		post.Image = image
 	}
-	if dbPost.Status == "semi-private" {
-		semiPrivates, err := db.FetchData("semiPrivate", "postId", postId)
-		if err != nil {
-			return Post{}, errors.New("Error fetching semiPrivate" + err.Error())
-		}
-		if len(semiPrivates) == 0 {
-			return Post{}, errors.New("user doesn't have any post")
-		}
-		for _, semiPrivate := range semiPrivates {
-			if semiPrivate.(db.SemiPrivate).UserId == userId {
-				return post, nil
-			}
-		}
-	} else if dbPost.Status == "private" {
-		//check if userId is in followers of the post creator
-		followers, err := findFollowers(dbPost.UserId)
-		if err != nil {
-			return Post{}, errors.New("Error fetching followers data" + err.Error())
-		}
-		for _, follower := range followers {
-			if follower == userId {
-				return post, nil
-			}
-		}
-	} else if dbPost.Status == "group" {
-		groups, err := db.FetchData("group_memeber", "userId", userId)
-		if err != nil {
-			return Post{}, errors.New("Error fetching group" + err.Error())
-		}
-		if len(groups) == 0 {
-			return Post{}, errors.New("user is not a memeber of group")
-		}
-		for _, group := range groups {
-			if group.(db.GroupMember).GroupId == dbPost.GroupId {
-				return post, nil
-			}
-		}
-	} else if dbPost.Status == "public" {
-		return post, nil
+	ok, err := checkPost(dbPosts[0].(db.Post), userId)
+
+	if err != nil {
+		return Post{}, errors.New("Error checking post" + err.Error())
 	}
-	return Post{}, errors.New("user doesn't have permission to this post")
+	if !ok {
+		return Post{}, errors.New("user doesn't have permission to this post")
+	}
+	return post, nil
+
 }
+func ReadPostsByProfile(currentUserId int, userId int) ([]Post, error) {
+	var posts []Post
+	dbPosts, err := db.FetchData("posts", "userId", userId)
+	if err != nil {
+		return []Post{}, errors.New("Error fetching posts" + err.Error())
+	}
+	if len(dbPosts) == 0 {
+		return []Post{}, errors.New("posts not found")
+	}
+	for _, dbPost := range dbPosts {
+		post, err := ReadPost(dbPost.(db.Post).PostId, currentUserId)
+		if err != nil {
+			return []Post{}, errors.New("Error checking post" + err.Error())
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
+func ReadPostsByGroup(currentUserId int, groupId int) ([]Post, error) {
+	var posts []Post
+	dbPosts, err := db.FetchData("posts", "groupId", groupId)
+	if err != nil {
+		return []Post{}, errors.New("Error fetching posts" + err.Error())
+	}
+	if len(dbPosts) == 0 {
+		return []Post{}, errors.New("posts not found")
+	}
+	for _, dbPost := range dbPosts {
+		post, err := ReadPost(dbPost.(db.Post).PostId, currentUserId)
+		if err != nil {
+			return []Post{}, errors.New("Error checking post" + err.Error())
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
+
+//func ProfilePost(currentUserId)

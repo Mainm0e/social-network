@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"backend/events"
+	"backend/utils"
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func CreatePost(payload json.RawMessage) (Response, error) {
@@ -16,6 +18,21 @@ func CreatePost(payload json.RawMessage) (Response, error) {
 		// handle the error
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
+	}
+
+	if post.Image != "" {
+		// Process the image and save it to the local storage
+		str := strconv.Itoa(post.PostId)
+		url := "./images/posts/" + str
+		url, err = utils.ProcessImage(post.Image, url)
+		if err != nil {
+			log.Println("Error processing post image:", err)
+			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return response, err
+		}
+		post.Image = url
+	} else {
+		post.Image = ""
 	}
 	//insert new post into database
 	err = InsertPost(post)
@@ -37,6 +54,14 @@ func CreatePost(payload json.RawMessage) (Response, error) {
 	response = Response{"post created successfully!", event, http.StatusOK}
 	return response, nil
 }
+
+func reverseString(s string) string {
+	runes := []rune(s)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
+}
 func GetPost(payload json.RawMessage) (Response, error) {
 	var response Response
 	request := map[string]any{}
@@ -55,7 +80,7 @@ func GetPost(payload json.RawMessage) (Response, error) {
 		response = Response{"postId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	// TODO: check if the userId is nessesary to get from request
+	// TODO: check if the userId is necessary to get from request
 	if request["userId"] == nil {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
@@ -80,7 +105,7 @@ func GetPost(payload json.RawMessage) (Response, error) {
 	return Response{"post retrieved successfully!", event, http.StatusOK}, nil
 }
 
-/* func GetPosts(payload json.RawMessage) (Response, error) {
+func GetPosts(payload json.RawMessage) (Response, error) {
 	var response Response
 	request := map[string]any{}
 	err := json.Unmarshal(payload, &request)
@@ -99,7 +124,7 @@ func GetPost(payload json.RawMessage) (Response, error) {
 		return response, err
 	}
 	//get posts from database
-	posts, err := ReadPosts(request["userId"].(int))
+	posts, err := ReadPost(request["postId"].(int), request["userId"].(int))
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
@@ -115,4 +140,3 @@ func GetPost(payload json.RawMessage) (Response, error) {
 	}
 	return Response{"posts retrieved successfully!", event, http.StatusOK}, nil
 }
-*/
