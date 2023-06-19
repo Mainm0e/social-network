@@ -32,7 +32,7 @@ const PostList = ({id}) => {
              content={postData.content}
              image={postData.image}
              time={postData.date}
-             user={postData.userId}
+             user={postData.creatorProfile}
              comments={postData.comments}
            />
          ); 
@@ -74,7 +74,7 @@ const Post = ({ id, title, content, image, time, user, comments}) => {
         <div className="post_header_right">
           <div className="post_header_user">
             <img src={user.avatar} alt="avatar" />
-            <p>{user.username}</p>
+            <p>{user.firstName} {user.lastName}</p>
           </div>
         </div>
       </div>
@@ -89,84 +89,95 @@ const Post = ({ id, title, content, image, time, user, comments}) => {
 };
 
 
+
+
 const CreatePost = ({ onSubmit }) => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [privacy, setPrivacy] = useState('public');
-  const [image, setImage] = useState(null);
-  const [showImage, setShowImage] = useState(null);
+ const [title, setTitle] = useState('');
+const [content, setContent] = useState('');
+const [privacy, setPrivacy] = useState('public');
+const [image, setImage] = useState(null);
+const [showImage, setShowImage] = useState(null);
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
-
-  const handleContentChange = (e) => {
-    setContent(e.target.value);
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64Image = reader.result;
-      setImage(base64Image);
-      setShowImage(file);
-    };
-    reader.readAsDataURL(file);
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const postData = {
-      title: title,
-      content: content,
-      image: image,
-      privacy: privacy,
-    };
-    onSubmit(postData);
-    setTitle('');
-    setContent('');
-    setImage(null);
-  };
-
-  return (
-    <div className="create_post">
-      <form onSubmit={handleSubmit}>
-        <div className="create_post_top">
-          <input
-            type="text"
-            placeholder="Title"
-            className="create_post_title"
-            value={title}
-            onChange={handleTitleChange}
-          />
-        </div>
-        <div className="create_post_bottom">
-          <textarea
-            placeholder="Content"
-            className="create_post_content"
-            value={content}
-            onChange={handleContentChange}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-        </div>
-        {showImage && (
-          <div className="create_post_image">
-            <img src={URL.createObjectURL(showImage)} alt="Selected" />
-          </div>
-        )}
-        <div className="create_post_button">
-          <button type="submit" className="create_post_submit">
-            Submit
-          </button>
-        </div>
-      </form>
-    </div>
-  );
+const handleTitleChange = (e) => {
+  setTitle(e.target.value);
 };
+
+const handleContentChange = (e) => {
+  setContent(e.target.value);
+};
+
+const handlePrivacyChange = (e) => { 
+  setPrivacy(e.target.value);
+};
+
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    const base64Image = reader.result;
+    setImage(base64Image);
+    setShowImage(file);
+  };
+  reader.readAsDataURL(file);
+};
+const handleSubmit = (e) => {
+  e.preventDefault();
+  const postData = {
+    title: title,
+    content: content,
+    image: image,
+    privacy: privacy,
+  };
+  onSubmit(postData);
+  setTitle('');
+  setContent('');
+  setImage(null);
+};
+
+return (
+  <div className="create_post">
+    <form onSubmit={handleSubmit}>
+      <div className="create_post_top">
+        <input
+          type="text"
+          placeholder="Title"
+          className="create_post_title"
+          value={title}
+          onChange={handleTitleChange}
+        />
+      </div>
+      <div className="create_post_bottom">
+        <textarea
+          placeholder="Content"
+          className="create_post_content"
+          value={content}
+          onChange={handleContentChange}
+        />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
+      </div>
+      {showImage && (
+        <div className="create_post_image">
+          <img src={URL.createObjectURL(showImage)} alt="Selected" />
+        </div>
+      )}
+      <div className="create_post_button">
+        <button type="submit" className="create_post_submit">
+          Submit
+        </button>
+      </div>
+      <div className="create_post_privacy">
+          <select value={privacy} onChange={handlePrivacyChange}>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+    </form>
+  </div>
+);};
 
 
 
