@@ -8,11 +8,18 @@ const LeftBox = ({user,link}) => {
     const handleLogout = () => {
         logout();
     }
+    const checkImage = () => {
+        if (user.avatar === ''|| user.avatar === null|| user.avatar === undefined) {
+            return null;
+        } else {
+            return  <div className="post_image"> <img src={user.avatar} alt="content" /> </div>;
+        }
+    };
     return (
         <div className="left-box">
             <div className="user_box">
                 <div className="img_box">
-                    <img src={user.avatar} alt="user-img" />
+                    {checkImage()}
                 </div>
                 <div className="user_info">
                     <div className="username">
