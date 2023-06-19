@@ -101,7 +101,7 @@ Global update rules for ease of maintenance, and simplifying of the UpdateData f
 */
 var UpdateRules = map[string]string{
 	"users":         "UPDATE users SET  privacy=? WHERE userId=?",
-	"posts":         "UPDATE posts SET userId=?, title=?, content=?, status=?, groupId=? WHERE postId=?",
+	"posts":         "UPDATE posts SET image=? WHERE postId=?",
 	"comments":      "UPDATE comments SET userId=?, postId=?, content=? WHERE commentId=?",
 	"groups":        "UPDATE groups SET creatorId=?, title=?, description=? WHERE groupId=?",
 	"follow":        "UPDATE follow SET followerId=?, followeeId=?, status=? WHERE followerId=?", // Assuming followerId uniquely identifies a follow record

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -288,6 +289,24 @@ func InsertPost(post Post) error {
 	}
 	if id == 0 {
 		return errors.New("error inserting post ")
+	}
+	if post.Image != "" {
+		// Process the image and save it to the local storage
+		str := strconv.Itoa(int(id))
+		url := "./images/posts/" + str
+		url, err := utils.ProcessImage(post.Image, url)
+		if err != nil {
+			log.Println("Error processing post image:", err)
+			//response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return err
+		}
+		post.Image = url
+	} else {
+		post.Image = ""
+	}
+	err = db.UpdateData("posts", post.Image, id)
+	if err != nil {
+		return errors.New("Error updating post " + err.Error())
 	}
 	if post.Status == "semi-private" {
 		for _, followerId := range post.Followers {
