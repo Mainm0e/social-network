@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
+import { getCookie } from '../../tools/cookie';
 import "./CommentBox.css"
+import { checkCommentData } from '../../tools/checkdata';
 const CommentBox = ({id,comments}) => {
 // return createcomment and commentlist button and default commentlist
     const [boxState, setBoxState] = useState(null);
@@ -29,8 +31,11 @@ const CommentBox = ({id,comments}) => {
 }
 
 const CreateComment = ({ id , showComment }) => {
+    const userId = getCookie('userId');
+    const sessionId = getCookie('sessionId');
     const [comment, setComment] = useState('');
     const [image, setImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
     const handleCommentChange = (e) => {
         setComment(e.target.value);
@@ -38,23 +43,54 @@ const CreateComment = ({ id , showComment }) => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        setImage(file);
+        const reader = new FileReader();
+        reader.onload = () => {
+            const base64 = reader.result;
+        setImage(base64);
+        setImagePreview(file)
+        };
+        reader.readAsDataURL(file);
     };
     
   const handleSubmit = (e) => {
     e.preventDefault();
     const commentData = {
-      comment: comment,
+    sessionId: sessionId,
+    commentId: 0,
+      postId: id,
+      userId: parseInt(userId),
+      creatorProfile: null,
+      content: comment,
       image: image,
+      date:"",
     };
-    onSubmit(commentData);
+    handleSubmitPost(commentData);
     setComment('');
     setImage(null);
     showComment();
   };
 
-const onSubmit = (commentData) => {
-    console.log(commentData);
+  const handleSubmitPost = (commentData) => {
+    // Logic to handle the submission of the post data
+  const check = checkCommentData(commentData);
+  if
+   (check.status === true ){
+    // Make API requests or perform other operations here
+    // request to create post
+    const createComment = async () => {
+      const response = await fetch("http://localhost:8080/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ type: "createComment", payload: commentData}),
+      });
+      const responseData = await response.json();
+    }
+    createComment();
+  } else {
+    alert(check.message)
+  }
   };
 
        return(
@@ -73,9 +109,9 @@ const onSubmit = (commentData) => {
                         onChange={handleImageChange}
                     />
                 </div>
-                {image && (
+                {imagePreview && (
                     <div className="create_comment_image">
-                        <img src={URL.createObjectURL(image)} alt="content" />
+                        <img src={URL.createObjectURL(imagePreview)} alt="content" />
                     </div>
                 )}
                 <div className="create_comment_button">
@@ -88,7 +124,6 @@ const onSubmit = (commentData) => {
 
 const CommentList = ({comments}) => {
     const loopComment = (comments) => {
-
         return comments.map((comment) => (
         <div className="comment_list_item" key={comment.id}>
                 <div className="comment_list_item_header">
@@ -100,7 +135,7 @@ const CommentList = ({comments}) => {
                     <div className="comment_list_item_header_right">
                         <div className="comment_list_item_header_user">
                           {/*   <img src={comment.user} alt="avatar" /> */}
-                            <p>{comment.user.email}</p>
+                            {/* <p>{comment.user.email}</p> */}
                         </div>
                     </div>
                 </div>

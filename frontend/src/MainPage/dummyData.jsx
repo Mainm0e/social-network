@@ -9,16 +9,19 @@ let link2 = {
     create : "#createpost",
     postlist : "#postlist",
 }
+let link3 = {
+    followers: "#followers",
+    following: "#followings",
+    }
 
 export const user1 = {
-    username: "kettu",
     fName: "Kettu",
     lName: "Kettunen",
     avatar: "https://picsum.photos/200",
     email: "example@example.com",
     birthdate: "01.01.1970",
-    bio: "I am a fox",
+    aboutMe: "I am a fox",
     following: 0,
     followers: 0,
 }
-export const navGroupLinkData = [link1,link2]
+export const navGroupLinkData = [link1,link2,link3]

@@ -19,19 +19,19 @@ Global database insertion rules for ease of maintenance, and simplifying of the 
 */
 var InsertRules = map[string]InsertRule{
 	"users": {
-		Query:      "INSERT INTO users(nickName, firstName, lastName, birthDate, email, password, aboutMe, avatar, privacy, creationTime) VALUES(?,?,?,?,?,?,?,?,?,?)",
+		Query:      "INSERT INTO users(email, firstName, lastName, birthDate, nickName, password, aboutMe, avatar, privacy, creationTime) VALUES(?,?,?,?,?,?,?,?,?,?)",
 		ExistTable: "users",
 		ExistField: "email",
 		ExistError: "email already exists",
 	},
 	"posts": {
-		Query:          "INSERT INTO posts(userId, title, content, creationTime, status, groupId) VALUES(?,?,?,?,?,?)",
+		Query:          "INSERT INTO posts(userId, groupId, title, content, creationTime, status, image) VALUES(?,?,?,?,?,?,?)",
 		NotExistTables: []string{"users", "groups"},
 		NotExistFields: []string{"userId", "groupId"},
 		NotExistErrors: []string{"user does not exist", "group does not exist"},
 	},
 	"comments": {
-		Query:          "INSERT INTO comments(userId, postId, content, creationTime) VALUES(?,?,?,?)",
+		Query:          "INSERT INTO comments(userId, postId, content, image, creationTime) VALUES(?,?,?,?,?)",
 		NotExistTables: []string{"users", "posts"},
 		NotExistFields: []string{"userId", "postId"},
 		NotExistErrors: []string{"user does not exist", "post does not exist"},
@@ -100,9 +100,9 @@ var TableKeys = map[string]string{
 Global update rules for ease of maintenance, and simplifying of the UpdateData function.
 */
 var UpdateRules = map[string]string{
-	"users":         "UPDATE users SET nickName=?, firstName=?, lastName=?, birthDate=?, email=?, password=?, aboutMe=?,avatar=?, privacy=? WHERE userId=?",
-	"posts":         "UPDATE posts SET userId=?, title=?, content=?, status=?, groupId=? WHERE postId=?",
-	"comments":      "UPDATE comments SET userId=?, postId=?, content=? WHERE commentId=?",
+	"users":         "UPDATE users SET  privacy=? WHERE userId=?",
+	"posts":         "UPDATE posts SET image=? WHERE postId=?",
+	"comments":      "UPDATE comments SET image=? WHERE commentId=?",
 	"groups":        "UPDATE groups SET creatorId=?, title=?, description=? WHERE groupId=?",
 	"follow":        "UPDATE follow SET followerId=?, followeeId=?, status=? WHERE followerId=?", // Assuming followerId uniquely identifies a follow record
 	"group_member":  "UPDATE group_member SET userId=?, groupId=?, status=? WHERE userId=?",      // Assuming userId uniquely identifies a group member record
@@ -148,18 +148,18 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"posts": {
-		SelectFields: "postId, userId, title, content, creationTime, status, groupId",
+		SelectFields: "postId, userId, title, content, creationTime, status, image, groupId",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var post Post
-			err := rows.Scan(&post.PostId, &post.UserId, &post.Title, &post.Content, &post.CreationTime, &post.Status, &post.GroupId)
+			err := rows.Scan(&post.PostId, &post.UserId, &post.Title, &post.Content, &post.CreationTime, &post.Status, &post.Image, &post.GroupId)
 			return post, err
 		},
 	},
 	"comments": {
-		SelectFields: "commentId, userId, postId, content, creationTime",
+		SelectFields: "commentId, userId, postId, content, image, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var comment Comment
-			err := rows.Scan(&comment.CommentId, &comment.UserId, &comment.PostId, &comment.Content, &comment.CreationTime)
+			err := rows.Scan(&comment.CommentId, &comment.UserId, &comment.PostId, &comment.Content, &comment.Image, &comment.CreationTime)
 			return comment, err
 		},
 	},

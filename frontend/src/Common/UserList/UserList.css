@@ -1,0 +1,60 @@
+.user-list {
+    width: 300px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+    font-family: Arial, sans-serif;
+  }
+
+  .user-list-container {
+    margin-bottom: 10px;
+  }
+
+  .user-list-header h2 {
+    font-size: 18px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .user-list-body ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .user-list-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+
+  .user-list-item-left {
+    margin-right: 10px;
+  }
+
+  .user-list-item-left img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+
+  .user-list-item-right span {
+    margin-right: 5px;
+  }
+
+  .user-list-footer {
+    text-align: right;
+  }
+
+  .user-list-footer button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+
+  .user-list-footer button:hover {
+    background-color: #45a049;
+  }

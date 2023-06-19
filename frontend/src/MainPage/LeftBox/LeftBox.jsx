@@ -1,8 +1,13 @@
 
-import { navGroupLinkData } from "../dummyData";
+
+import {logout} from "../../tools/logout";
 import NavList from "./NavList";
 import "./LeftBox.css";
-const LeftBox = ({user}) => {
+
+const LeftBox = ({user,link}) => {
+    const handleLogout = () => {
+        logout();
+    }
     return (
         <div className="left-box">
             <div className="user_box">
@@ -11,15 +16,16 @@ const LeftBox = ({user}) => {
                 </div>
                 <div className="user_info">
                     <div className="username">
-                        <span>{user.username}</span>
+                        <span>{user.firstName}</span>
                     </div>
                     <div className="logout_btn">
-                        <button>logout</button>
+                        <button onClick={handleLogout}>logout</button>
                     </div>
                 </div>
             </div>
-            <NavList type={"Post"} links={navGroupLinkData[1]} />
-            <NavList type={"Nav"} links={navGroupLinkData[0]} />
+            <NavList type={"Post"} links={link[1]} />
+            <NavList type={"Nav"} links={link[0]} />
+            <NavList type={"Connection"} links={link[2]} />
 
         </div>
     );
