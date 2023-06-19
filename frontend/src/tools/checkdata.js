@@ -29,3 +29,30 @@ export function checkPostData(data){
         };
     }
     }
+export function checkCommentData(data){
+    /* 
+     const commentData = {
+    sessionId: sessionId,
+    commentId: 0,
+      postId: id,
+      userId: parseInt(userId),
+      creatorProfile: null,
+      content: comment,
+      image: image,
+      date:"",
+    }; */
+    console.log("incheck",data)
+    if (data.content === "" || data.content === null || data.content === undefined) {
+        return {
+            title: "Error",
+            message: ["Content is empty"],
+            status: false,
+        };
+    } else {
+        return {
+            title: "Success",
+            message: ["Comment successfully"],
+            status: true,
+        };
+    }
+    }

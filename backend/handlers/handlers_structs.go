@@ -6,12 +6,16 @@ import (
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":       LoginPage,
-	"register":    RegisterPage,
-	"profile":     ProfilePage,
-	"profileList": ProfileList,
-	"createPost":  CreatePost,
-	"requestPost": GetPost,
+	"login":         LoginPage,
+	"register":      RegisterPage,
+	"profile":       ProfilePage,
+	"profileList":   ProfileList,
+	"createPost":    CreatePost,
+	"GetPost":       GetPost,
+	"GetPosts":      GetPosts,
+	"createComment": CreateComment,
+	//"getComment":    GetComment,
+	//"getComments":   GetComments,
 	//"requestPosts": GetPosts,
 }
 
@@ -24,6 +28,11 @@ type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+type LoginResponse struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+}
+
 type ProfileListRequest struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
@@ -33,6 +42,7 @@ type ProfileListRequest struct {
 type ProfileRequest struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
+	ProfileId int    `json:"profileId"`
 }
 type RegisterData struct {
 	NickName  string `json:"nickName,omitempty"` // optional
@@ -69,28 +79,34 @@ type PrivateProfile struct {
 	Followers []int  `json:"followers"` // become array of uuid
 	Following []int  `json:"following"` // become array of uuid
 }
+
 type Comment struct {
-	CommentId int    `json:"commentId"`
-	PostId    int    `json:"postId"`
-	UserId    int    `json:"userId"`
-	Content   string `json:"content"`
-	Date      string `json:"Date"`
+	SessionId      string       `json:"sessionId"`
+	CommentId      int          `json:"commentId"`
+	PostId         int          `json:"postId"`
+	UserId         int          `json:"userId"`
+	CreatorProfile SmallProfile `json:"creatorProfile"`
+	Content        string       `json:"content"`
+	Image          string       `json:"image,omitempty"`
+	Date           string       `json:"Date"`
 }
 type Post struct {
-	SessionId string    `json:"sessionId"`
-	PostId    int       `json:"postId"`
-	UserId    int       `json:"userId"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	Status    string    `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
-	Followers []int     `json:"followers"` //---> this one related to status
-	Image     string    `json:"image,omitempty"`
-	GroupId   int       `json:"groupId"` // ---> if post is a group post
-	Comments  []Comment `json:"comments"`
-	Date      string    `json:"date"`
+	SessionId      string       `json:"sessionId"`
+	PostId         int          `json:"postId"`
+	UserId         int          `json:"userId"`
+	CreatorProfile SmallProfile `json:"creatorProfile"`
+	Title          string       `json:"title"`
+	Content        string       `json:"content"`
+	Status         string       `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
+	Followers      []int        `json:"followers"` //---> this one related to status
+	Image          string       `json:"image,omitempty"`
+	GroupId        int          `json:"groupId"` // ---> if post is a group post
+	Comments       []Comment    `json:"comments"`
+	Date           string       `json:"date"`
 }
 type RequestPost struct {
 	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
 	PostId    int    `json:"postId"`
 }
 

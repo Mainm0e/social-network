@@ -49,7 +49,7 @@ func ProcessImage(data string, url string) (string, error) {
 	// Remove the data type prefix if present
 	parts := strings.SplitN(data, ",", 2)
 	if len(parts) != 2 {
-		return "", errors.New("invalid avatar image data")
+		return "", errors.New("invalid image data")
 	}
 
 	// Extract the image data after the comma
@@ -69,19 +69,19 @@ func ProcessImage(data string, url string) (string, error) {
 	// Decode the Base64-encoded image data
 	decodedData, err := base64.StdEncoding.DecodeString(imageData)
 	if err != nil {
-		return "", errors.New("Error decoding avatar image  " + err.Error())
+		return "", errors.New("Error decoding image  " + err.Error())
 	}
 	// Save the image to the desired location
 	err = ioutil.WriteFile(url+"."+imageType, decodedData, 0644)
 	if err != nil {
-		return "", errors.New("Error saving avatar image  " + err.Error())
+		return "", errors.New("Error saving image  " + err.Error())
 	}
-	log.Println("Avatar image saved successfully")
+	log.Println("image saved successfully")
 	return url + "." + imageType, nil
 }
 
 /*
-RetrieveImage retrieves the avatar image as Base64-encoded string from the local system
+RetrieveImage retrieves the image as Base64-encoded string from the local system
 based on the provided file path.
 If an error occurs, it returns an empty string and the error.
 */
@@ -89,8 +89,8 @@ func RetrieveImage(filePath string) (string, error) {
 	// Read the image file as bytes
 	imageData, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Println("Error reading avatar image:", err)
-		return "", errors.New("Error reading avatar image: " + err.Error())
+		log.Println("Error reading image:", err)
+		return "", errors.New("Error reading image: " + err.Error())
 	}
 
 	// Determine the image type based on the file extension

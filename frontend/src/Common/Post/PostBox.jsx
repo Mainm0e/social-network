@@ -4,7 +4,7 @@ import './Post.css';
 import { getCookie } from '../../tools/cookie';
 import { checkPostData } from '../../tools/checkdata';
 
-const PostList = (id) => {
+const PostList = ({id}) => {
   const [postData, setPostData] = useState(null);
   useEffect(() => {
     const getPost = async () => {
@@ -14,37 +14,44 @@ const PostList = (id) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({type: 'get_posts', payload: { sessionId: sessionId, userId: id } }),
+        body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(id), postId : 5 } }),
       });
       const responseData = await response.json();
-      setPostData(responseData);
+      setPostData(responseData.event.payload);
+      console.log("in PostList",responseData)
     };
     getPost();
   }, []);
+  const createPost = () => {
+    if (postData !== null) {
+         return (
+           <Post
+             key={postData.userId}
+             id={postData.postId}
+             title={postData.title}
+             content={postData.content}
+             image={postData.image}
+             time={postData.date}
+             user={postData.userId}
+             comments={postData.comments}
+           />
+         ); 
+       }
+     };
+   
   if (!postData) {
     return <div>Loading...</div>;
-  } else if (postData.event.payload !== null) {
+  } else  {
     return (
       <div className="post_list">
-        {postData.event.payload.map((post) => (
-          <Post
-            key={post.id}
-            id={post.id}
-            title={post.title}
-            content={post.content}
-            image={post.image}
-            time={post.time}
-            user={post.user}
-            comments={post.comments}
-          />
-        ))}
+        {createPost()}
       </div>
     );
   }
   
 };
-
 const Post = ({ id, title, content, image, time, user, comments}) => {
+  console.log("in post", comments)
   const checkImage = () => {
     console.log(image)
     if (image === ''|| image === null|| image === undefined) {

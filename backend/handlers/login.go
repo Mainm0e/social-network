@@ -17,7 +17,7 @@ func LoginPage(payload json.RawMessage) (Response, error) {
 		log.Println("Error unmarshaling JSON to LoginData:", err)
 	}
 	log.Println("Login try by:", loginData)
-	_, err = loginData.login()
+	id, err := loginData.login()
 	if err != nil {
 		response := Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		log.Println("Error logging in:", err)
@@ -30,7 +30,8 @@ func LoginPage(payload json.RawMessage) (Response, error) {
 			response := Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, err
 		}
-		payload, err = json.Marshal(map[string]string{"sessionId": sessionId})
+		loginResponse := LoginResponse{sessionId, id}
+		payload, err = json.Marshal(loginResponse)
 		if err != nil {
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, errors.New("Error marshaling profile to JSON: " + err.Error())

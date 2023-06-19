@@ -88,6 +88,9 @@ if error occur then it return error
 */
 func findFollowers(userId int) ([]int, error) {
 	followers, err := db.FetchData("follow", "followeeId", userId)
+	if len(followers) == 0 {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, errors.New("Error fetching followers data" + err.Error())
 	}
@@ -99,6 +102,9 @@ func findFollowers(userId int) ([]int, error) {
 }
 func findFollowings(userId int) ([]int, error) {
 	followings, err := db.FetchData("follow", "followerId", userId)
+	if len(followings) == 0 {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, errors.New("Error fetching followings data" + err.Error())
 	}
@@ -178,7 +184,17 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		len(followings),
 		PrivateProfile{},
 	}
+	if user.UserId == userId {
+		profile.PrivateData = PrivateProfile{
+			user.BirthDate,
+			user.Email,
+			user.AboutMe.String,
+			followers,
+			followings,
+		}
+		return profile, nil
 
+	}
 	if status == "following" || userId == profileId {
 		log.Println("yay user is user", profile.PrivateData)
 		profile.PrivateData = PrivateProfile{
@@ -201,24 +217,24 @@ login is a function that attempts to log in a user based on the provided data.
 It takes in a byte slice `data` containing the login information.
 It returns a boolean value indicating whether the login was successful, and an error if any occurred.
 */
-func (lg *LoginData) login() (bool, error) {
+func (lg *LoginData) login() (int, error) {
 
 	// Fetch user data from the database based on the provided email.
 	user, err := db.FetchData("users", "email", lg.Email)
 	if err != nil {
-		return false, errors.New("Error fetching data" + err.Error())
+		return 0, errors.New("Error fetching data" + err.Error())
 	}
 
 	// Check if a user with the specified email was found.
 	if len(user) == 0 {
-		return false, errors.New("user not found")
+		return 0, errors.New("user not found")
 	}
 
 	// Compare the provided password with the password stored in the database.
 	if user[0].(db.User).Password == lg.Password {
-		return true, nil
+		return user[0].(db.User).UserId, nil
 	} else {
-		return false, errors.New("password incorrect")
+		return 0, errors.New("password incorrect")
 	}
 }
 
@@ -229,7 +245,6 @@ It returns a boolean value indicating whether the registration was successful, a
 */
 func (regData *RegisterData) register() error {
 	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
-	fmt.Println("regData", regData)
 	if err != nil {
 		return errors.New("Error inserting user" + err.Error())
 	}
@@ -283,13 +298,15 @@ InsertPost function insert the post into database and check if it is semi-privat
 if error occur then it return error
 */
 func InsertPost(post Post) error {
-	id, err := db.InsertData("posts", post.UserId, post.GroupId, post.Title, post.Content, time.Now(), post.Status)
+
+	id, err := db.InsertData("posts", post.UserId, post.GroupId, post.Title, post.Content, time.Now(), post.Status, "")
 	if err != nil {
 		return errors.New("Error inserting post " + err.Error())
 	}
 	if id == 0 {
 		return errors.New("error inserting post ")
 	}
+	fmt.Println("post image", post.Image)
 	if post.Image != "" {
 		// Process the image and save it to the local storage
 		str := strconv.Itoa(int(id))
@@ -318,7 +335,34 @@ func InsertPost(post Post) error {
 	}
 	return nil
 }
-
+func InsertComment(comment Comment) error {
+	id, err := db.InsertData("comments", comment.UserId, comment.PostId, comment.Content, "", time.Now())
+	if err != nil {
+		return errors.New("Error inserting comment " + err.Error())
+	}
+	if id == 0 {
+		return errors.New("error inserting comment ")
+	}
+	if comment.Image != "" {
+		// Process the image and save it to the local storage
+		str := strconv.Itoa(int(id))
+		url := "./images/comments/" + str
+		url, err := utils.ProcessImage(comment.Image, url)
+		if err != nil {
+			log.Println("Error processing comment image:", err)
+			//response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return err
+		}
+		comment.Image = url
+	} else {
+		comment.Image = ""
+	}
+	err = db.UpdateData("comments", comment.Image, id)
+	if err != nil {
+		return errors.New("Error updating comment image" + err.Error())
+	}
+	return nil
+}
 func readComments(currentUserId, postId int) ([]Comment, error) {
 	/* 	// check if user has permission to see this post
 	   	posts, err := db.FetchData("posts", "postId", postId)
@@ -360,9 +404,9 @@ func readComments(currentUserId, postId int) ([]Comment, error) {
 }
 
 /*
-ReadPost function read the post from database and return it if user have permission to see it base on
-post status and user relation to the post creator.
-if error occur then it return error
+checkPost function check if user has permission to see the post that pass to it base on post status.
+it used in readPost and readComments functions.
+it return true if user has permission and false if not. if error occur it return error.
 */
 func checkPost(dbPost db.Post, userId int) (bool, error) {
 
@@ -421,6 +465,11 @@ func checkPost(dbPost db.Post, userId int) (bool, error) {
 	return false, errors.New("user doesn't have permission to this post")
 
 }
+
+/*
+ReadPost function read post from database and check if current user has permission to see it, using checkPost function.
+it return post if user has permission, error if error occur or post not found.
+*/
 func ReadPost(postId int, userId int) (Post, error) {
 	dbPosts, err := db.FetchData("posts", "postId", postId)
 	if err != nil {
@@ -430,15 +479,19 @@ func ReadPost(postId int, userId int) (Post, error) {
 		return Post{}, errors.New("post not found")
 	}
 	dbPost := dbPosts[0].(db.Post)
-	var post Post
-	post = Post{
-		PostId:  dbPost.PostId,
-		UserId:  dbPost.UserId,
-		Title:   dbPost.Title,
-		Content: dbPost.Content,
-		Status:  dbPost.Status,
-		GroupId: dbPost.GroupId,
-		Date:    dbPost.CreationTime,
+	creator, err := fillSmallProfile(dbPost.UserId)
+	if err != nil {
+		return Post{}, errors.New("Error fetching post creator" + err.Error())
+	}
+	post := Post{
+		PostId:         dbPost.PostId,
+		UserId:         dbPost.UserId,
+		CreatorProfile: creator,
+		Title:          dbPost.Title,
+		Content:        dbPost.Content,
+		Status:         dbPost.Status,
+		GroupId:        dbPost.GroupId,
+		Date:           dbPost.CreationTime,
 	}
 	comments, err := readComments(userId, postId)
 	if err != nil {
@@ -446,7 +499,6 @@ func ReadPost(postId int, userId int) (Post, error) {
 	}
 	post.Comments = comments
 	post.Followers = []int{}
-
 	if dbPost.Image != "" {
 		image, err := utils.RetrieveImage(dbPost.Image)
 		if err != nil {
@@ -465,6 +517,12 @@ func ReadPost(postId int, userId int) (Post, error) {
 	return post, nil
 
 }
+
+/*
+ReadPostsByProfile function read all posts of a profile from database
+and returns it if user have permission to see it base on post status and user relation to the post creator.
+if error occur then it return error.
+*/
 func ReadPostsByProfile(currentUserId int, userId int) ([]Post, error) {
 	var posts []Post
 	dbPosts, err := db.FetchData("posts", "userId", userId)
@@ -483,6 +541,12 @@ func ReadPostsByProfile(currentUserId int, userId int) ([]Post, error) {
 	}
 	return posts, nil
 }
+
+/*
+ReadPostsByGroup function read all posts of a group from database
+and returns it if user have permission to see it if user is a member of the group
+if error occur then it return error.
+*/
 func ReadPostsByGroup(currentUserId int, groupId int) ([]Post, error) {
 	var posts []Post
 	dbPosts, err := db.FetchData("posts", "groupId", groupId)
@@ -501,5 +565,3 @@ func ReadPostsByGroup(currentUserId int, groupId int) ([]Post, error) {
 	}
 	return posts, nil
 }
-
-//func ProfilePost(currentUserId)
