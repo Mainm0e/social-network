@@ -14,7 +14,6 @@ const PostList = ({id}) => {
         headers: {
           'Content-Type': 'application/json',
         },
-
         body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(id), postId : 5 } }),
       });
       const responseData = await response.json();
@@ -52,6 +51,7 @@ const PostList = ({id}) => {
   
 };
 const Post = ({ id, title, content, image, time, user, comments}) => {
+  console.log("in post", comments)
   const checkImage = () => {
     console.log(image)
     if (image === ''|| image === null|| image === undefined) {

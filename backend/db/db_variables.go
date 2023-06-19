@@ -31,7 +31,7 @@ var InsertRules = map[string]InsertRule{
 		NotExistErrors: []string{"user does not exist", "group does not exist"},
 	},
 	"comments": {
-		Query:          "INSERT INTO comments(userId, postId, content, image, creationTime) VALUES(?,?,?,?)",
+		Query:          "INSERT INTO comments(userId, postId, content, image, creationTime) VALUES(?,?,?,?,?)",
 		NotExistTables: []string{"users", "posts"},
 		NotExistFields: []string{"userId", "postId"},
 		NotExistErrors: []string{"user does not exist", "post does not exist"},

@@ -336,7 +336,7 @@ func InsertPost(post Post) error {
 	return nil
 }
 func InsertComment(comment Comment) error {
-	id, err := db.InsertData("comments", comment.UserId, comment.PostId, comment.Content, time.Now())
+	id, err := db.InsertData("comments", comment.UserId, comment.PostId, comment.Content, "", time.Now())
 	if err != nil {
 		return errors.New("Error inserting comment " + err.Error())
 	}
