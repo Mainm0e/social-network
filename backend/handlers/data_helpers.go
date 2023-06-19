@@ -88,6 +88,9 @@ if error occur then it return error
 */
 func findFollowers(userId int) ([]int, error) {
 	followers, err := db.FetchData("follow", "followeeId", userId)
+	if len(followers) == 0 {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, errors.New("Error fetching followers data" + err.Error())
 	}
@@ -99,6 +102,9 @@ func findFollowers(userId int) ([]int, error) {
 }
 func findFollowings(userId int) ([]int, error) {
 	followings, err := db.FetchData("follow", "followerId", userId)
+	if len(followings) == 0 {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, errors.New("Error fetching followings data" + err.Error())
 	}
@@ -178,7 +184,17 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		len(followings),
 		PrivateProfile{},
 	}
+	if user.UserId == userId {
+		profile.PrivateData = PrivateProfile{
+			user.BirthDate,
+			user.Email,
+			user.AboutMe.String,
+			followers,
+			followings,
+		}
+		return profile, nil
 
+	}
 	if status == "following" || userId == profileId {
 		log.Println("yay user is user", profile.PrivateData)
 		profile.PrivateData = PrivateProfile{
@@ -229,7 +245,6 @@ It returns a boolean value indicating whether the registration was successful, a
 */
 func (regData *RegisterData) register() error {
 	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
-	fmt.Println("regData", regData)
 	if err != nil {
 		return errors.New("Error inserting user" + err.Error())
 	}
@@ -452,14 +467,12 @@ func ReadPost(postId int, userId int) (Post, error) {
 	}
 	post.Comments = comments
 	post.Followers = []int{}
-	fmt.Println("post image is: ", dbPost.Image)
 	if dbPost.Image != "" {
 		image, err := utils.RetrieveImage(dbPost.Image)
 		if err != nil {
 			return Post{}, errors.New("Error retrieving post image: " + err.Error())
 		}
 		post.Image = image
-		fmt.Println("post image is: ", post.Image)
 	}
 	ok, err := checkPost(dbPosts[0].(db.Post), userId)
 

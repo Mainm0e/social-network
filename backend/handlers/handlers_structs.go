@@ -39,6 +39,7 @@ type ProfileListRequest struct {
 type ProfileRequest struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
+	ProfileId int    `json:"profileId"`
 }
 type RegisterData struct {
 	NickName  string `json:"nickName,omitempty"` // optional
