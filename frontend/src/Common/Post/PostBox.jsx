@@ -32,7 +32,7 @@ const PostList = ({id}) => {
              content={postData.content}
              image={postData.image}
              time={postData.date}
-             user={postData.userId}
+             user={postData.creatorProfile}
              comments={postData.comments}
            />
          ); 
@@ -74,7 +74,7 @@ const Post = ({ id, title, content, image, time, user, comments}) => {
         <div className="post_header_right">
           <div className="post_header_user">
             <img src={user.avatar} alt="avatar" />
-            <p>{user.username}</p>
+            <p>{user.firstName} {user.lastName}</p>
           </div>
         </div>
       </div>
