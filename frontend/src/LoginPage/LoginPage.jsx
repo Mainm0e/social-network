@@ -52,6 +52,7 @@ function LoginPage() {
       if (data.statusCode === 200){
         // set cookie
         document.cookie = "sessionId=" + data.event.payload.sessionId;
+        document.cookie = "userId=" + data.event.payload.userId;
         window.location.href = '/';
         return true;
       }

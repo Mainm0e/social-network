@@ -1,6 +1,7 @@
 import "../MainBox.css";
-const Header = (profile) => {
-  const user = profile.profile;
+const Header = ({profile}) => {
+  console.log("in header", profile)
+  const user = profile;
   const checkPrivacy = () => {
     if (true) {
       return (

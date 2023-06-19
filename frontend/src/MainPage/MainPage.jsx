@@ -5,10 +5,13 @@ import LeftBox from "./LeftBox/LeftBox";
 import RightBox from "./RightBox/RightBox";
 import ChatBox from "../Common/ChatBox/ChatBox";
 import { navGroupLinkData } from "./dummyData";
+import { getCookie } from "../tools/cookie";
 
 // dummy data
 function MainPage() {
-  const testProfile_Id = 1;
+  // get userId from cookie
+  const id = getCookie("userId")
+  const userId =  parseInt(id);
   // make url = localhost:3000/
   const url = window.location.href;
   const urlSplit = url.split("/");
@@ -16,14 +19,6 @@ function MainPage() {
   window.history.pushState({}, null, urlJoin);
 
   const [data, setData] = useState(null);
-  //get cookie from browser
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2){
-      return parts[1]
-    }
-  };
   const sessionId = getCookie("sessionId");
   useEffect(() => {
     const fetchData = async () => {
@@ -32,11 +27,10 @@ function MainPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ type: "profile", payload: {sessionId:sessionId, userId: 1} }),
+        body: JSON.stringify({ type: "profile", payload: {sessionId:sessionId, userId: userId, profileId: userId} }),
       });
       const responseData = await response.json();
       setData(responseData);
-      console.log(responseData);
     };
 
     fetchData();
@@ -50,8 +44,8 @@ function MainPage() {
     <div className="main-page">
       <div className="main-page-container">
         <LeftBox user={data.event.payload} link={navGroupLinkData}/>
-        <MainBox user={testProfile_Id}/>
-        <RightBox profileId={testProfile_Id}/>
+        <MainBox user={userId}/>
+        <RightBox profileId={userId}/>
         <ChatBox />
       </div>
     </div>
