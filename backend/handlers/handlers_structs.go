@@ -25,6 +25,11 @@ type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+type LoginResponse struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+}
+
 type ProfileListRequest struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
