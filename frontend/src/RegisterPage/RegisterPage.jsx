@@ -103,14 +103,13 @@
             setRegisterStatus(false);
             fetch('http://localhost:8080/api', {
               method: 'POST',
-              body: JSON.stringify({"event_type":"register", "payload":data}),
+              body: JSON.stringify({"type":"register", "payload":data}),
               })
               .then(response => response.json())
               .then(data => {
-                console.log('Success:', data);
-                if (data.success){
+                if (data.statusCode===200){
                   setRegisterStatus(true);
-                  /* window.location.href = '/login'; */
+                  window.location.href = '/login';
                 }
                 else {
                   setAlertTitle(data.message)

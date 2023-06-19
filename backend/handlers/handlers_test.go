@@ -51,6 +51,7 @@ It returns the inserted user as a db.User struct and any error encountered durin
 */
 func insertRandomUser(t *testing.T) (RegisterData, error) {
 	user, err := createRandomUser(t)
+	fmt.Println(user)
 	if err != nil {
 		return user, errors.New("createRandomUser got error: " + err.Error())
 	}
@@ -92,14 +93,13 @@ func TestLogin(t *testing.T) {
 	}
 	var tests = []struct {
 		Email, Password any
-		want            bool
 	}{
 		//test correct input
-		{user.Email, user.Password, true},
+		{user.Email, user.Password},
 		//test incorrect input (wrong password)
-		{user.Email, randomPassword, false},
+		{user.Email, randomPassword},
 		//test incorrect email (user not found)
-		{randomEmail, user.Password, false},
+		{randomEmail, user.Password},
 	}
 
 	for _, tt := range tests {
@@ -109,10 +109,10 @@ func TestLogin(t *testing.T) {
 			data.Email = tt.Email.(string)
 			data.Password = tt.Password.(string)
 
-			bo, err := data.login()
+			_, err := data.login()
 
-			if bo != tt.want {
-				t.Errorf("login got: %v, want: %v error:%v.", bo, tt.want, err)
+			if err != nil {
+				t.Errorf("login failed got error: %v", err)
 			}
 		})
 

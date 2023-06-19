@@ -6,8 +6,7 @@ import AlertBox from '../Common/AlertBox/AlertBox';
 // LoginPage component
 // This component is used to render the login page
 // Props: none
-function LoginPage() {
-  
+function LoginPage() {  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
@@ -39,19 +38,21 @@ function LoginPage() {
   };
   let msg = [];
   const checkemail = (email, password) => {
-
+    console.log("checkEmail",email, password);
     fetch('http://localhost:8080/api', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({event_type:"login","payload":{email: email, password: password}}),
+      body: JSON.stringify({type:"login","payload":{email: email, password: password}}),
 
     }).then(response => response.json())
     .then(data => {
       console.log('Success:', data);
-      if (data.success){
-        alert('Login successful');
+      if (data.statusCode === 200){
+        // set cookie
+        document.cookie = "sessionId=" + data.event.payload.sessionId;
+        document.cookie = "userId=" + data.event.payload.userId;
         window.location.href = '/';
         return true;
       }
@@ -81,6 +82,7 @@ function LoginPage() {
   const handleLogin = () => {
     // Perform login logic here
     if (checkemail(email, password)) {
+      console.log("do login",email, password)
       setLoginStatus(true);
       document.querySelector(".alert-box").style.display = "none";
     } else {

@@ -125,41 +125,44 @@ middleware chain implemented by the loggerMiddleware() function.
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Extract the session cookie from the request header
-		cookie, err := extractCookie(r)
+		// Copy the r into a new r
+		/* var event handlers.Event
+
+		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			log.Println("Error extracting cookie: ", err.Error())
-
-			// Respond with 401 Unauthorized with a message
-			http.Error(w, "No session cookie found", http.StatusUnauthorized)
+			// Handle the error
+			log.Println("Error reading request body", http.StatusBadRequest)
 			return
 		}
+		defer r.Body.Close()
 
-		isAuthenticated, err := sessions.Check(cookie)
+		newBody := ioutil.NopCloser(bytes.NewReader(body))
+		newRequest := r.Clone(r.Context())
+		newRequest.Body = newBody
+
+		err = json.NewDecoder(newRequest.Body).Decode(&event)
 		if err != nil {
-			log.Println("Error checking authentication: ", err.Error())
-
-			// Respond with 500 Internal Server Error with a message
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			// Handle the error
+			log.Println("Error decoding JSON", http.StatusBadRequest)
 			return
 		}
 
-		if !isAuthenticated {
-			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
+		// Use the new request in subsequent middleware or handlers
+		// Access the event structure from the newRequest.Body here
 
-			// Check for login event exception from the login url
-			if r.URL.Path == "/login" {
-				// If the user is not authenticated and the request is for the login page,
-				// pass to the next middleware or handler
-				handler.ServeHTTP(w, r)
-				return
-			}
+		// Call the next middleware or handler
+		// Check if the event is a login or register event
+		if event.Event_type == "login" || event.Event_type == "register" {
+			// skip authentication check
+			log.Println("Skipping authentication check for login or register event", event)
 
-			// Respond with 401 Unauthorized
-			http.Error(w, "Unauthorized access", http.StatusUnauthorized)
+			handler.ServeHTTP(w, newRequest)
 			return
 		}
 
-		// If authenticated, pass to the next middleware or handler
+		// ... rest of your authentication logic ...
+
+		// If authenticated, pass to the next middleware or handler */
 		handler.ServeHTTP(w, r)
 	})
 }
@@ -177,9 +180,7 @@ func initialiseRoutes() http.Handler {
 	// Register handler functions for various routes
 	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
 	mux.HandleFunc("/api", handlers.HTTPEventRouter)
-	//mux.HandleFunc("/login", handlers.LoginPage)
-	//mux.HandleFunc("/register", handlers.RegisterPage)
-	// mux.HandleFunc("/main", handlers.MainPage)
+	//mux.HandleFunc("/ws", sockets.WebSocketEventRouter)
 
 	// Wrap the mux with the CORS middleware and return it
 	// Although the return type is an http.Handler, it is actually a wrapped *mux.Router which

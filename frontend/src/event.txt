@@ -1,0 +1,16 @@
+Json object for fetch data
+
+// login
+json = {type:"login","payload":{email: email, password: password}}
+
+// Register
+json ={"type":"register", "payload":data}
+
+// profile
+json = { type:"profile" , "payload":{sessionId:sessionId, userId:id}}
+
+// profileList
+
+json = { type: "profileList", payload: {sessionId:sessionId, userId: id, request:"followings"} }
+
+
