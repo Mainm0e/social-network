@@ -15,35 +15,93 @@ const PostList = (id) => {
           'Content-Type': 'application/json',
         },
 
-        body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(1), postId : 5 } }),
+        body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(1), postId : 4 } }),
       });
       const responseData = await response.json();
-      setPostData(responseData);
+      setPostData(responseData.event.payload);
+      console.log(responseData.event.payload)
     };
     getPost();
   }, []);
+  const createPost = () => {
+    if (postData !== null) {
+         return (
+           <Post
+             key={postData.userId}
+             id={postData.postId}
+             title={postData.title}
+             content={postData.content}
+             image={postData.image}
+             time={postData.date}
+             user={postData.userId}
+             comments={postData.comments}
+           />
+         ); 
+       }
+     };
+   
   if (!postData) {
     return <div>Loading...</div>;
-  } else if (postData.event.payload !== null) {
+  } else  {
     return (
       <div className="post_list">
-        {postData.event.payload.map((post) => (
-          <Post
-            key={post.id}
-            id={post.id}
-            title={post.title}
-            content={post.content}
-            image={post.image}
-            time={post.time}
-            user={post.user}
-            comments={post.comments}
-          />
-        ))}
+        {createPost()}
       </div>
     );
   }
   
 };
+/* 
+const PostList = (id) => {
+  const [postData, setPostData] = useState(null);
+  useEffect(() => {
+    const getPost = async () => {
+      const sessionId = getCookie('sessionId');
+      const response = await fetch('http://localhost:8080/api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+
+        body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(1), postId : 11 } }),
+      });
+      const responseData = await response.json();
+      setPostData(responseData.event.payload);
+      console.log(responseData.event.payload)
+    };
+    getPost();
+  }, []);
+  // function that get post data and loop to create post'
+  const createPost = () => {
+ if (postData !== null) {
+      return (
+        <Post
+          key={postData.userId}
+          id={postData.postId}
+          title={postData.title}
+          content={postData.content}
+          image={postData.image}
+          time={postData.date}
+          user={postData.userId}
+          comments={postData.comments}
+        />
+      ); 
+    }
+  };
+
+
+  if (!postData) {
+    return <div>Loading...</div>;
+  } else if (postData !== null) {
+    return (
+      <div className="post_list">
+        {createPost()}
+      </div>
+    );
+  }
+  
+};
+ */
 
 const Post = ({ id, title, content, image, time, user, comments}) => {
   const checkImage = () => {
