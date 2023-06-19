@@ -391,13 +391,28 @@ func readComments(currentUserId, postId int) ([]Comment, error) {
 	var commentsList []Comment
 	for _, comment := range comments {
 		dbComment := comment.(db.Comment)
+		if dbComment.Image != "" {
+			image, err := utils.RetrieveImage(dbComment.Image)
+			if err != nil {
+				return []Comment{}, errors.New("Error retrieving post image: " + err.Error())
+			}
+			dbComment.Image = image
+		}
+		CreatorProfile, err := fillSmallProfile(dbComment.UserId)
+		if err != nil {
+			return []Comment{}, errors.New("Error filling profile" + err.Error())
+		}
+
 		commentsList = append(commentsList, Comment{
-			CommentId: dbComment.CommentId,
-			PostId:    dbComment.PostId,
-			UserId:    dbComment.UserId,
-			Content:   dbComment.Content,
-			Date:      dbComment.CreationTime,
+			CommentId:      dbComment.CommentId,
+			PostId:         dbComment.PostId,
+			UserId:         dbComment.UserId,
+			CreatorProfile: CreatorProfile,
+			Content:        dbComment.Content,
+			Image:          dbComment.Image,
+			Date:           dbComment.CreationTime,
 		})
+
 	}
 	return commentsList, nil
 
