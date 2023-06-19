@@ -2,11 +2,9 @@ package handlers
 
 import (
 	"backend/events"
-	"backend/utils"
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 func CreatePost(payload json.RawMessage) (Response, error) {
@@ -20,20 +18,6 @@ func CreatePost(payload json.RawMessage) (Response, error) {
 		return response, err
 	}
 
-	if post.Image != "" {
-		// Process the image and save it to the local storage
-		str := strconv.Itoa(post.PostId)
-		url := "./images/posts/" + str
-		url, err = utils.ProcessImage(post.Image, url)
-		if err != nil {
-			log.Println("Error processing post image:", err)
-			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-			return response, err
-		}
-		post.Image = url
-	} else {
-		post.Image = ""
-	}
 	//insert new post into database
 	err = InsertPost(post)
 	if err != nil {
