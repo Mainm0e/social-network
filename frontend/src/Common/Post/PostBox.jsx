@@ -24,11 +24,11 @@ const PostList = (id) => {
   if (!postData) {
     return <div>Loading...</div>;
   } else if (postData.event.payload !== null) {
-  return (
-    <div className="post_list">
-      {postData.map((post) => (
-        <Post
-          key={post.id}
+    return (
+      <div className="post_list">
+        {postData.event.payload.map((post) => (
+          <Post
+            key={post.id}
             id={post.id}
             title={post.title}
             content={post.content}
@@ -36,11 +36,12 @@ const PostList = (id) => {
             time={post.time}
             user={post.user}
             comments={post.comments}
-        />
+          />
         ))}
-    </div>
-  );
+      </div>
+    );
   }
+  
 };
 
 const Post = ({ id, title, content, image, time, user, comments}) => {
@@ -86,6 +87,7 @@ const CreatePost = ({ onSubmit }) => {
   const [content, setContent] = useState('');
   const [privacy, setPrivacy] = useState('public');
   const [image, setImage] = useState(null);
+  const [showImage, setShowImage] = useState(null);
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
@@ -97,9 +99,14 @@ const CreatePost = ({ onSubmit }) => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setImage(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Image = reader.result;
+      setImage(base64Image);
+      setShowImage(file);
+    };
+    reader.readAsDataURL(file);
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const postData = {
@@ -139,9 +146,9 @@ const CreatePost = ({ onSubmit }) => {
             onChange={handleImageChange}
           />
         </div>
-        {image && (
+        {showImage && (
           <div className="create_post_image">
-            <img src={URL.createObjectURL(image)} alt="Selected" />
+            <img src={URL.createObjectURL(showImage)} alt="Selected" />
           </div>
         )}
         <div className="create_post_button">
