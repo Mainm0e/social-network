@@ -11,7 +11,8 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"profile":     ProfilePage,
 	"profileList": ProfileList,
 	"createPost":  CreatePost,
-	"requestPost": GetPost,
+	"GetPost":     GetPost,
+	"GetPosts":    GetPosts,
 	//"requestPosts": GetPosts,
 }
 
