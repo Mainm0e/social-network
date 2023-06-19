@@ -14,6 +14,7 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"GetPost":       GetPost,
 	"GetPosts":      GetPosts,
 	"createComment": CreateComment,
+
 	//"getComment":    GetComment,
 	//"getComments":   GetComments,
 	//"requestPosts": GetPosts,
@@ -108,6 +109,14 @@ type RequestPost struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 	PostId    int    `json:"postId"`
+}
+
+type ReqAllPosts struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	From      string `json:"from"` // from profile or from group
+	ProfileId int    `json:"profileId"`
+	GroupId   int    `json:"groupId"`
 }
 
 // add post struct coming from frontend
