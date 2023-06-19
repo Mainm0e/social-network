@@ -6,13 +6,16 @@ import (
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":       LoginPage,
-	"register":    RegisterPage,
-	"profile":     ProfilePage,
-	"profileList": ProfileList,
-	"createPost":  CreatePost,
-	"GetPost":     GetPost,
-	"GetPosts":    GetPosts,
+	"login":         LoginPage,
+	"register":      RegisterPage,
+	"profile":       ProfilePage,
+	"profileList":   ProfileList,
+	"createPost":    CreatePost,
+	"GetPost":       GetPost,
+	"GetPosts":      GetPosts,
+	"createComment": CreateComment,
+	//"getComment":    GetComment,
+	//"getComments":   GetComments,
 	//"requestPosts": GetPosts,
 }
 
@@ -75,12 +78,16 @@ type PrivateProfile struct {
 	Followers []int  `json:"followers"` // become array of uuid
 	Following []int  `json:"following"` // become array of uuid
 }
+
 type Comment struct {
-	CommentId int    `json:"commentId"`
-	PostId    int    `json:"postId"`
-	UserId    int    `json:"userId"`
-	Content   string `json:"content"`
-	Date      string `json:"Date"`
+	SessionId      string       `json:"sessionId"`
+	CommentId      int          `json:"commentId"`
+	PostId         int          `json:"postId"`
+	UserId         int          `json:"userId"`
+	CreatorProfile SmallProfile `json:"creatorProfile"`
+	Content        string       `json:"content"`
+	Image          string       `json:"image,omitempty"`
+	Date           string       `json:"Date"`
 }
 type Post struct {
 	SessionId      string       `json:"sessionId"`
