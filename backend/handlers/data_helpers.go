@@ -44,13 +44,18 @@ func fillSmallProfile(userId int) (SmallProfile, error) {
 		LastName:  user.LastName,
 		Avatar:    user.Avatar,
 	}
+	var imageUrl string
 	if user.Avatar != nil {
-		avatar, err := utils.RetrieveImage(*user.Avatar)
-		if err != nil {
-			return SmallProfile{}, errors.New("Error retrieving avatar image: " + err.Error())
-		}
-		smallProfile.Avatar = &avatar
+		imageUrl = *user.Avatar
+	} else {
+		imageUrl = "./images/avatars/default.png"
 	}
+	avatar, err := utils.RetrieveImage(imageUrl)
+	if err != nil {
+		return SmallProfile{}, errors.New("Error retrieving avatar image: " + err.Error())
+	}
+
+	user.Avatar = &avatar
 	return smallProfile, nil
 }
 
@@ -165,14 +170,19 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 	if err != nil {
 		return Profile{}, errors.New("Error findFollowings: " + err.Error())
 	}
+	var imageUrl string
 	if user.Avatar != nil {
-
-		avatar, err := utils.RetrieveImage(*user.Avatar)
-		if err != nil {
-			return Profile{}, errors.New("Error retrieving avatar image: " + err.Error())
-		}
-		user.Avatar = &avatar
+		imageUrl = *user.Avatar
+	} else {
+		imageUrl = "./images/avatars/default.png"
 	}
+	avatar, err := utils.RetrieveImage(imageUrl)
+	if err != nil {
+		return Profile{}, errors.New("Error retrieving avatar image: " + err.Error())
+	}
+
+	user.Avatar = &avatar
+
 	profile := Profile{
 		sessionId,
 		user.UserId,
