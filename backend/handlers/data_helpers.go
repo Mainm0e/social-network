@@ -283,13 +283,15 @@ InsertPost function insert the post into database and check if it is semi-privat
 if error occur then it return error
 */
 func InsertPost(post Post) error {
-	id, err := db.InsertData("posts", post.UserId, post.GroupId, post.Title, post.Content, time.Now(), post.Status)
+
+	id, err := db.InsertData("posts", post.UserId, post.GroupId, post.Title, post.Content, time.Now(), post.Status, "")
 	if err != nil {
 		return errors.New("Error inserting post " + err.Error())
 	}
 	if id == 0 {
 		return errors.New("error inserting post ")
 	}
+	fmt.Println("post image", post.Image)
 	if post.Image != "" {
 		// Process the image and save it to the local storage
 		str := strconv.Itoa(int(id))
@@ -446,13 +448,14 @@ func ReadPost(postId int, userId int) (Post, error) {
 	}
 	post.Comments = comments
 	post.Followers = []int{}
-
+	fmt.Println("post image is: ", dbPost.Image)
 	if dbPost.Image != "" {
 		image, err := utils.RetrieveImage(dbPost.Image)
 		if err != nil {
 			return Post{}, errors.New("Error retrieving post image: " + err.Error())
 		}
 		post.Image = image
+		fmt.Println("post image is: ", post.Image)
 	}
 	ok, err := checkPost(dbPosts[0].(db.Post), userId)
 

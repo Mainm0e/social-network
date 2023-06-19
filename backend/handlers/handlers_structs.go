@@ -78,17 +78,18 @@ type Comment struct {
 	Date      string `json:"Date"`
 }
 type Post struct {
-	SessionId string    `json:"sessionId"`
-	PostId    int       `json:"postId"`
-	UserId    int       `json:"userId"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	Status    string    `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
-	Followers []int     `json:"followers"` //---> this one related to status
-	Image     string    `json:"image,omitempty"`
-	GroupId   int       `json:"groupId"` // ---> if post is a group post
-	Comments  []Comment `json:"comments"`
-	Date      string    `json:"date"`
+	SessionId      string       `json:"sessionId"`
+	PostId         int          `json:"postId"`
+	UserId         int          `json:"userId"`
+	CreatorProfile SmallProfile `json:"creatorProfile"`
+	Title          string       `json:"title"`
+	Content        string       `json:"content"`
+	Status         string       `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
+	Followers      []int        `json:"followers"` //---> this one related to status
+	Image          string       `json:"image,omitempty"`
+	GroupId        int          `json:"groupId"` // ---> if post is a group post
+	Comments       []Comment    `json:"comments"`
+	Date           string       `json:"date"`
 }
 type RequestPost struct {
 	SessionId string `json:"sessionId"`
