@@ -42,10 +42,10 @@ func InitiateImagesPath() error {
 }
 
 /*
-ProcessAvatarImage decodes the Base64-encoded image data based on the data type prefix
+ProcessImage decodes the Base64-encoded image data based on the data type prefix
 and saves it to the desired location if error occurs returns an error
 */
-func ProcessAvatarImage(data string, url string) (string, error) {
+func ProcessImage(data string, url string) (string, error) {
 	// Remove the data type prefix if present
 	parts := strings.SplitN(data, ",", 2)
 	if len(parts) != 2 {
@@ -81,11 +81,11 @@ func ProcessAvatarImage(data string, url string) (string, error) {
 }
 
 /*
-RetrieveAvatarImage retrieves the avatar image as Base64-encoded string from the local system
+RetrieveImage retrieves the avatar image as Base64-encoded string from the local system
 based on the provided file path.
 If an error occurs, it returns an empty string and the error.
 */
-func RetrieveAvatarImage(filePath string) (string, error) {
+func RetrieveImage(filePath string) (string, error) {
 	// Read the image file as bytes
 	imageData, err := ioutil.ReadFile(filePath)
 	if err != nil {
