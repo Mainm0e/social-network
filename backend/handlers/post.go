@@ -7,6 +7,12 @@ import (
 	"net/http"
 )
 
+/*
+Here we have the handlers for the post requests
+- CreatePost: creates a new post in the database and returns the sessionId
+- GetPost: gets a post from the database and returns the post and the sessionId
+- GetPosts: gets all posts related to a user from the database and returns the posts and the sessionId
+*/
 func CreatePost(payload json.RawMessage) (Response, error) {
 	var response Response
 	var post Post
@@ -91,7 +97,7 @@ func GetPost(payload json.RawMessage) (Response, error) {
 
 func GetPosts(payload json.RawMessage) (Response, error) {
 	var response Response
-	request := map[string]any{}
+	var request ReqAllPosts
 	err := json.Unmarshal(payload, &request)
 	log.Println("User: ", request)
 	if err != nil {
@@ -99,20 +105,33 @@ func GetPosts(payload json.RawMessage) (Response, error) {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if request["sessionId"] == nil {
+	if request.SessionId == "" {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if request["userId"] == nil {
+	if request.UserId == 0 {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 	//get posts from database
-	posts, err := ReadPost(request["postId"].(int), request["userId"].(int))
-	if err != nil {
-		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+	var posts []Post
+	if request.From == "group" {
+		posts, err = ReadPostsByGroup(request.UserId, request.GroupId)
+		if err != nil {
+			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return response, err
+		}
+	} else if request.From == "profile" {
+		posts, err = ReadPostsByProfile(request.UserId, request.ProfileId)
+		if err != nil {
+			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return response, err
+		}
+	} else {
+		response = Response{"from is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
+
 	payload, err = json.Marshal(posts)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}

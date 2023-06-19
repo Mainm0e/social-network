@@ -123,19 +123,20 @@ const CreateComment = ({ id , showComment }) => {
 }
 
 const CommentList = ({comments}) => {
+    console.log(comments)
     const loopComment = (comments) => {
         return comments.map((comment) => (
-        <div className="comment_list_item" key={comment.id}>
+        <div className="comment_list_item" key={comment.commentId}>
                 <div className="comment_list_item_header">
                     <div className="comment_list_item_header_left">
                         <div className="comment_list_item_header_info">
-                            <p>{comment.time}</p>
+                            <p>{comment.Date}</p>
                         </div>
                     </div>
                     <div className="comment_list_item_header_right">
                         <div className="comment_list_item_header_user">
-                          {/*   <img src={comment.user} alt="avatar" /> */}
-                            {/* <p>{comment.user.email}</p> */}
+                            <img src={comment.creatorProfile.avatar} alt="avatar" />
+                            <p>{comment.creatorProfile.firstName} {comment.creatorProfile.lastName}</p>
                         </div>
                     </div>
                 </div>

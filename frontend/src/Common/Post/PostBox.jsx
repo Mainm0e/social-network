@@ -14,28 +14,28 @@ const PostList = ({id}) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(id), postId : 5 } }),
+        body: JSON.stringify({type: 'GetPosts', payload: { sessionId: sessionId, userId: parseInt(id), from:"profile",profileId:parseInt(id),groupId:0}}),
       });
       const responseData = await response.json();
       setPostData(responseData.event.payload);
-      console.log("in PostList",responseData)
     };
     getPost();
   }, []);
   const createPost = () => {
     if (postData !== null) {
-         return (
+      console.log("in createPost",postData.length)
+         return postData.map((post) => (
            <Post
-             key={postData.userId}
-             id={postData.postId}
-             title={postData.title}
-             content={postData.content}
-             image={postData.image}
-             time={postData.date}
-             user={postData.userId}
-             comments={postData.comments}
+             key={post.postId}
+             id={post.postId}
+             title={post.title}
+             content={post.content}
+             image={post.image}
+             time={post.date}
+             user={post.creatorProfile}
+             comments={post.comments}
            />
-         ); 
+         ));
        }
      };
    
@@ -74,7 +74,7 @@ const Post = ({ id, title, content, image, time, user, comments}) => {
         <div className="post_header_right">
           <div className="post_header_user">
             <img src={user.avatar} alt="avatar" />
-            <p>{user.username}</p>
+            <p>{user.firstName} {user.lastName}</p>
           </div>
         </div>
       </div>
