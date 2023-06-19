@@ -114,6 +114,11 @@ const CreatePost = ({ onSubmit }) => {
     };
     reader.readAsDataURL(file);
   };
+
+  const handlePrivacyChange = (e) => { 
+    setPrivacy(e.target.value);
+  };
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     const postData = {
@@ -153,15 +158,21 @@ const CreatePost = ({ onSubmit }) => {
             onChange={handleImageChange}
           />
         </div>
-        {showImage && (
+        {image && (
           <div className="create_post_image">
-            <img src={URL.createObjectURL(showImage)} alt="Selected" />
+            <img src={URL.createObjectURL(image)} alt="Selected" />
           </div>
         )}
         <div className="create_post_button">
           <button type="submit" className="create_post_submit">
             Submit
           </button>
+        </div>
+        <div className="create_post_privacy">
+          <select value={privacy} onChange={handlePrivacyChange}>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
         </div>
       </form>
     </div>
