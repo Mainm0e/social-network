@@ -4,7 +4,7 @@ import './Post.css';
 import { getCookie } from '../../tools/cookie';
 import { checkPostData } from '../../tools/checkdata';
 
-const PostList = (id) => {
+const PostList = ({id}) => {
   const [postData, setPostData] = useState(null);
   useEffect(() => {
     const getPost = async () => {
@@ -15,11 +15,11 @@ const PostList = (id) => {
           'Content-Type': 'application/json',
         },
 
-        body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(1), postId : 5 } }),
+        body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(id), postId : 5 } }),
       });
       const responseData = await response.json();
       setPostData(responseData.event.payload);
-      console.log(responseData.event.payload)
+      console.log("in PostList",responseData)
     };
     getPost();
   }, []);
@@ -51,58 +51,6 @@ const PostList = (id) => {
   }
   
 };
-/* 
-const PostList = (id) => {
-  const [postData, setPostData] = useState(null);
-  useEffect(() => {
-    const getPost = async () => {
-      const sessionId = getCookie('sessionId');
-      const response = await fetch('http://localhost:8080/api', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-
-        body: JSON.stringify({type: 'GetPost', payload: { sessionId: sessionId, userId: parseInt(1), postId : 11 } }),
-      });
-      const responseData = await response.json();
-      setPostData(responseData.event.payload);
-      console.log(responseData.event.payload)
-    };
-    getPost();
-  }, []);
-  // function that get post data and loop to create post'
-  const createPost = () => {
- if (postData !== null) {
-      return (
-        <Post
-          key={postData.userId}
-          id={postData.postId}
-          title={postData.title}
-          content={postData.content}
-          image={postData.image}
-          time={postData.date}
-          user={postData.userId}
-          comments={postData.comments}
-        />
-      ); 
-    }
-  };
-
-
-  if (!postData) {
-    return <div>Loading...</div>;
-  } else if (postData !== null) {
-    return (
-      <div className="post_list">
-        {createPost()}
-      </div>
-    );
-  }
-  
-};
- */
-
 const Post = ({ id, title, content, image, time, user, comments}) => {
   const checkImage = () => {
     console.log(image)
