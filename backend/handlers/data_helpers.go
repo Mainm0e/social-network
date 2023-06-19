@@ -432,15 +432,19 @@ func ReadPost(postId int, userId int) (Post, error) {
 		return Post{}, errors.New("post not found")
 	}
 	dbPost := dbPosts[0].(db.Post)
-	var post Post
-	post = Post{
-		PostId:  dbPost.PostId,
-		UserId:  dbPost.UserId,
-		Title:   dbPost.Title,
-		Content: dbPost.Content,
-		Status:  dbPost.Status,
-		GroupId: dbPost.GroupId,
-		Date:    dbPost.CreationTime,
+	creator, err := fillSmallProfile(dbPost.UserId)
+	if err != nil {
+		return Post{}, errors.New("Error fetching post creator" + err.Error())
+	}
+	post := Post{
+		PostId:         dbPost.PostId,
+		UserId:         dbPost.UserId,
+		CreatorProfile: creator,
+		Title:          dbPost.Title,
+		Content:        dbPost.Content,
+		Status:         dbPost.Status,
+		GroupId:        dbPost.GroupId,
+		Date:           dbPost.CreationTime,
 	}
 	comments, err := readComments(userId, postId)
 	if err != nil {
