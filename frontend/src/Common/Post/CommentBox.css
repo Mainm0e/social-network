@@ -22,6 +22,10 @@
     color: #fff;
     cursor: pointer;
 }
+.comment-button button.active {
+  background-color: #aaa;
+  /* Add any other styling properties for the active button */
+}
 
 .comment .comment-button button:hover {
     background-color: #aaa;
@@ -117,12 +121,23 @@
     display: flex;
     align-items: center;
   }
+  .comment_list_item_header_user {
+    display: flex;
+    align-items: center;
+  }
   
   .comment_list_item_header_user p {
     margin: 0;
     font-size: 14px;
     font-weight: bold;
     color: #333;
+  }
+
+  .comment_list_item_header_user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
   }
   
   .comment_list_item_body p.content {
