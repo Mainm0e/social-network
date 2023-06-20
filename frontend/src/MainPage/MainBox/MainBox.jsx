@@ -14,7 +14,7 @@ const MainBox = ({ user }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
+        body: JSON.stringify({ 
           type: "profile",
           payload: { sessionId: sessionId, userId: user, profileId: user },
         }),
