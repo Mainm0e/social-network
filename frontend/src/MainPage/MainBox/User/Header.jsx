@@ -23,18 +23,19 @@ const Header = ({profile}) => {
   const sessionId = getCookie("sessionId");
   const userId = getCookie("userId");
     const sentRequest = async () => {
+      console.log(userId)
        const response = await fetch("http://localhost:8080/api", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ 
-          type: "testFollow",
-          payload: { sessionId: sessionId, userId: userId, profileId: userId , relationship: "follower"},
+          type: "exploreGroups",
+          payload: { sessionId: sessionId, userId: parseInt(userId)},
         }),
       });
       const responseData = await response.json();
-      console.log("in sentRequest", responseData)
+      console.log("expor in sentRequest", responseData)
     };
   
   return (

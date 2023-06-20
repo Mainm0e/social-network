@@ -1,2 +1,2 @@
 -- +migrate Down
-ALTER TABLE groups DROP COLUMN image;
+ALTER TABLE groups DROP COLUMN creationTime;
