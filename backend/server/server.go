@@ -232,7 +232,10 @@ func setupHTTPS(serverCh chan<- *http.Server, portAddress string) {
 		Handler:      handler,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		// IdleTimeout:  15 * time.Second,
+
+		// IdleTimeout specifies the maximum amount of time to wait for the next
+		// request when keep-alives are enabled. (helps in re-using connections)
+		IdleTimeout: 15 * time.Second,
 	}
 
 	// Send the server instance through the channel
@@ -262,11 +265,14 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 	gracefully shutdown and close all connections. The function returns an error, which is non-nil
 	if an error occurs at any point during the server setup.
 	*/
+
 	// Initiate logging
 	err := initiateLogging(logPath)
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
 	}
+
+	// Initiate path for server-side image storage
 	error := utils.InitiateImagesPath()
 	if error != nil {
 		return errors.New("StartServer() error: " + error.Error())
@@ -278,7 +284,7 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 	}
 
 	// Check / migrate database
-	// TEMP: use first migration file as initial schema for now
+	// TODO: use first migration file as initial schema for now, find a cleaner way of automating this
 	err = db.Check("./db/database.db", "./db/migrations/01_initial_schema.sql")
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
@@ -323,7 +329,7 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 		return errors.New("Graceful shutdown of server failed: " + err.Error())
 	}
 
-	fmt.Println("\nServer shutdown gracefully... like a rabid five-winged swan!") // Keep this during development, for debugging via terminal
+	fmt.Println("\nServer shutdown gracefully... like a rabid five-winged swan!") // TODO: Keep this during development, for debugging via terminal
 	log.Print("Server exited properly")
 
 	return nil
