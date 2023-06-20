@@ -12,7 +12,7 @@ cd ..
 # Start the frontend
 cd frontend
 echo "Starting frontend React app..."
-npm start &
+npx react-scripts start & # Using npx to run react-scripts
 cd ..
 
 # Wait for all background processes to finish (or be killed)
