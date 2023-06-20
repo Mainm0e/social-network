@@ -59,16 +59,15 @@ It takes in a database connection and applies all the migrations in the
 encountered in applying the migrations.
 */
 func executeMigration(DB *sql.DB) error {
-	fmt.Println("migrating...")
+	log.Println("migrating...")
 	migrations := &migrate.FileMigrationSource{
 		Dir: "./db/migrations",
 	}
-	fmt.Println("migration:", migrations)
 	n, err := migrate.Exec(DB, "sqlite3", migrations, migrate.Up)
 	if err != nil {
-		return errors.New("error applying migrations: " + err.Error())
+		return errors.New("executeMigration() error applying migrations: " + err.Error())
 	}
-	fmt.Println("applied migrations!\n", n)
+	log.Println("applied migrations!\n", n)
 	return nil
 }
 
