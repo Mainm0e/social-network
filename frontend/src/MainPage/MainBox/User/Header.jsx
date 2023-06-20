@@ -1,6 +1,6 @@
 import "../MainBox.css";
+import { getCookie } from "../../../tools/cookie";
 const Header = ({profile}) => {
-  console.log("in header", profile)
   const user = profile;
   const checkPrivacy = () => {
     if (true) {
@@ -20,9 +20,25 @@ const Header = ({profile}) => {
       return <></>;
     }
   };
+  const sessionId = getCookie("sessionId");
+  const userId = getCookie("userId");
+    const sentRequest = async () => {
+       const response = await fetch("http://localhost:8080/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          type: "testFollow",
+          payload: { sessionId: sessionId, userId: userId, profileId: userId , relationship: "follower"},
+        }),
+      });
+      const responseData = await response.json();
+      console.log("in sentRequest", responseData)
+    };
   
   return (
-    <div className="main_header" key={user.id}  >
+    <div className="main_header" key={user.userId}  >
       <div className="info_img">
         <img src={user.avatar} alt="user-img" />
       </div>
@@ -42,6 +58,10 @@ const Header = ({profile}) => {
           <div className="following">
             <label>Following: </label>
             <span>{user.followingNum}</span>
+          </div>
+          {/* follow button */}
+          <div className="follow_button">
+            <button onClick={sentRequest}>Follow</button>
           </div>
         </div>
       </div>
