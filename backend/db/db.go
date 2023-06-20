@@ -67,7 +67,7 @@ func executeMigration(DB *sql.DB) error {
 	if err != nil {
 		return errors.New("executeMigration() error applying migrations: " + err.Error())
 	}
-	log.Printf("applied \" %v \" migrations!")
+	log.Printf("applied \" %v \" migrations!", n)
 	return nil
 }
 
