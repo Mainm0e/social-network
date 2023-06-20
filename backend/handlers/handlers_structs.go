@@ -119,21 +119,16 @@ type ReqAllPosts struct {
 	GroupId   int    `json:"groupId"`
 }
 
-// add post struct coming from frontend
-/*
-	comment struct coming from frontend
-	type Comment struct {
-		PostId   int    `json:"postId"`
-		UserId   int    `json:"userId"`
-		Content  string `json:"content"`
-		ParentId int    `json:"parentId"`
-	}
-
-	send post struct to frontend
-	type SendPost struct {
-	PostId   int    `json:"postId"`
-	Post    Post   `json:"post"`
-	Comments []Comment `json:"comments"`
-	}
-
-*/
+type Group struct {
+	SessionId      string       `json:"sessionId"`
+	CreatorProfile SmallProfile `json:"creatorProfile"`
+	GroupId        int          `json:"groupId"`
+	Title          string       `json:"title"`
+	Description    string       `json:"description"`
+	Date           string       `json:"date"`
+}
+type Follow struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	FollowId  int    `json:"followId"`
+}
