@@ -590,3 +590,52 @@ func ReadPostsByGroup(currentUserId int, groupId int) ([]Post, error) {
 	}
 	return posts, nil
 }
+
+func InsertGroup(group Group) error {
+	_, err := db.InsertData("groups", group.CreatorProfile.UserId, group.Title, group.Description, time.Now())
+	if err != nil {
+		return errors.New("Error inserting group" + err.Error())
+	}
+	return nil
+}
+func InsertGroupMember(groupId int, userId int) error {
+	_, err := db.InsertData("group_member", groupId, userId)
+	if err != nil {
+		return errors.New("Error inserting group member" + err.Error())
+	}
+	return nil
+}
+func ReadGroup(groupId int) (Group, error) {
+	dbGroups, err := db.FetchData("groups", "groupId", groupId)
+	if err != nil {
+		return Group{}, errors.New("Error fetching group" + err.Error())
+	}
+	if len(dbGroups) == 0 {
+		return Group{}, errors.New("group not found")
+	}
+	dbGroup := dbGroups[0].(db.Group)
+	creator, err := fillSmallProfile(dbGroup.CreatorId)
+	if err != nil {
+		return Group{}, errors.New("Error fetching group creator" + err.Error())
+	}
+	group := Group{
+		GroupId:        dbGroup.GroupId,
+		CreatorProfile: creator,
+		Title:          dbGroup.Title,
+		Description:    dbGroup.Description,
+		Date:           dbGroup.CreationTime,
+	}
+	return group, nil
+}
+
+/*
+func InsertGroupInvitation(groupId int, userId int) error {
+
+}
+func InsertGroupRequest(groupId int, userId int) error {
+
+}
+func readGroupInvitations(userId int) ([]Group, error) {
+
+}
+*/

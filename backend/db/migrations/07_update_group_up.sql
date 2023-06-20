@@ -1,0 +1,2 @@
+-- +migrate Up
+ALTER TABLE groups ADD COLUMN date TEXT NOT NULL  DEFAULT "0000-00-00 00:00:00";  
