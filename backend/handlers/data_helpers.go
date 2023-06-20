@@ -55,7 +55,7 @@ func fillSmallProfile(userId int) (SmallProfile, error) {
 		return SmallProfile{}, errors.New("Error retrieving avatar image: " + err.Error())
 	}
 
-	user.Avatar = &avatar
+	smallProfile.Avatar = &avatar
 	return smallProfile, nil
 }
 
