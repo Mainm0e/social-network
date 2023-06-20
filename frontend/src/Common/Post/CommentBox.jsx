@@ -2,24 +2,45 @@ import React, {useState} from 'react';
 import { getCookie } from '../../tools/cookie';
 import "./CommentBox.css"
 import { checkCommentData } from '../../tools/checkdata';
-const CommentBox = ({id,comments}) => {
+const CommentBox = ({id,comments,activePost}) => {
 // return createcomment and commentlist button and default commentlist
     const [boxState, setBoxState] = useState(null);
+    const [check, setCheck] = useState(null);
     const changeState = (e) => {
-       if (e.target.innerText === "Create Comment"){
-           setBoxState(<CreateComment id={id} showComment={showComment}/>)
-       } else if (e.target.innerText === "Comment List"&& comments !== undefined){
+       if (e.target.innerText === "Create Comment" && check !== "create"){
+            activePost(id)
+            setCheck("create")
+            setBoxState(<CreateComment id={id} showComment={showComment}/>)
+       } else if (e.target.innerText === "Comment List"&& comments !== undefined && check !== "list"){
+            activePost(id)
+            setCheck("list")
             setBoxState(<CommentList comments={comments}/>)
+       } else {
+        setCheck(null)
+        setBoxState(null)
+        activePost(null)
        }
     }
     const showComment = () => {
+        activePost(id)
         setBoxState(<CommentList comments={comments}/>)
     }
+
     return(
         <div className="comment">
         <div className="comment-button">
-            <button onClick={changeState}>Create Comment</button>
-            <button onClick={changeState}>Comment List</button>
+        <button
+          onClick={changeState}
+          className={check === 'create' ? 'active' : ''}
+        >
+          Create Comment
+        </button>
+        <button
+          onClick={changeState}
+          className={check === 'list' ? 'active' : ''}
+        >
+            Comment List
+        </button>
         </div>
        {boxState}
         
@@ -125,11 +146,9 @@ const CommentList = ({comments}) => {
         return comments.map((comment) => (
         <div className="comment_list_item" key={comment.commentId}>
                 <div className="comment_list_item_header">
-                    <div className="comment_list_item_header_left">
-                        <div className="comment_list_item_header_info">
-                            <p>{comment.Date}</p>
-                        </div>
-                    </div>
+                    <div className="comment_list_item_body">
+                    <p className="content">{comment.content}</p>
+                </div>
                     <div className="comment_list_item_header_right">
                         <div className="comment_list_item_header_user">
                             <img src={comment.creatorProfile.avatar} alt="avatar" />
@@ -137,9 +156,11 @@ const CommentList = ({comments}) => {
                         </div>
                     </div>
                 </div>
-                <div className="comment_list_item_body">
-                    <p className="content">{comment.content}</p>
-                </div>
+                <div className="comment_list_item_header_left">
+                        <div className="comment_list_item_header_info">
+                            <p>{comment.Date}</p>
+                        </div>
+                    </div>
                 {checkImage(comment.image)}
             </div>
         ));

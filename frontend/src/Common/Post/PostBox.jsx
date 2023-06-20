@@ -21,6 +21,7 @@ const PostList = ({id}) => {
     };
     getPost();
   }, []);
+  
   const createPost = () => {
     if (postData !== null) {
       console.log("in createPost",postData.length)
@@ -51,18 +52,32 @@ const PostList = ({id}) => {
   
 };
 const Post = ({ id, title, content, image, time, user, comments}) => {
-  console.log("in post", comments)
+  const postId = id;
+
   const checkImage = () => {
-    console.log(image)
     if (image === ''|| image === null|| image === undefined) {
       return null;
     } else {
       return  <div className="post_image"> <img src={image} alt="content" /> </div>;
     }
   };
+  const activePost = (id) => {
+    const postList = document.getElementsByClassName("post");
+    const activePost = document.querySelector(`[postid="${id}"]`);
+    if (id === null){
+      for (let i = 0; i < postList.length; i++) {
+        postList[i].classList.remove("hidden");
+      }
+    } else {
+    for (let i = 0; i < postList.length; i++) {
+      postList[i].classList.add("hidden");
+    }
+    activePost.classList.remove("hidden");
+  }
+  }
   return (
     <>
-    <div className="post">
+    <div className="post" postId={id}>
           {checkImage()}
       <div className="post_header">
         <div className="post_header_left">
@@ -81,9 +96,8 @@ const Post = ({ id, title, content, image, time, user, comments}) => {
       <div className="post_body">
       <p className="content">{content}</p>
       </div>
-      {/* button for comment and create comment */}
+      <Comment id={id} comments={comments} activePost={activePost}/>
     </div>
-      <Comment id={id} comments={comments} />
       </>
   );
 };
