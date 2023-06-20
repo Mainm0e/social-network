@@ -190,6 +190,7 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		user.FirstName,
 		user.LastName,
 		user.Avatar,
+		"you",
 		len(followers),
 		len(followings),
 		PrivateProfile{},
@@ -202,10 +203,11 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 			followers,
 			followings,
 		}
+		profile.Relation = "you"
 		return profile, nil
 
 	}
-	if status == "following" || userId == profileId {
+	if status == "following" {
 		log.Println("yay user is user", profile.PrivateData)
 		profile.PrivateData = PrivateProfile{
 			user.BirthDate,
@@ -214,7 +216,9 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 			followers,
 			followings,
 		}
+		profile.Relation = status
 	} else if status == "follow" || status == "pending" {
+		profile.Relation = status
 		return profile, nil
 	} else {
 		return Profile{}, errors.New("error checkUserRelation: wtf")
