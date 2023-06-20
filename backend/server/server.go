@@ -5,9 +5,11 @@ import (
 	"backend/handlers"
 	"backend/server/sessions"
 	"backend/utils"
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +17,17 @@ import (
 	"syscall"
 	"time"
 )
+
+/*
+resetRequestBody is a function which takes an http.Request and a byte slice as inputs.
+It is used to reset the request body after it has been read by the middleware chain. This
+allows the request body to be read multiple times by the middleware chain (for whatever
+reason) without causing any errors for downstrem handlers, which require it for instance
+to extract JSON event data.
+*/
+func resetRequestBody(r *http.Request, bodyBytes []byte) {
+	r.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+}
 
 /*
 initiateLogging creates a log file with each instance of server startup, and sets
