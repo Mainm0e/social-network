@@ -21,14 +21,24 @@ import (
 )
 
 /*
-resetRequestBody is a function which takes an http.Request and a byte slice as inputs.
-It is used to reset the request body after it has been read by the middleware chain. This
-allows the request body to be read multiple times by the middleware chain (for whatever
-reason) without causing any errors for downstrem handlers, which require it for instance
-to extract JSON event data.
+extractAndResetRequestBody is a function which takes an http.Request as an input and returns
+a byte slice and an error value. It is used to extract the request body from the request header.
+The byte slice is essentially a copy of the request body, which is then used to create a new
+request body as the original request body is a stream which can only be read once. The new request
+body is then set as the request body of the original request. This allows the request body to be
+read multiple times by later handlers. The error value returned is non-nil if there is an error
+reading the request body.
 */
-func resetRequestBody(r *http.Request, bodyBytes []byte) {
-	r.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+func extractAndResetRequestBody(r *http.Request) ([]byte, error) {
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Reset the request body so it can be read again by later handlers
+	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	return bodyBytes, nil
 }
 
 /*
