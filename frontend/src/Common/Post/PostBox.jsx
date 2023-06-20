@@ -242,6 +242,8 @@ const PostBox = ({id}) => {
         const responseData = await response.json();
       }
       createPost();
+     /*  herf = "#postlist"; */
+      window.location.hash = "postlist";
     } else {
       alert(check.message)
     }

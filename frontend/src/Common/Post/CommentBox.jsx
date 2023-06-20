@@ -15,9 +15,6 @@ const CommentBox = ({id,comments}) => {
     const showComment = () => {
         setBoxState(<CommentList comments={comments}/>)
     }
-
-
-   
     return(
         <div className="comment">
         <div className="comment-button">
