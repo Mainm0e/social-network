@@ -2,16 +2,12 @@ package server
 
 import (
 	"backend/db"
-	"backend/events"
 	"backend/handlers"
 	"backend/server/sessions"
 	"backend/utils"
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -129,39 +125,41 @@ middleware chain implemented by the loggerMiddleware() function.
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Extract the session cookie from the request header
-		// Copy the r into a new r
-		var event events.Event
-
-		body, err := ioutil.ReadAll(r.Body)
+		cookie, err := extractCookie(r)
 		if err != nil {
-			// Handle the error
-			log.Println("Error reading request body", http.StatusBadRequest)
+			log.Println("Error extracting cookie: ", err.Error())
+
+			// Respond with 401 Unauthorized with a message
+			http.Error(w, "No session cookie found", http.StatusUnauthorized)
 			return
 		}
-		defer r.Body.Close()
 
-		newBody := ioutil.NopCloser(bytes.NewReader(body))
-		newRequest := r.Clone(r.Context())
-		newRequest.Body = newBody
-
-		err = json.NewDecoder(newRequest.Body).Decode(&event)
+		isAuthenticated, err := sessions.Check(cookie)
 		if err != nil {
-			// Handle the error
-			log.Println("Error decoding JSON", http.StatusBadRequest)
+			log.Println("Error checking authentication: ", err.Error())
+
+			// Respond with 500 Internal Server Error with a message
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
 
-		// Call the next middleware or handler
-		// Check if the event is a login or register event
-		if event.Type == "login" || event.Type == "register" {
-			// Skip authentication check
-			log.Println("Skipping authentication check for login or register event", event)
+		if !isAuthenticated {
+			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
 
-			handler.ServeHTTP(w, newRequest)
+			// Check for login event exception from the login url
+			if r.URL.Path == "/login" {
+				// If the user is not authenticated and the request is for the login page,
+				// pass to the next middleware or handler
+				handler.ServeHTTP(w, r)
+				return
+			}
+
+			// Respond with 401 Unauthorized
+			http.Error(w, "Unauthorized access", http.StatusUnauthorized)
 			return
 		}
 
-		// If authenticated, pass to the next middleware or handler */
+		// If authenticated, pass to the next middleware or handler
 		handler.ServeHTTP(w, r)
 	})
 }
