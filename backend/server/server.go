@@ -2,11 +2,13 @@ package server
 
 import (
 	"backend/db"
+	"backend/events"
 	"backend/handlers"
 	"backend/server/sessions"
 	"backend/utils"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -137,6 +139,25 @@ middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Extract body from request for event type checking
+		bodyBytes, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		// Reset the request body so it can be read again by later handlers
+		resetRequestBody(r, bodyBytes)
+
+		var event events.Event
+		if err := json.Unmarshal(bodyBytes, &event); err == nil {
+			// If this is a login or register event, bypass the authentication check
+			if event.Type == "login" || event.Type == "register" {
+				// Call the next handler in the chain
+				handler.ServeHTTP(w, r)
+				return
+			}
+		}
+
 		// Extract the session cookie from the request header
 		cookie, err := extractCookie(r)
 		if err != nil {
@@ -158,14 +179,6 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 
 		if !isAuthenticated {
 			log.Printf("User is not authenticated") // TODO: Extract username from session cookie
-
-			// Check for login event exception from the login url
-			if r.URL.Path == "/login" {
-				// If the user is not authenticated and the request is for the login page,
-				// pass to the next middleware or handler
-				handler.ServeHTTP(w, r)
-				return
-			}
 
 			// Respond with 401 Unauthorized
 			http.Error(w, "Unauthorized access", http.StatusUnauthorized)
