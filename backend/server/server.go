@@ -2,12 +2,16 @@ package server
 
 import (
 	"backend/db"
+	"backend/events"
 	"backend/handlers"
 	"backend/server/sessions"
 	"backend/utils"
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -126,7 +130,7 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Extract the session cookie from the request header
 		// Copy the r into a new r
-		/* var event handlers.Event
+		var event events.Event
 
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -147,20 +151,15 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 			return
 		}
 
-		// Use the new request in subsequent middleware or handlers
-		// Access the event structure from the newRequest.Body here
-
 		// Call the next middleware or handler
 		// Check if the event is a login or register event
-		if event.Event_type == "login" || event.Event_type == "register" {
-			// skip authentication check
+		if event.Type == "login" || event.Type == "register" {
+			// Skip authentication check
 			log.Println("Skipping authentication check for login or register event", event)
 
 			handler.ServeHTTP(w, newRequest)
 			return
 		}
-
-		// ... rest of your authentication logic ...
 
 		// If authenticated, pass to the next middleware or handler */
 		handler.ServeHTTP(w, r)
