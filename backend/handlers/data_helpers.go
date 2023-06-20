@@ -627,6 +627,52 @@ func ReadGroup(groupId int) (Group, error) {
 	}
 	return group, nil
 }
+func ReadAllGroups(sessionId string) ([]Group, error) {
+	dbGroups, err := db.FetchData("groups", "")
+	if err != nil {
+		return []Group{}, errors.New("Error fetching groups" + err.Error())
+	}
+	if len(dbGroups) == 0 {
+		return []Group{}, errors.New("no group found")
+	}
+	var groups []Group
+	for _, dbGroup := range dbGroups {
+		dbGroup := dbGroup.(db.Group)
+		creator, err := fillSmallProfile(dbGroup.CreatorId)
+		if err != nil {
+			return []Group{}, errors.New("Error fetching group creator" + err.Error())
+		}
+		group := Group{
+			SessionId:      sessionId,
+			GroupId:        dbGroup.GroupId,
+			Title:          dbGroup.Title,
+			Description:    dbGroup.Description,
+			Date:           dbGroup.CreationTime,
+			CreatorProfile: creator,
+		}
+		groups = append(groups, group)
+	}
+	return groups, nil
+}
+func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
+	dbUsers, err := db.FetchData("users", "")
+	if err != nil {
+		return []Profile{}, errors.New("Error fetching users" + err.Error())
+	}
+	if len(dbUsers) == 0 {
+		return []Profile{}, errors.New("no user found")
+	}
+	var users []Profile
+	for _, dbUser := range dbUsers {
+		dbUser := dbUser.(db.User)
+		user, err := FillProfile(userId, dbUser.UserId, sessionId)
+		if err != nil {
+			return []Profile{}, errors.New("Error fetching user" + err.Error())
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
 
 /*
 func InsertGroupInvitation(groupId int, userId int) error {
