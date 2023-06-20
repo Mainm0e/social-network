@@ -150,14 +150,14 @@ middleware chain implemented by the loggerMiddleware() function.
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Extract body from request for event type checking
-		bodyBytes, err := io.ReadAll(r.Body)
+		bodyBytes, err := extractAndResetRequestBody(r)
 		if err != nil {
+			log.Println("authenticationMiddleware() error reading request body: ", err.Error())
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-		// Reset the request body so it can be read again by later handlers
-		resetRequestBody(r, bodyBytes)
 
+		// Event type exception check for login and register events
 		var event events.Event
 		if err := json.Unmarshal(bodyBytes, &event); err == nil {
 			// If this is a login or register event, bypass the authentication check
