@@ -217,11 +217,13 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 			followings,
 		}
 		profile.Relation = status
-	} else if status == "follow" || status == "pending" {
+		return profile, nil
+
+	} else if status == "follower" || status == "pending" {
 		profile.Relation = status
 		return profile, nil
 	} else {
-		return Profile{}, errors.New("error checkUserRelation: wtf")
+		return Profile{}, errors.New("error checkUserRelation: wtf:" + status)
 	}
 	return profile, nil
 }
@@ -676,6 +678,31 @@ func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
 		users = append(users, user)
 	}
 	return users, nil
+}
+func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error) {
+	users, err := ReadAllUsers(userId, sessionId)
+	if err != nil {
+		return []Profile{}, errors.New("Error fetching users: " + err.Error())
+	}
+
+	members, err := db.FetchData("group_member", "groupId", groupId)
+	if err != nil {
+		return []Profile{}, errors.New("Error fetching members: " + err.Error())
+	}
+
+	memberIds := make(map[int]struct{})
+	for _, member := range members {
+		memberIds[member.(db.GroupMember).UserId] = struct{}{}
+	}
+
+	var nonMembers []Profile
+	for _, user := range users {
+		if _, exists := memberIds[user.UserId]; !exists {
+			nonMembers = append(nonMembers, user)
+		}
+	}
+
+	return nonMembers, nil
 }
 
 /*

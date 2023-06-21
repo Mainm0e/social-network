@@ -30,7 +30,7 @@ const Header = ({profile}) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ 
-          type: "exploreGroups",
+          type: "exploreUsers",
           payload: { sessionId: sessionId, userId: parseInt(userId)},
         }),
       });
