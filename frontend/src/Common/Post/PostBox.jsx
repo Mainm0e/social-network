@@ -77,7 +77,7 @@ const Post = ({ id, title, content, image, time, user, comments}) => {
   }
   return (
     <>
-    <div className="post" postId={id}>
+    <div className="post" postid={id}>
           {checkImage()}
       <div className="post_header">
         <div className="post_header_left">

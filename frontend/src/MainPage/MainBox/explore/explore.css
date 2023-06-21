@@ -1,0 +1,77 @@
+/* .explore_list_item_left img{
+    width: 40px;
+} */
+.explore {
+    background-color: #f7f7f7;
+    padding: 20px;
+  }
+  
+  .explore_top {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .explore_top h1 {
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .explore_body {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .explore_list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  
+  /* Apply the styles for the user card as provided in the previous response */
+
+  .explore_list_item {
+    flex: 0 0 calc(33.33% - 10px);
+    /* Adjust the width percentage and gap as desired */
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
+@media (max-width: 767px) {
+    .explore_list_item {
+      flex-basis: 50%;
+      /* Adjust the width percentage as desired for smaller screens */
+    }
+  }
+  
+  .explore_list_item_left {
+    margin-right: 10px;
+  }
+  
+  .explore_list_item_left img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+  
+  .explore_list_item_right h3 {
+    margin: 0;
+  }
+  
+  .explore_list_item_right_bottom button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .explore_list_item_right_bottom button:hover {
+    background-color: #0056b3;
+  }
