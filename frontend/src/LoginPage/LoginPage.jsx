@@ -51,8 +51,9 @@ function LoginPage() {
       console.log('Success:', data);
       if (data.statusCode === 200){
         // set cookie
+        console.log("set cookie",data)
         document.cookie = "sessionId=" + data.event.payload.sessionId;
-        document.cookie = "userId=" + data.event.payload.userId;
+        localStorage.setItem("userId", data.event.payload.userId);
         window.location.href = '/';
         return true;
       }

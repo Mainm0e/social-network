@@ -5,13 +5,14 @@ import LeftBox from "./LeftBox/LeftBox";
 import RightBox from "./RightBox/RightBox";
 import ChatBox from "../Common/ChatBox/ChatBox";
 import { navGroupLinkData } from "./dummyData";
-import { getCookie } from "../tools/cookie";
+import { getCookie, getUserId} from "../tools/cookie";
 
 // dummy data
 function MainPage() {
   // get userId from cookie
-  const id = getCookie("userId")
+  const id = getUserId("userId")
   const userId =  parseInt(id);
+  console.log("userId",userId)
   // make url = localhost:3000/
   const url = window.location.href;
   const urlSplit = url.split("/");
