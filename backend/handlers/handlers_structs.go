@@ -67,6 +67,7 @@ type Profile struct {
 	FirstName    string         `json:"firstName"`
 	LastName     string         `json:"lastName"`
 	Avatar       *string        `json:"avatar"` //
+	Relation     string         `json:"relation"`
 	FollowerNum  int            `json:"followerNum"`
 	FollowingNum int            `json:"followingNum"`
 	PrivateData  PrivateProfile `json:"privateProfile"`
