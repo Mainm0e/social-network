@@ -219,13 +219,12 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		profile.Relation = status
 		return profile, nil
 
-	} else if status == "follower" || status == "pending" {
+	} else if status == "follower" || status == "pending" || status == "follow" {
 		profile.Relation = status
 		return profile, nil
 	} else {
 		return Profile{}, errors.New("error checkUserRelation: wtf:" + status)
 	}
-	return profile, nil
 }
 
 /*

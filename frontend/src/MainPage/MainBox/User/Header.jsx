@@ -1,5 +1,5 @@
 import "../MainBox.css";
-import { getCookie } from "../../../tools/cookie";
+import { getCookie, getUserId } from "../../../tools/cookie";
 const Header = ({profile}) => {
   const user = profile;
   const checkPrivacy = () => {
@@ -21,7 +21,7 @@ const Header = ({profile}) => {
     }
   };
   const sessionId = getCookie("sessionId");
-  const userId = getCookie("userId");
+  const userId = getUserId("userId");
     const sentRequest = async () => {
       console.log(userId)
        const response = await fetch("http://localhost:8080/api", {
