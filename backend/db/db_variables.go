@@ -67,10 +67,10 @@ var InsertRules = map[string]InsertRule{
 		NotExistErrors: []string{"post does not exist", "user does not exist"},
 	},
 	"notifications": {
-		Query:          "INSERT INTO notifications(receiverId, senderId, type, content, creationTime) VALUES(?,?,?,?,?)",
-		NotExistTables: []string{"users", "users"},
-		NotExistFields: []string{"receiverId", "senderId"},
-		NotExistErrors: []string{"receiver does not exist", "sender does not exist"},
+		Query:          "INSERT INTO notifications(receiverId, senderId, groupId, type, content, creationTime) VALUES(?,?,?,?,?,?)",
+		NotExistTables: []string{"users", "users", "groups"},
+		NotExistFields: []string{"receiverId", "senderId", "groupId"},
+		NotExistErrors: []string{"receiver does not exist", "sender does not exist", "group does not exist"},
 	},
 	"events": {
 		Query:          "INSERT INTO events(creatorId, receiverId, groupId, title, content, creationTime, option) VALUES(?,?,?,?,?,?,?)",
@@ -104,8 +104,8 @@ var UpdateRules = map[string]string{
 	"posts":         "UPDATE posts SET image=? WHERE postId=?",
 	"comments":      "UPDATE comments SET image=? WHERE commentId=?",
 	"groups":        "UPDATE groups SET creatorId=?, title=?, description=? WHERE groupId=?",
-	"follow":        "UPDATE follow SET followerId=?, followeeId=?, status=? WHERE followerId=?", // Assuming followerId uniquely identifies a follow record
-	"group_member":  "UPDATE group_member SET userId=?, groupId=?, status=? WHERE userId=?",      // Assuming userId uniquely identifies a group member record
+	"follow":        "UPDATE follow SET  status=? WHERE followerId=?",                       // Assuming followerId uniquely identifies a follow record
+	"group_member":  "UPDATE group_member SET userId=?, groupId=?, status=? WHERE userId=?", // Assuming userId uniquely identifies a group member record
 	"messages":      "UPDATE messages SET senderId=?, receiverId=?, messageContent=?, sendTime=?, seen=? WHERE messageId=?",
 	"semiPrivate":   "UPDATE semiPrivate SET postId=?, userId=? WHERE postId=?", // Assuming postId uniquely identifies a semiPrivate record
 	"notifications": "UPDATE notifications SET receiverId=?, senderId=?, type=?, content=?, creationTime=? WHERE notificationId=?",
@@ -204,10 +204,10 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"notifications": {
-		SelectFields: "notificationId, receiverId, senderId, type, content, creationTime",
+		SelectFields: "notificationId, receiverId, senderId,groupId, type, content, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var notification Notification
-			err := rows.Scan(&notification.NotificationId, &notification.ReceiverId, &notification.SenderId, &notification.Type, &notification.Content, &notification.CreationTime)
+			err := rows.Scan(&notification.NotificationId, &notification.ReceiverId, &notification.SenderId, &notification.GroupId, &notification.Type, &notification.Content, &notification.CreationTime)
 			return notification, err
 		},
 	},

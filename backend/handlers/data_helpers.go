@@ -703,15 +703,63 @@ func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 
 	return nonMembers, nil
 }
+func InsertGroupInvitation(senderId int, groupId int, receiverId int, content string) error {
+	_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", content, time.Now())
+	if err != nil {
+		return errors.New("Error inserting group invitation" + err.Error())
+	}
+	return nil
+	// TODO: send notification to receiver
+}
+func InsertGroupRequest(senderId int, groupId int) error {
+	group, err := ReadGroup(groupId)
+	if err != nil {
+		return errors.New("Error fetching group" + err.Error())
+	}
+	receiverId := group.CreatorProfile.UserId
+	if receiverId == 0 {
+		return errors.New("error fetching group creator")
+	}
+	id, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_request", "", time.Now())
+	if err != nil {
+		return errors.New("Error inserting group request" + err.Error())
+	}
+	if id == 0 {
+		return errors.New("error inserting group request")
+	}
+	return nil
+}
 
-/*
-func InsertGroupInvitation(groupId int, userId int) error {
+// todo: change status values in follow table (Maryam)
+func InsertFollowRequest(senderId int, receiverId int) error {
+	_, err := db.InsertData("notifications", receiverId, senderId, 0, "follow_request", "", time.Now())
+	if err != nil {
+		return errors.New("Error inserting follow request" + err.Error())
+	}
+	_, err = db.InsertData("follow", senderId, receiverId, "pending")
+	if err != nil {
+		return errors.New("Error inserting follow request in follow table" + err.Error())
+	}
+
+	return nil
+}
+func DeleteFollowRequest(followId int, notifId int, accepted int) error {
+	err := db.DeleteData("notifications", followId)
+	if err != nil {
+		return errors.New("Error deleting follow request" + err.Error())
+	}
+	if accepted == 1 {
+		err = db.UpdateData("follow", "follower", followId)
+		if err != nil {
+			return errors.New("Error updating follow request" + err.Error())
+		}
+	} else if accepted == 0 {
+		err = db.DeleteData("follow", followId)
+		if err != nil {
+			return errors.New("Error deleting follow request" + err.Error())
+		}
+	}
+
+	return nil
 
 }
-func InsertGroupRequest(groupId int, userId int) error {
-
-}
-func readGroupInvitations(userId int) ([]Group, error) {
-
-}
-*/

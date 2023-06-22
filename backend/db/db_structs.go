@@ -83,6 +83,7 @@ type Notification struct {
 	NotificationId int    `json:"notificationId"`
 	ReceiverId     int    `json:"receiverId"`
 	SenderId       int    `json:"senderId"`
+	GroupId        int    `json:"groupId"`
 	Type           string `json:"type"`
 	Content        string `json:"content"`
 	CreationTime   string `json:"creationTime"`
