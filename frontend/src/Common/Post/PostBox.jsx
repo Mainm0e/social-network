@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import Comment from './CommentBox';
 import './Post.css';
-import { getCookie } from '../../tools/cookie';
+import { getCookie, getUserId } from '../../tools/cookie';
 import { checkPostData } from '../../tools/checkdata';
 
-const PostList = ({id}) => {
+const PostList = ({profileId}) => {
+
   const [postData, setPostData] = useState(null);
   useEffect(() => {
     const getPost = async () => {
+      const userId = getUserId("userId")
       const sessionId = getCookie('sessionId');
       const response = await fetch('http://localhost:8080/api', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({type: 'GetPosts', payload: { sessionId: sessionId, userId: parseInt(id), from:"profile",profileId:parseInt(id),groupId:0}}),
+        body: JSON.stringify({type: 'GetPosts', payload: { sessionId: sessionId, userId: parseInt(userId), from:"profile",profileId:parseInt(profileId),groupId:0}}),
       });
       const responseData = await response.json();
       setPostData(responseData.event.payload);
@@ -273,7 +275,7 @@ const PostBox = ({id}) => {
 
         {body === 'postlist' && (
         <section id="postlist">
-          <PostList id={id} />
+          <PostList profileId={id} />
         </section>
       )}
       </>

@@ -12,7 +12,9 @@ function MainPage() {
   // get userId from cookie
   const id = getUserId("userId")
   const userId =  parseInt(id);
-  console.log("userId",userId)
+
+  // !!TODO!! how to get profile id that can send to mainbox that show user that we want ???
+  const profileId = 4
   // make url = localhost:3000/
   const url = window.location.href;
   const urlSplit = url.split("/");
@@ -38,6 +40,8 @@ function MainPage() {
 
   }, []);
 
+  
+
   if (!data) {
     return <div>Loading...</div>;
   } else{
@@ -45,8 +49,8 @@ function MainPage() {
     <div className="main-page">
       <div className="main-page-container">
         <LeftBox user={data.event.payload} link={navGroupLinkData}/>
-        <MainBox user={userId}/>
-        <RightBox profileId={userId}/>
+        <MainBox  profileId={profileId} state={"explore"}/>
+        <RightBox/>
         <ChatBox />
       </div>
     </div>
@@ -55,3 +59,26 @@ function MainPage() {
 }
 
 export default MainPage;
+
+
+const Profile = ({userData, profileId, navLink}) => {
+  return (
+  <>
+  <LeftBox user={userData} link={navLink} />
+  <MainBox userId={profileId} state={"profile"}/>
+  <RightBox/>
+  <ChatBox/>
+  </> 
+  )
+}
+
+const Explore = ({userData, navLink}) => {
+  return (
+    <>
+      <LeftBox user={userData} link={navLink}/>
+      <MainBox userId={null} state={"explore"}/>
+      <RightBox/>
+      <ChatBox/>
+    </>
+  )
+}
