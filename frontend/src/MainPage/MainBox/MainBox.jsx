@@ -8,7 +8,7 @@ import { getCookie, getUserId } from "../../tools/cookie";
 
 
 const MainBox = ({ profileId, type ,state}) => {
-  console.log("profileId", profileId, "state", state)
+  console.log("profileId", profileId, "state", state, "type", type)
   const sessionId = getCookie("sessionId");
   const userId = getUserId("userId")
 

@@ -64,28 +64,28 @@ const BoxState = ({userData, navLink}) => {
   const state = searchParams.get("id");
   if (url.pathname === "/user") {
     if (state !== null){
-      return <Profile userData={userData} profileId={state} navLink={navLink}/>
+      return <Profile userData={userData} profileId={state} navLink={navLink} type={"user"}/>
     } else if (state === null){
-      console.log("url", url, "searchParams",searchParams, "state", state)
      return  <Explore userData={userData} navLink={navLink} type={"user"}/>
     }
   } else if (url.pathname === "/group"){
     if (state !== null){
-      console.log("state profile", state)
     } else if (state === null){
       return <Explore userData={userData} navLink={navLink} type={"group"}/>
     }
+  } else if (url.pathname === "/"){
+    const id = getUserId("userId")
+    return <Profile userData={userData} profileId={parseInt(id)} navLink={navLink} type={"user"}/>
   }
 }
 
 
 
-const Profile = ({userData, profileId, navLink}) => {
-  console.log("userData",userData,"profileId", profileId, "navLink", navLink)
+const Profile = ({userData, profileId, navLink ,type}) => {
   return (
   <>
   <LeftBox user={userData} link={navLink} />
-  <MainBox profileId={parseInt(profileId)} state={"profile"}/>
+  <MainBox profileId={parseInt(profileId)} type={type} state={"profile"}/>
   <RightBox/>
   <ChatBox/>
   </> 
