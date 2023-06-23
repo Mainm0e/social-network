@@ -7,18 +7,38 @@ import { getCookie, getUserId } from "../../tools/cookie";
 
 
 
-const MainBox = ({ profileId, state}) => {
+const MainBox = ({ profileId, type ,state}) => {
+  console.log("profileId", profileId, "state", state)
   const sessionId = getCookie("sessionId");
   const userId = getUserId("userId")
 
   if (state === "explore"){
-    return (
-      <Explore type={"user"}/> 
-    )
+    if (type ==="user"){
+      return (
+        <Explore type={"exploreUsers"}/> 
+        )
+      } else if (type === "group"){
+        return (
+          <Explore type={"exploreGroups"}/>
+        )
+      } else {
+        return (
+          <Explore type={"exploreUsers"}/> 
+          )
+      }
   } else if (state === "profile"){
-    return(
-      <Profile sessionId={sessionId} userId={userId} profileId={profileId}/>
-    )
+    if (type === "user"){
+      return(
+        <Profile sessionId={sessionId} userId={userId} profileId={profileId}/>
+        )
+      } else if (type === "group"){
+        console.log( "im group explore")
+        return(
+          <>
+          <p>hello</p>
+          </>
+        )
+      }
 };
 }
 

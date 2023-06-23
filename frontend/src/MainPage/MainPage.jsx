@@ -14,15 +14,10 @@ function MainPage() {
   const userId =  parseInt(id);
 
   // !!TODO!! how to get profile id that can send to mainbox that show user that we want ???
-  const profileId = 4
-  // make url = localhost:3000/
-  const url = window.location.href;
-  const urlSplit = url.split("/");
-  const urlJoin = urlSplit.slice(0, 3).join("/");
-  window.history.pushState({}, null, urlJoin);
 
   const [data, setData] = useState(null);
   const sessionId = getCookie("sessionId");
+
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch("http://localhost:8080/api", {
@@ -33,24 +28,21 @@ function MainPage() {
         body: JSON.stringify({ type: "profile", payload: {sessionId:sessionId, userId: userId, profileId: userId} }),
       });
       const responseData = await response.json();
-      setData(responseData);
+      setData(responseData.event.payload);
     };
 
     fetchData();
-
   }, []);
 
-  
+ 
 
   if (!data) {
     return <div>Loading...</div>;
-  } else{
+  } else {
   return (
     <div className="main-page">
       <div className="main-page-container">
-        <LeftBox user={data.event.payload} link={navGroupLinkData}/>
-        <MainBox  profileId={profileId} state={"explore"}/>
-        <RightBox/>
+        <BoxState userData={data} navLink={navGroupLinkData}/>
         <ChatBox />
       </div>
     </div>
@@ -60,23 +52,52 @@ function MainPage() {
 
 export default MainPage;
 
+// BoxState is component that read url and send user to correct place
+// first check url pathname 
+// then if is looking for state value that is null or not if state have some value 
+// it will sent state value to profile componen
+const BoxState = ({userData, navLink}) => {
+  /*  !!todo!!
+      - error handler that if mainbox cant find user profile with that id what need todo */
+  const url = new URL(window.location.href);
+  const searchParams = new URLSearchParams(url.search);
+  const state = searchParams.get("id");
+  if (url.pathname === "/user") {
+    if (state !== null){
+      return <Profile userData={userData} profileId={state} navLink={navLink}/>
+    } else if (state === null){
+      console.log("url", url, "searchParams",searchParams, "state", state)
+     return  <Explore userData={userData} navLink={navLink} type={"user"}/>
+    }
+  } else if (url.pathname === "/group"){
+    if (state !== null){
+      console.log("state profile", state)
+    } else if (state === null){
+      return <Explore userData={userData} navLink={navLink} type={"group"}/>
+    }
+  }
+}
+
+
 
 const Profile = ({userData, profileId, navLink}) => {
+  console.log("userData",userData,"profileId", profileId, "navLink", navLink)
   return (
   <>
   <LeftBox user={userData} link={navLink} />
-  <MainBox userId={profileId} state={"profile"}/>
+  <MainBox profileId={parseInt(profileId)} state={"profile"}/>
   <RightBox/>
   <ChatBox/>
   </> 
   )
 }
 
-const Explore = ({userData, navLink}) => {
+const Explore = ({userData, navLink, type}) => {
+  console.log("userDat",userData,"navLink", navLink,"type",type)
   return (
     <>
       <LeftBox user={userData} link={navLink}/>
-      <MainBox userId={null} state={"explore"}/>
+      <MainBox userId={null} type={type} state={"explore"}/>
       <RightBox/>
       <ChatBox/>
     </>
