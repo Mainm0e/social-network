@@ -30,6 +30,7 @@ const LeftBox = ({user,link}) => {
                     </div>
                 </div>
             </div>
+            <NavList type={"Main"} links={link[3]} />
             <NavList type={"Post"} links={link[1]} />
             <NavList type={"Nav"} links={link[0]} />
             <NavList type={"Connection"} links={link[2]} />

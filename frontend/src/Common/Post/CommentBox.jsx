@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { getCookie } from '../../tools/cookie';
+import { getCookie, getUserId } from '../../tools/cookie';
 import "./CommentBox.css"
 import { checkCommentData } from '../../tools/checkdata';
 const CommentBox = ({id,comments,activePost}) => {
@@ -49,7 +49,7 @@ const CommentBox = ({id,comments,activePost}) => {
 }
 
 const CreateComment = ({ id , showComment }) => {
-    const userId = getCookie('userId');
+    const userId = getUserId('userId');
     const sessionId = getCookie('sessionId');
     const [comment, setComment] = useState('');
     const [image, setImage] = useState(null);

@@ -21,7 +21,7 @@ function App() {
     if (sessionId !== null && page === "/"||sessionId !== null && page === "/register"||sessionId !== null && page === "/login"){
       return <MainPage />
     } else {
-      return <ErrorPage />
+      return  <MainPage />
     }
 
   };

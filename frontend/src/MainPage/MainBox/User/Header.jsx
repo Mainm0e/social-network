@@ -1,7 +1,9 @@
 import "../MainBox.css";
 import { getCookie, getUserId } from "../../../tools/cookie";
 const Header = ({profile}) => {
+  console.log("in header p", profile)
   const user = profile;
+  console.log("in header u", user)
   const checkPrivacy = () => {
     if (true) {
       return (
