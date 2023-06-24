@@ -61,10 +61,11 @@ type Follow struct {
 }
 
 type Group struct {
-	GroupId     int    `json:"groupId"`
-	CreatorId   int    `json:"creatorId"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
+	GroupId      int    `json:"groupId"`
+	CreatorId    int    `json:"creatorId"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	CreationTime string `json:"creationTime"`
 }
 
 type GroupMember struct {

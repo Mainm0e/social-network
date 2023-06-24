@@ -373,8 +373,13 @@ func FetchData(table string, condition string, args ...any) ([]any, error) {
 	if _, ok := FetchRules[table]; !ok {
 		return nil, fmt.Errorf("unknown table: %s", table)
 	}
-	// Prepare the SQL query
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s=? ", FetchRules[table].SelectFields, table, condition)
+	var query string
+	if condition == "" {
+		query = fmt.Sprintf("SELECT %s FROM %s", FetchRules[table].SelectFields, table)
+	} else {
+		// Prepare the SQL query
+		query = fmt.Sprintf("SELECT %s FROM %s WHERE %s=? ", FetchRules[table].SelectFields, table, condition)
+	}
 	// Execute the query
 	rows, err := DB.Query(query, args...)
 	if err != nil {

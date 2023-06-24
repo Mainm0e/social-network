@@ -13,7 +13,11 @@ let link3 = {
     followers: "#followers",
     following: "#followings",
     }
-
+let link4 = {
+    home: "/",
+    ExploreUser: "/user",
+    ExploreGroup: "/group",
+}
 export const user1 = {
     fName: "Kettu",
     lName: "Kettunen",
@@ -24,4 +28,4 @@ export const user1 = {
     following: 0,
     followers: 0,
 }
-export const navGroupLinkData = [link1,link2,link3]
+export const navGroupLinkData = [link1,link2,link3,link4]
