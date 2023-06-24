@@ -37,7 +37,7 @@ var InsertRules = map[string]InsertRule{
 		NotExistErrors: []string{"user does not exist", "post does not exist"},
 	},
 	"groups": {
-		Query:          "INSERT INTO groups(creatorId, title, description) VALUES(?,?,?)",
+		Query:          "INSERT INTO groups(creatorId, title, description, creationTime) VALUES(?,?,?,?)",
 		NotExistTables: []string{"users"},
 		NotExistFields: []string{"creatorId"},
 		NotExistErrors: []string{"creator does not exist"},
@@ -164,10 +164,10 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"groups": {
-		SelectFields: "groupId, creatorId, title, description",
+		SelectFields: "groupId, creatorId, title, description, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var group Group
-			err := rows.Scan(&group.GroupId, &group.CreatorId, &group.Title, &group.Description)
+			err := rows.Scan(&group.GroupId, &group.CreatorId, &group.Title, &group.Description, &group.CreationTime)
 			return group, err
 		},
 	},

@@ -9,10 +9,10 @@ VALUES (1, 'Group 1', 'Description for Group 1'),
        (2, 'Group 2', 'Description for Group 2'),
        (1, 'Group 3', 'Description for Group 3');
 
-INSERT INTO posts (userId, title, content, creationTime, status, groupId)
-VALUES (1, 'Post 1', 'Content of Post 1', '2023-05-31 13:00:00', 'public', NULL),
-       (2, 'Post 2', 'Content of Post 2', '2023-05-31 14:00:00', 'private', NULL),
-       (1, 'Post 3', 'Content of Post 3', '2023-05-31 15:00:00', 'group', 1);
+INSERT INTO posts (userId, title, content, creationTime, status, groupId,image)
+VALUES (1, 'Post 1', 'Content of Post 1', '2023-05-31 13:00:00', 'public', 0,""),
+       (2, 'Post 2', 'Content of Post 2', '2023-05-31 14:00:00', 'private', 0,""),
+       (1, 'Post 3', 'Content of Post 3', '2023-05-31 15:00:00', 'group', 1,"");
 
 INSERT INTO comments (userId, postId, content, creationTime)
 VALUES (2, 1, 'Comment on Post 1', '2023-05-31 16:00:00'),

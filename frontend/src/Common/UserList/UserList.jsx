@@ -6,7 +6,6 @@ import "./UserList.css";
 const UserList = ({title,id,clearBox}) => {
    
     const [data, setData] = useState(null);
-    console.log("in userlist",title,"wtf",id)
     useEffect(() => {
     const getUserList = async () => {
         const response = await fetch("http://localhost:8080/api", {
@@ -18,7 +17,6 @@ const UserList = ({title,id,clearBox}) => {
         });
         const responseData = await response.json();
         setData(responseData.event.payload);
-        console.log("in getUserList",data)
     }
     getUserList();
     }, []);
@@ -37,7 +35,7 @@ const UserList = ({title,id,clearBox}) => {
                             <li key={user.userId}>
                                 <div className="user-list-item">
                                     <div className="user-list-item-left">
-                                        <img src={user.image} alt="user" />
+                                        <img src={user.avatar} alt="user" />
                                     </div>
                                     <div className="user-list-item-right">
                                     <span>{user.firstName}</span><span> </span><span>{user.lastName}</span>

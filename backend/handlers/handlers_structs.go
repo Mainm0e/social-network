@@ -14,10 +14,8 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"GetPost":       GetPost,
 	"GetPosts":      GetPosts,
 	"createComment": CreateComment,
-
-	//"getComment":    GetComment,
-	//"getComments":   GetComments,
-	//"requestPosts": GetPosts,
+	"exploreUsers":  ExploreUsers,
+	"exploreGroups": ExploreGroups,
 }
 
 type Response struct {
@@ -69,6 +67,7 @@ type Profile struct {
 	FirstName    string         `json:"firstName"`
 	LastName     string         `json:"lastName"`
 	Avatar       *string        `json:"avatar"` //
+	Relation     string         `json:"relation"`
 	FollowerNum  int            `json:"followerNum"`
 	FollowingNum int            `json:"followingNum"`
 	PrivateData  PrivateProfile `json:"privateProfile"`
@@ -119,21 +118,20 @@ type ReqAllPosts struct {
 	GroupId   int    `json:"groupId"`
 }
 
-// add post struct coming from frontend
-/*
-	comment struct coming from frontend
-	type Comment struct {
-		PostId   int    `json:"postId"`
-		UserId   int    `json:"userId"`
-		Content  string `json:"content"`
-		ParentId int    `json:"parentId"`
-	}
-
-	send post struct to frontend
-	type SendPost struct {
-	PostId   int    `json:"postId"`
-	Post    Post   `json:"post"`
-	Comments []Comment `json:"comments"`
-	}
-
-*/
+type Group struct {
+	SessionId      string       `json:"sessionId"`
+	CreatorProfile SmallProfile `json:"creatorProfile"`
+	GroupId        int          `json:"groupId"`
+	Title          string       `json:"title"`
+	Description    string       `json:"description"`
+	Date           string       `json:"date"`
+}
+type Follow struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	FollowId  int    `json:"followId"`
+}
+type Explore struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+}

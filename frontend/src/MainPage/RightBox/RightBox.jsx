@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./RightBox.css";
 import UserList from "../../Common/UserList/UserList";
+import { getUserId } from "../../tools/cookie";
 
-const RightBox = ({ profileId }) => {
+const RightBox = () => {
   const [box, setBox] = useState(null);
+  const userId = getUserId("userId")
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -13,9 +15,9 @@ const RightBox = ({ profileId }) => {
       clearBox();
       setTimeout(() => {
         if (hash === "followers") {
-          setBox(<UserList title="followers" id={profileId} clearBox={clearBox} />);
+          setBox(<UserList title="followers" id={userId} clearBox={clearBox} />);
         } else if (hash === "followings") {
-          setBox(<UserList title="followings" id={profileId} clearBox={clearBox} />);
+          setBox(<UserList title="followings" id={userId} clearBox={clearBox} />);
         } else {
           setBox(<div className="loading">Loading...</div>);
         }
@@ -31,7 +33,7 @@ const RightBox = ({ profileId }) => {
       // Cleanup the event listener on component unmount
       window.removeEventListener("hashchange", handleHashChange);
     };
-  }, [profileId]);
+  }, [userId]);
 
   const clearBox = () => {
     setBox(null);
