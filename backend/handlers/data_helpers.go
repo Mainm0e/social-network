@@ -770,6 +770,12 @@ func InsertFollowRequest(senderId int, receiverId int) error {
 	}
 	return nil
 }
+
+/*
+DeleteFollowRequest function delete the follow request from notification table and update the follow table base on user decision
+if error occur then it return error
+*/
+
 func DeleteFollowRequest(followId int, notifId int, response string) error {
 	err := db.DeleteData("notifications", followId)
 	if err != nil {

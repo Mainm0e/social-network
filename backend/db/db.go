@@ -242,7 +242,7 @@ func InsertData(tableName string, args ...any) (int64, error) {
 	}
 
 	for i := range rule.NotExistTables {
-		if tableName == "posts" && rule.NotExistFields[i] == "groupId" && args[i] == 0 {
+		if tableName == "posts" || tableName == "notifications" && rule.NotExistFields[i] == "groupId" && args[i] == 0 {
 			continue
 		}
 		err := CheckDataDoesNotExist(rule.NotExistTables[i], rule.NotExistFields[i], args[i])
