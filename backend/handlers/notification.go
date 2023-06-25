@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func RequestNotification(payload json.RawMessage) (Response, error) {
+func RequestNotifications(payload json.RawMessage) (Response, error) {
 	var response Response
 	var request Explore
 	err := json.Unmarshal(payload, &request)

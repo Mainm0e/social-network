@@ -18,7 +18,7 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"exploreGroups":  ExploreGroups,
 	"followRequest":  FollowRequest,
 	"followResponse": FollowResponse,
-	"requestNotif":   RequestNotification,
+	"requestNotif":   RequestNotifications,
 }
 
 type Response struct {
