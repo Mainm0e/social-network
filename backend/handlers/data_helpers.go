@@ -771,6 +771,23 @@ func InsertFollowRequest(senderId int, receiverId int) error {
 	return nil
 }
 
+func ReadNotifications(userId int) ([]db.Notification, error) {
+	notifications, err := db.FetchData("notifications", "receiverId", userId)
+	if err != nil {
+		return []db.Notification{}, errors.New("Error fetching notifications" + err.Error())
+	}
+	result := make([]db.Notification, len(notifications))
+	for i, n := range notifications {
+		if notification, ok := n.(db.Notification); ok {
+			result[i] = notification
+		} else {
+			return nil, fmt.Errorf("invalid notification type at index %d", i)
+		}
+	}
+
+	return result, nil
+}
+
 /*
 DeleteFollowRequest function delete the follow request from notification table and update the follow table base on user decision
 if error occur then it return error
