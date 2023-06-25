@@ -73,10 +73,16 @@ var InsertRules = map[string]InsertRule{
 		NotExistErrors: []string{"receiver does not exist", "sender does not exist", "group does not exist"},
 	},
 	"events": {
-		Query:          "INSERT INTO events(creatorId, receiverId, groupId, title, content, creationTime, option) VALUES(?,?,?,?,?,?,?)",
-		NotExistTables: []string{"users", "users", "groups"},
-		NotExistFields: []string{"creatorId", "receiverId", "groupId"},
-		NotExistErrors: []string{"creator does not exist", "receiver does not exist", "group does not exist"},
+		Query:          "INSERT INTO events(creatorId, groupId, title, content, creationTime) VALUES(?,?,?,?,?)",
+		NotExistTables: []string{"users", "groups"},
+		NotExistFields: []string{"creatorId", "groupId"},
+		NotExistErrors: []string{"creator does not exist", "group does not exist"},
+	},
+	"event_member": {
+		Query:          "INSERT INTO event_member(eventId, memberId, option) VALUES(?,?,?)",
+		NotExistTables: []string{"events", "users"},
+		NotExistFields: []string{"eventId", "userId"},
+		NotExistErrors: []string{"event does not exist", "user does not exist"},
 	},
 }
 
@@ -94,6 +100,7 @@ var TableKeys = map[string]string{
 	"semiPrivate":   "postId", // Assuming postId uniquely identifies a semiPrivate record
 	"notifications": "notificationId",
 	"events":        "eventId",
+	"event_member":  "eventId", // Assuming eventId uniquely identifies an event member record //TODO: check if this is correct
 }
 
 /*
@@ -109,7 +116,8 @@ var UpdateRules = map[string]string{
 	"messages":      "UPDATE messages SET senderId=?, receiverId=?, messageContent=?, sendTime=?, seen=? WHERE messageId=?",
 	"semiPrivate":   "UPDATE semiPrivate SET postId=?, userId=? WHERE postId=?", // Assuming postId uniquely identifies a semiPrivate record
 	"notifications": "UPDATE notifications SET receiverId=?, senderId=?, type=?, content=?, creationTime=? WHERE notificationId=?",
-	"events":        "UPDATE events SET creatorId=?, receiverId=?, groupId=?, title=?, content=?, creationTime=?, option=? WHERE eventId=?",
+	"events":        "UPDATE events SET creatorId=?, groupId=?, title=?, content=?, creationTime=? WHERE eventId=?",
+	"event_member":  "UPDATE event_member SET option=? WHERE eventId=? AND memberId=? ", // Assuming eventId uniquely identifies an event member record //TODO: check if this is correct
 }
 
 /*
@@ -212,11 +220,19 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"events": {
-		SelectFields: "eventId, creatorId, receiverId, groupId, title, content, creationTime, option",
+		SelectFields: "eventId, creatorId, groupId, title, content, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var event Event
-			err := rows.Scan(&event.EventId, &event.CreatorId, &event.ReceiverId, &event.GroupId, &event.Title, &event.Content, &event.CreationTime, &event.Option)
+			err := rows.Scan(&event.EventId, &event.CreatorId, &event.GroupId, &event.Title, &event.Content, &event.CreationTime)
 			return event, err
+		},
+	},
+	"event_member": {
+		SelectFields: "eventId, memberId, option",
+		ScanFields: func(rows *sql.Rows) (interface{}, error) {
+			var eventMember EventMember
+			err := rows.Scan(&eventMember.EventId, &eventMember.MemberId, &eventMember.Option)
+			return eventMember, err
 		},
 	},
 }

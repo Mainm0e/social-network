@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/db"
 	"backend/events"
 	"encoding/json"
 )
@@ -139,4 +140,9 @@ type Follow struct {
 	UserId    int    `json:"userId"`
 	FollowId  int    `json:"followId"`
 	Response  string `json:"response"`
+}
+type GroupEvent struct {
+	SessionId    string                    `json:"sessionId"`
+	Event        db.Event                  `json:"event"`
+	Participants map[string][]SmallProfile `json:"participants"`
 }
