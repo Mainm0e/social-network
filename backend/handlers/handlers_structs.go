@@ -126,12 +126,14 @@ type Group struct {
 	Description    string       `json:"description"`
 	Date           string       `json:"date"`
 }
+
+type Explore struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+}
 type Follow struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 	FollowId  int    `json:"followId"`
-}
-type Explore struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
+	Response  string `json:"response"`
 }

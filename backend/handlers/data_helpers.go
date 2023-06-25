@@ -768,20 +768,19 @@ func InsertFollowRequest(senderId int, receiverId int) error {
 	if err != nil {
 		return errors.New("Error inserting follow request in follow table" + err.Error())
 	}
-
 	return nil
 }
-func DeleteFollowRequest(followId int, notifId int, accepted int) error {
+func DeleteFollowRequest(followId int, notifId int, response string) error {
 	err := db.DeleteData("notifications", followId)
 	if err != nil {
 		return errors.New("Error deleting follow request" + err.Error())
 	}
-	if accepted == 1 {
+	if response == "accept" {
 		err = db.UpdateData("follow", "follower", followId)
 		if err != nil {
 			return errors.New("Error updating follow request" + err.Error())
 		}
-	} else if accepted == 0 {
+	} else if response == "reject" {
 		err = db.DeleteData("follow", followId)
 		if err != nil {
 			return errors.New("Error deleting follow request" + err.Error())
