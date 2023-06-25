@@ -6,16 +6,18 @@ import (
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":         LoginPage,
-	"register":      RegisterPage,
-	"profile":       ProfilePage,
-	"profileList":   ProfileList,
-	"createPost":    CreatePost,
-	"GetPost":       GetPost,
-	"GetPosts":      GetPosts,
-	"createComment": CreateComment,
-	"exploreUsers":  ExploreUsers,
-	"exploreGroups": ExploreGroups,
+	"login":          LoginPage,
+	"register":       RegisterPage,
+	"profile":        ProfilePage,
+	"profileList":    ProfileList,
+	"createPost":     CreatePost,
+	"GetPost":        GetPost,
+	"GetPosts":       GetPosts,
+	"createComment":  CreateComment,
+	"exploreUsers":   ExploreUsers,
+	"exploreGroups":  ExploreGroups,
+	"followRequest":  FollowRequest,
+	"followResponse": FollowResponse,
 }
 
 type Response struct {
