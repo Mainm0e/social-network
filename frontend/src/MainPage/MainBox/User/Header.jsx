@@ -32,8 +32,8 @@ const Header = ({profile}) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ 
-          type: "exploreUsers",
-          payload: { sessionId: sessionId, userId: parseInt(userId)},
+          type: "followRequest",
+          payload: { sessionId: sessionId, userId: parseInt(userId), followId:user.userId,response:""},
         }),
       });
       const responseData = await response.json();
