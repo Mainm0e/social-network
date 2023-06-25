@@ -730,6 +730,34 @@ func InsertGroupRequest(senderId int, groupId int) error {
 	return nil
 }
 
+/*
+GroupInvitationCheck function check if user accept or reject or ignore the group invitation, then insert or delete the user from group_member table base on user decision
+if error occur then it return error
+*/
+func GroupInvitationCheck(accept string, notifId int, userId int, groupId int) error {
+	if accept == "" {
+		return nil
+	}
+	err := db.DeleteData("notifications", notifId)
+	if err != nil {
+		return errors.New("Error deleting group invitation" + err.Error())
+	}
+	if accept == "accept" {
+		err := db.UpdateData("group_member", "member", userId)
+		if err != nil {
+			return errors.New("Error inserting group member" + err.Error())
+
+		} else if accept == "reject" {
+			err = db.DeleteData("group_member", userId)
+			if err != nil {
+				return errors.New("Error deleting group member" + err.Error())
+			}
+		}
+	}
+	return nil
+
+}
+
 // todo: change status values in follow table (Maryam)
 func InsertFollowRequest(senderId int, receiverId int) error {
 	_, err := db.InsertData("notifications", receiverId, senderId, 0, "follow_request", "", time.Now())
@@ -759,7 +787,5 @@ func DeleteFollowRequest(followId int, notifId int, accepted int) error {
 			return errors.New("Error deleting follow request" + err.Error())
 		}
 	}
-
 	return nil
-
 }
