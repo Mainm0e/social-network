@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 import AlertBox from '../Common/AlertBox/AlertBox';
+import { fetchData } from '../tools/fetchData';
 
 // LoginPage component
 // This component is used to render the login page
@@ -39,41 +40,10 @@ function LoginPage() {
   let msg = [];
   const checkemail = (email, password) => {
     console.log("checkEmail",email, password);
-    fetch('http://localhost:8080/api', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({type:"login","payload":{email: email, password: password}}),
-
-    }).then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
-      if (data.statusCode === 200){
-        // set cookie
-        console.log("set cookie",data)
-        document.cookie = "sessionId=" + data.event.payload.sessionId;
-        localStorage.setItem("userId", data.event.payload.userId);
-        window.location.href = '/';
-        return true;
-      }
-      else {
-        setAlertTitle("Error");
-        msg.push(data.message);
-        setAlertMessage(msg);
-        return false;
-      }
-    })
-
-/* 
-    if (email === "admin" && password === "admin") {
-      return true;
-    } else {
-      setAlertTitle("Error");
-      msg.push("email or password is incorrect");
-      setAlertMessage(msg);
-      return false;
-    } */
+    const method = "POST"
+    const type = "login"
+    const payload = {email: email, password: password}
+    fetchData(method,type,payload)
   }
 
   const [loginStatus, setLoginStatus] = useState(true);
