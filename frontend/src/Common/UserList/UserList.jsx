@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getCookie } from "../../tools/cookie";
 import "./UserList.css";
+import { fetchData } from "../../tools/fetchData";
 
 
 const UserList = ({title,id,clearBox}) => {
@@ -20,6 +21,12 @@ const UserList = ({title,id,clearBox}) => {
         setData(responseData.event.payload);
     }
     getUserList(); */
+    const method = "POST"
+    const type = "profileList"
+    const payload = {sessionId:getCookie("sessionId"), userId: id, request:title}
+    fetchData(method,type,payload).then((responseData) => {
+        setData(data)
+    })
     }, []);
     if (data===null) {
         return <div>Loading...</div>;
