@@ -7,7 +7,8 @@ const UserList = ({title,id,clearBox}) => {
    
     const [data, setData] = useState(null);
     useEffect(() => {
-    const getUserList = async () => {
+
+/*     const getUserList = async () => {
         const response = await fetch("http://localhost:8080/api", {
             method: "POST",
             headers: {
@@ -18,7 +19,7 @@ const UserList = ({title,id,clearBox}) => {
         const responseData = await response.json();
         setData(responseData.event.payload);
     }
-    getUserList();
+    getUserList(); */
     }, []);
     if (data===null) {
         return <div>Loading...</div>;
