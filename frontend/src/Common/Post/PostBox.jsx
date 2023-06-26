@@ -196,14 +196,6 @@ const PostBox = ({ id }) => {
   const [body, setBody] = useState("");
   const [data, setData] = useState(null);
   useEffect(() => {
-    // fetch data from backend
-    // to get the post list
-    const method = "POST";
-    const type = "post";
-    const payload = { user_id: id };
-    fetchData(method, type, payload).then((data) => {
-      setData(data);
-    });
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1);
       setBody(hash);

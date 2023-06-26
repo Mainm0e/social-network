@@ -1,11 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import "../MainBox.css";
 import { getCookie, getUserId } from "../../../tools/cookie";
+import { fetchData } from "../../../tools/fetchData";
 const Header = ({profile,handleRefresh}) => {
-  const [requestSent, setRequestSent] = useState(false);
-  const refreshHeader = () => {
-    setRequestSent(false); // Reset the request status
-  };
   const user = profile;
   const checkPrivacy = () => {
     if (true) {
@@ -28,17 +25,10 @@ const Header = ({profile,handleRefresh}) => {
   const sessionId = getCookie("sessionId");
   const userId = getUserId("userId");
     const sentRequest = async () => {
-       const response = await fetch("http://localhost:8080/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          type: "followRequest",
-          payload: { sessionId: sessionId, userId: parseInt(userId), followId:user.userId,response:""},
-        }),
-      });
-      const responseData = await response.json();
+      const method = "POST"
+      const type = "followRequest"
+      const payload ={ sessionId: sessionId, userId: parseInt(userId), followId:user.userId,response:""}
+      fetchData(method,type,payload).then((data) => {console.log(data)})
       handleRefresh();
     };
   
@@ -65,7 +55,7 @@ const Header = ({profile,handleRefresh}) => {
             <span>{user.followingNum}</span>
           </div>
           {/* follow button */}
-          <Followbtn relation={user.relation} sentRequest={sentRequest} refreshHeader={refreshHeader} />
+          <Followbtn relation={user.relation} sentRequest={sentRequest}/>
         </div>
       </div>
     </div>
@@ -74,12 +64,11 @@ const Header = ({profile,handleRefresh}) => {
 
 export default Header;
 
-const Followbtn = ({  relation, sentRequest, refreshHeader }) => {
+const Followbtn = ({  relation, sentRequest }) => {
 
   const handleSentRequest = async () => {
     await sentRequest();
     // Trigger the refresh of the Header component
-    refreshHeader();
   };
   
   if (relation === "you"){
