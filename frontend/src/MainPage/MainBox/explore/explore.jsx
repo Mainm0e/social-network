@@ -3,6 +3,7 @@ import { getCookie,getUserId } from "../../../tools/cookie";
 import { useHistory } from "react-router-dom"; // Import useHistory from react-router-dom
 
 import "./explore.css";
+import { fetchData } from "../../../tools/fetchData";
 
 const Explore = ({type}) => {
     const sessionId = getCookie("sessionId");
@@ -11,6 +12,11 @@ const Explore = ({type}) => {
     const [data, setData] = useState(null);
   
     useEffect(() => {
+        const method = "POST"
+        const payload = { sessionId: sessionId, userId: uId}
+        fetchData(method,type,payload).then((data)=>{
+            setData(data)
+        })
         const getExplore = async () => {
                 const response = await fetch("http://localhost:8080/api", {
                   method: "POST",
