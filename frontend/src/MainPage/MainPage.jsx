@@ -6,6 +6,7 @@ import RightBox from "./RightBox/RightBox";
 import ChatBox from "../Common/ChatBox/ChatBox";
 import { navGroupLinkData } from "./dummyData";
 import { getCookie, getUserId} from "../tools/cookie";
+import { fetchData } from "../tools/fetchData";
 
 // dummy data
 function MainPage() {
@@ -19,19 +20,10 @@ function MainPage() {
   const sessionId = getCookie("sessionId");
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://localhost:8080/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type: "profile", payload: {sessionId:sessionId, userId: userId, profileId: userId} }),
-      });
-      const responseData = await response.json();
-      setData(responseData.event.payload);
-    };
-
-    fetchData();
+    const method = "POST"
+    const type = "profile"
+    const payload = { sessionId: sessionId, userId: userId, profileId: userId }
+    fetchData(method,type, payload).then((data) => setData(data));
   }, []);
 
  
