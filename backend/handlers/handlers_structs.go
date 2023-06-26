@@ -6,16 +6,18 @@ import (
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":         LoginPage,
-	"register":      RegisterPage,
-	"profile":       ProfilePage,
-	"profileList":   ProfileList,
-	"createPost":    CreatePost,
-	"GetPost":       GetPost,
-	"GetPosts":      GetPosts,
-	"createComment": CreateComment,
-	"exploreUsers":  ExploreUsers,
-	"exploreGroups": ExploreGroups,
+	"login":          LoginPage,
+	"register":       RegisterPage,
+	"profile":        ProfilePage,
+	"profileList":    ProfileList,
+	"createPost":     CreatePost,
+	"GetPost":        GetPost,
+	"GetPosts":       GetPosts,
+	"createComment":  CreateComment,
+	"exploreUsers":   ExploreUsers,
+	"exploreGroups":  ExploreGroups,
+	"followRequest":  FollowRequest,
+	"followResponse": FollowResponse,
 }
 
 type Response struct {
@@ -126,12 +128,14 @@ type Group struct {
 	Description    string       `json:"description"`
 	Date           string       `json:"date"`
 }
+
+type Explore struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+}
 type Follow struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 	FollowId  int    `json:"followId"`
-}
-type Explore struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
+	Response  string `json:"response"`
 }

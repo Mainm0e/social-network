@@ -45,7 +45,7 @@ func fillSmallProfile(userId int) (SmallProfile, error) {
 		Avatar:    user.Avatar,
 	}
 	var imageUrl string
-	if user.Avatar != nil {
+	if user.Avatar != nil && *user.Avatar != "" {
 		imageUrl = *user.Avatar
 	} else {
 		imageUrl = "./images/avatars/default.png"
@@ -171,7 +171,7 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		return Profile{}, errors.New("Error findFollowings: " + err.Error())
 	}
 	var imageUrl string
-	if user.Avatar != nil {
+	if user.Avatar != nil && *user.Avatar != "" {
 		imageUrl = *user.Avatar
 	} else {
 		imageUrl = "./images/avatars/default.png"
@@ -217,13 +217,14 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 			followings,
 		}
 		profile.Relation = status
-	} else if status == "follow" || status == "pending" {
+		return profile, nil
+
+	} else if status == "follower" || status == "pending" || status == "follow" {
 		profile.Relation = status
 		return profile, nil
 	} else {
-		return Profile{}, errors.New("error checkUserRelation: wtf")
+		return Profile{}, errors.New("error checkUserRelation: wtf:" + status)
 	}
-	return profile, nil
 }
 
 /*
@@ -677,15 +678,113 @@ func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
 	}
 	return users, nil
 }
+func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error) {
+	users, err := ReadAllUsers(userId, sessionId)
+	if err != nil {
+		return []Profile{}, errors.New("Error fetching users: " + err.Error())
+	}
+
+	members, err := db.FetchData("group_member", "groupId", groupId)
+	if err != nil {
+		return []Profile{}, errors.New("Error fetching members: " + err.Error())
+	}
+
+	memberIds := make(map[int]struct{})
+	for _, member := range members {
+		memberIds[member.(db.GroupMember).UserId] = struct{}{}
+	}
+
+	var nonMembers []Profile
+	for _, user := range users {
+		if _, exists := memberIds[user.UserId]; !exists {
+			nonMembers = append(nonMembers, user)
+		}
+	}
+
+	return nonMembers, nil
+}
+func InsertGroupInvitation(senderId int, groupId int, receiverId int, content string) error {
+	_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", content, time.Now())
+	if err != nil {
+		return errors.New("Error inserting group invitation" + err.Error())
+	}
+	return nil
+	// TODO: send notification to receiver
+}
+func InsertGroupRequest(senderId int, groupId int) error {
+	group, err := ReadGroup(groupId)
+	if err != nil {
+		return errors.New("Error fetching group" + err.Error())
+	}
+	receiverId := group.CreatorProfile.UserId
+	if receiverId == 0 {
+		return errors.New("error fetching group creator")
+	}
+	id, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_request", "", time.Now())
+	if err != nil {
+		return errors.New("Error inserting group request" + err.Error())
+	}
+	if id == 0 {
+		return errors.New("error inserting group request")
+	}
+	return nil
+}
 
 /*
-func InsertGroupInvitation(groupId int, userId int) error {
-
-}
-func InsertGroupRequest(groupId int, userId int) error {
-
-}
-func readGroupInvitations(userId int) ([]Group, error) {
-
-}
+GroupInvitationCheck function check if user accept or reject or ignore the group invitation, then insert or delete the user from group_member table base on user decision
+if error occur then it return error
 */
+func GroupInvitationCheck(accept string, notifId int, userId int, groupId int) error {
+	if accept == "" {
+		return nil
+	}
+	err := db.DeleteData("notifications", notifId)
+	if err != nil {
+		return errors.New("Error deleting group invitation" + err.Error())
+	}
+	if accept == "accept" {
+		err := db.UpdateData("group_member", "member", userId)
+		if err != nil {
+			return errors.New("Error inserting group member" + err.Error())
+
+		} else if accept == "reject" {
+			err = db.DeleteData("group_member", userId)
+			if err != nil {
+				return errors.New("Error deleting group member" + err.Error())
+			}
+		}
+	}
+	return nil
+
+}
+
+// todo: change status values in follow table (Maryam)
+func InsertFollowRequest(senderId int, receiverId int) error {
+	_, err := db.InsertData("notifications", receiverId, senderId, 0, "follow_request", "", time.Now())
+	if err != nil {
+		return errors.New("Error inserting follow request" + err.Error())
+	}
+	_, err = db.InsertData("follow", senderId, receiverId, "pending")
+	if err != nil {
+		return errors.New("Error inserting follow request in follow table" + err.Error())
+	}
+	return nil
+}
+func DeleteFollowRequest(followId int, notifId int, response string) error {
+	err := db.DeleteData("notifications", followId)
+	if err != nil {
+		return errors.New("Error deleting follow request" + err.Error())
+	}
+	if response == "accept" {
+		err = db.UpdateData("follow", "follower", followId)
+		if err != nil {
+			return errors.New("Error updating follow request" + err.Error())
+		}
+	} else if response == "reject" {
+		err = db.DeleteData("follow", followId)
+		if err != nil {
+			return errors.New("Error deleting follow request" + err.Error())
+		}
+	}
+	return nil
+}

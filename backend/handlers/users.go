@@ -26,7 +26,7 @@ func ExploreUsers(payload json.RawMessage) (Response, error) {
 		return response, err
 	}
 	//get users from database
-	users, err := ReadAllUsers(explore.UserId, explore.SessionId)
+	users, err := NonMemberUsers(1, explore.UserId, explore.SessionId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err

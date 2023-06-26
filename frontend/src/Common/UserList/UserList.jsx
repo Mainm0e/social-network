@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { getCookie } from "../../tools/cookie";
 import "./UserList.css";
+import { fetchData } from "../../tools/fetchData";
 
 
 const UserList = ({title,id,clearBox}) => {
    
     const [data, setData] = useState(null);
     useEffect(() => {
-    const getUserList = async () => {
-        const response = await fetch("http://localhost:8080/api", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ type: "profileList", payload: {sessionId:getCookie("sessionId"), userId: id, request:title}}),
-        });
-        const responseData = await response.json();
-        setData(responseData.event.payload);
-    }
-    getUserList();
+    const method = "POST"
+    const type = "profileList"
+    const payload = {sessionId:getCookie("sessionId"), userId: id, request:title}
+    fetchData(method,type,payload).then((responseData) => {
+        setData(data)
+    })
     }, []);
     if (data===null) {
         return <div>Loading...</div>;
