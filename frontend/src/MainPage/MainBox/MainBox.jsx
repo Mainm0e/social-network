@@ -4,6 +4,7 @@ import Body from "./User/Body";
 import Explore from "./explore/explore";
 import "./MainBox.css";
 import { getCookie, getUserId } from "../../tools/cookie";
+import { fetchData } from "../../tools/fetchData";
 
 
 
@@ -53,22 +54,13 @@ export default MainBox;
 const Profile = ({sessionId, userId,profileId,refreshComponent}) =>{
    const [data, setData] = useState(null);
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://localhost:8080/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          type: "profile",
-          payload: { sessionId: sessionId, userId: parseInt(userId), profileId: profileId },
-        }),
-      });
-      const responseData = await response.json();
-      setData(responseData.event.payload);
-    };
-    fetchData();
+    const method = "POST"
+    const type = "profile"
+    const payload = { sessionId: sessionId, userId: parseInt(userId), profileId: profileId }
+
+    fetchData(method,type, payload).then((data) => setData(data) );
   }, [sessionId, userId, profileId]);
+
   const handleRefresh = () => {
     refreshComponent(); // Call the refresh function from the parent component
   };

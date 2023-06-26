@@ -93,21 +93,25 @@ const Followbtn = ({  relation, sentRequest, refreshHeader }) => {
       </div>
     );
   }
-  else if (relation === "follower") {
+  else if (relation === "follow") {
     return (
       <div className="follow_btn">
         <button className="follow_btn" onClick={handleSentRequest}>
-          Accept
+          follow
         </button>
       </div>
     );
-  } else {
+  } else if (relation === "pending"){
     return (
       <div className="follow_btn">
         <button className="follow_btn" onClick={handleSentRequest}>
-          Follow
+          pending
         </button>
       </div>
+    )
+  } else {
+    return (
+      <></>
     );
   }
 }
