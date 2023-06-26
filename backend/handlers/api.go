@@ -17,7 +17,7 @@ func HTTPEventRouter(w http.ResponseWriter, r *http.Request) {
 		var event events.Event
 		log.Println("request url", r.URL.Path)
 		err := json.NewDecoder(r.Body).Decode(&event)
-		log.Println("Event:", event)
+		log.Println("Event:", event.Type, "payload: ", string(event.Payload))
 		if err != nil {
 			log.Println("Error decoding event:", err)
 			response := Response{"Error decoding event:" + err.Error(), events.Event{}, http.StatusBadRequest}
@@ -39,12 +39,7 @@ func HTTPEventRouter(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(response)
 			return
 		}
-		testData, err := json.Marshal(response)
-		if err != nil {
-			log.Println("Error marshaling response to JSON:", err)
-			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-		}
-		log.Println("Response before sending it :", string(testData))
+
 		json.NewEncoder(w).Encode(response)
 	}
 }

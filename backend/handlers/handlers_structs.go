@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/db"
 	"backend/events"
 	"encoding/json"
 )
@@ -18,6 +19,7 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"exploreGroups":  ExploreGroups,
 	"followRequest":  FollowRequest,
 	"followResponse": FollowResponse,
+	"requestNotif":   RequestNotifications,
 }
 
 type Response struct {
@@ -138,4 +140,9 @@ type Follow struct {
 	UserId    int    `json:"userId"`
 	FollowId  int    `json:"followId"`
 	Response  string `json:"response"`
+}
+type GroupEvent struct {
+	SessionId    string                    `json:"sessionId"`
+	Event        db.Event                  `json:"event"`
+	Participants map[string][]SmallProfile `json:"participants"`
 }

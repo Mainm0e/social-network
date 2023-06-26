@@ -26,7 +26,7 @@ func fetchUser(userId int) (db.User, error) {
 }
 
 /*
-smallProfiles use for followers and followings list in profile page and maybe explore page in future
+smallProfiles use for followers, followings list in profile page and explore page
 */
 
 /*
@@ -101,7 +101,9 @@ func findFollowers(userId int) ([]int, error) {
 	}
 	var followerIds []int
 	for _, follower := range followers {
-		followerIds = append(followerIds, follower.(db.Follow).FollowerId)
+		if follower.(db.Follow).Status == "following" {
+			followerIds = append(followerIds, follower.(db.Follow).FollowerId)
+		}
 	}
 	return followerIds, nil
 }
@@ -115,7 +117,9 @@ func findFollowings(userId int) ([]int, error) {
 	}
 	var followingIds []int
 	for _, following := range followings {
-		followingIds = append(followingIds, following.(db.Follow).FolloweeId)
+		if following.(db.Follow).Status == "following" {
+			followingIds = append(followingIds, following.(db.Follow).FolloweeId)
+		}
 	}
 	return followingIds, nil
 }
@@ -166,10 +170,10 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		return Profile{}, errors.New("Error findFollowers: " + err.Error())
 	}
 	followings, err := findFollowings(profileId)
-	log.Println("followings", followings, "followers", followers)
 	if err != nil {
 		return Profile{}, errors.New("Error findFollowings: " + err.Error())
 	}
+
 	var imageUrl string
 	if user.Avatar != nil && *user.Avatar != "" {
 		imageUrl = *user.Avatar
@@ -180,7 +184,6 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 	if err != nil {
 		return Profile{}, errors.New("Error retrieving avatar image: " + err.Error())
 	}
-
 	user.Avatar = &avatar
 
 	profile := Profile{
@@ -190,7 +193,7 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		user.FirstName,
 		user.LastName,
 		user.Avatar,
-		"you",
+		"",
 		len(followers),
 		len(followings),
 		PrivateProfile{},
@@ -207,8 +210,8 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		return profile, nil
 
 	}
-	if status == "following" {
-		log.Println("yay user is user", profile.PrivateData)
+	profile.Relation = status
+	if status == "following" || user.Privacy == "public" {
 		profile.PrivateData = PrivateProfile{
 			user.BirthDate,
 			user.Email,
@@ -216,11 +219,8 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 			followers,
 			followings,
 		}
-		profile.Relation = status
 		return profile, nil
-
-	} else if status == "follower" || status == "pending" || status == "follow" {
-		profile.Relation = status
+	} else if status == "pending" || status == "follow" {
 		return profile, nil
 	} else {
 		return Profile{}, errors.New("error checkUserRelation: wtf:" + status)
@@ -596,69 +596,6 @@ func ReadPostsByGroup(currentUserId int, groupId int) ([]Post, error) {
 	return posts, nil
 }
 
-func InsertGroup(group Group) error {
-	_, err := db.InsertData("groups", group.CreatorProfile.UserId, group.Title, group.Description, time.Now())
-	if err != nil {
-		return errors.New("Error inserting group" + err.Error())
-	}
-	return nil
-}
-func InsertGroupMember(groupId int, userId int) error {
-	_, err := db.InsertData("group_member", groupId, userId)
-	if err != nil {
-		return errors.New("Error inserting group member" + err.Error())
-	}
-	return nil
-}
-func ReadGroup(groupId int) (Group, error) {
-	dbGroups, err := db.FetchData("groups", "groupId", groupId)
-	if err != nil {
-		return Group{}, errors.New("Error fetching group" + err.Error())
-	}
-	if len(dbGroups) == 0 {
-		return Group{}, errors.New("group not found")
-	}
-	dbGroup := dbGroups[0].(db.Group)
-	creator, err := fillSmallProfile(dbGroup.CreatorId)
-	if err != nil {
-		return Group{}, errors.New("Error fetching group creator" + err.Error())
-	}
-	group := Group{
-		GroupId:        dbGroup.GroupId,
-		CreatorProfile: creator,
-		Title:          dbGroup.Title,
-		Description:    dbGroup.Description,
-		Date:           dbGroup.CreationTime,
-	}
-	return group, nil
-}
-func ReadAllGroups(sessionId string) ([]Group, error) {
-	dbGroups, err := db.FetchData("groups", "")
-	if err != nil {
-		return []Group{}, errors.New("Error fetching groups" + err.Error())
-	}
-	if len(dbGroups) == 0 {
-		return []Group{}, errors.New("no group found")
-	}
-	var groups []Group
-	for _, dbGroup := range dbGroups {
-		dbGroup := dbGroup.(db.Group)
-		creator, err := fillSmallProfile(dbGroup.CreatorId)
-		if err != nil {
-			return []Group{}, errors.New("Error fetching group creator" + err.Error())
-		}
-		group := Group{
-			SessionId:      sessionId,
-			GroupId:        dbGroup.GroupId,
-			Title:          dbGroup.Title,
-			Description:    dbGroup.Description,
-			Date:           dbGroup.CreationTime,
-			CreatorProfile: creator,
-		}
-		groups = append(groups, group)
-	}
-	return groups, nil
-}
 func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
 	dbUsers, err := db.FetchData("users", "")
 	if err != nil {
@@ -674,7 +611,9 @@ func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
 		if err != nil {
 			return []Profile{}, errors.New("Error fetching user" + err.Error())
 		}
-		users = append(users, user)
+		if user.UserId != userId {
+			users = append(users, user)
+		}
 	}
 	return users, nil
 }
@@ -703,6 +642,7 @@ func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 
 	return nonMembers, nil
 }
+
 func InsertGroupInvitation(senderId int, groupId int, receiverId int, content string) error {
 	_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", content, time.Now())
 	if err != nil {
@@ -770,6 +710,29 @@ func InsertFollowRequest(senderId int, receiverId int) error {
 	}
 	return nil
 }
+
+func ReadNotifications(userId int) ([]db.Notification, error) {
+	notifications, err := db.FetchData("notifications", "receiverId", userId)
+	if err != nil {
+		return []db.Notification{}, errors.New("Error fetching notifications" + err.Error())
+	}
+	result := make([]db.Notification, len(notifications))
+	for i, n := range notifications {
+		if notification, ok := n.(db.Notification); ok {
+			result[i] = notification
+		} else {
+			return nil, fmt.Errorf("invalid notification type at index %d", i)
+		}
+	}
+
+	return result, nil
+}
+
+/*
+DeleteFollowRequest function delete the follow request from notification table and update the follow table base on user decision
+if error occur then it return error
+*/
+
 func DeleteFollowRequest(followId int, notifId int, response string) error {
 	err := db.DeleteData("notifications", followId)
 	if err != nil {
