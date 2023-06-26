@@ -101,7 +101,9 @@ func findFollowers(userId int) ([]int, error) {
 	}
 	var followerIds []int
 	for _, follower := range followers {
-		followerIds = append(followerIds, follower.(db.Follow).FollowerId)
+		if follower.(db.Follow).Status == "following" {
+			followerIds = append(followerIds, follower.(db.Follow).FollowerId)
+		}
 	}
 	return followerIds, nil
 }
@@ -115,7 +117,9 @@ func findFollowings(userId int) ([]int, error) {
 	}
 	var followingIds []int
 	for _, following := range followings {
-		followingIds = append(followingIds, following.(db.Follow).FolloweeId)
+		if following.(db.Follow).Status == "following" {
+			followingIds = append(followingIds, following.(db.Follow).FolloweeId)
+		}
 	}
 	return followingIds, nil
 }
@@ -166,10 +170,10 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		return Profile{}, errors.New("Error findFollowers: " + err.Error())
 	}
 	followings, err := findFollowings(profileId)
-	log.Println("followings", followings, "followers", followers)
 	if err != nil {
 		return Profile{}, errors.New("Error findFollowings: " + err.Error())
 	}
+
 	var imageUrl string
 	if user.Avatar != nil && *user.Avatar != "" {
 		imageUrl = *user.Avatar
@@ -180,7 +184,6 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 	if err != nil {
 		return Profile{}, errors.New("Error retrieving avatar image: " + err.Error())
 	}
-
 	user.Avatar = &avatar
 
 	profile := Profile{
@@ -190,7 +193,7 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		user.FirstName,
 		user.LastName,
 		user.Avatar,
-		"you",
+		"",
 		len(followers),
 		len(followings),
 		PrivateProfile{},
@@ -207,8 +210,8 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		return profile, nil
 
 	}
-	if status == "following" {
-		log.Println("yay user is user", profile.PrivateData)
+	profile.Relation = status
+	if status == "following" || user.Privacy == "public" {
 		profile.PrivateData = PrivateProfile{
 			user.BirthDate,
 			user.Email,
@@ -216,11 +219,8 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 			followers,
 			followings,
 		}
-		profile.Relation = status
 		return profile, nil
-
-	} else if status == "follower" || status == "pending" || status == "follow" {
-		profile.Relation = status
+	} else if status == "pending" || status == "follow" {
 		return profile, nil
 	} else {
 		return Profile{}, errors.New("error checkUserRelation: wtf:" + status)

@@ -19,9 +19,9 @@ VALUES (2, 1, 'Comment on Post 1', '2023-05-31 16:00:00'),
        (1, 3, 'Comment on Post 3', '2023-05-31 17:00:00');
 
 INSERT INTO follow (followerId, followeeId, status)
-VALUES (1, 2, 'follower'),
-       (2, 1, 'follower'),
-       (1, 3, 'follower');
+VALUES (1, 2, 'following'),
+       (2, 1, 'following'),
+       (1, 3, 'following');
 
 INSERT INTO group_member (userId, groupId, status)
 VALUES (1, 1, 'member'),
@@ -49,7 +49,7 @@ VALUES (1, 2, 'Message 1', '2023-05-31 22:00:00', 0),
 DELETE FROM messages;
 
 -- Remove the previously inserted rows from other tables (follow, group_member, semiPrivate, notifications, events)
-DELETE FROM follow WHERE followerId IN (1, 2) AND followeeId IN (2, 1,3) AND status = 'follower';
+DELETE FROM follow WHERE followerId IN (1, 2) AND followeeId IN (2, 1,3) AND status = 'following';
 DELETE FROM group_member WHERE userId IN (1, 2) AND groupId IN (1, 2) AND status = 'member';
 DELETE FROM semiPrivate WHERE postId IN (1, 3) AND userId IN (1, 2);
 DELETE FROM notifications WHERE receiverId IN (1, 2) AND senderId IN (2, 1);
