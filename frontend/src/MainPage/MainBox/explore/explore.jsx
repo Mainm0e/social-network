@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { getCookie,getUserId } from "../../../tools/cookie";
-import { useHistory } from "react-router-dom"; // Import useHistory from react-router-dom
 
 import "./explore.css";
 import { fetchData } from "../../../tools/fetchData";
@@ -17,23 +16,7 @@ const Explore = ({type}) => {
         fetchData(method,type,payload).then((data)=>{
             setData(data)
         })
-        const getExplore = async () => {
-                const response = await fetch("http://localhost:8080/api", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ 
-                    type: type,
-                    payload: { sessionId: sessionId, userId: uId},
-                  }),
-                });
-                const responseData = await response.json();
-                console.log("expor in sentRequest", responseData)
-                setData(responseData.event.payload);
-                };
-                getExplore();
-        }, []);
+        }, [sessionId,type,uId]);
         
         const generateExploreList = () => {
             return data.map((user) => {
@@ -76,9 +59,9 @@ export default Explore;
 
 const navigateToProfile = (type,userId) => {
     let linkType ="user"
-    if (type == "exploreUsers"){
+    if (type === "exploreUsers"){
         linkType = "user"
-    } else if (type =="exploreGroups"){
+    } else if (type ==="exploreGroups"){
         linkType = "group"
     }
     return window.location.href = `/${linkType}?id=${userId}`;
