@@ -26,7 +26,7 @@ func fetchUser(userId int) (db.User, error) {
 }
 
 /*
-smallProfiles use for followers and followings list in profile page and maybe explore page in future
+smallProfiles use for followers, followings list in profile page and explore page
 */
 
 /*
@@ -611,7 +611,9 @@ func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
 		if err != nil {
 			return []Profile{}, errors.New("Error fetching user" + err.Error())
 		}
-		users = append(users, user)
+		if user.UserId != userId {
+			users = append(users, user)
+		}
 	}
 	return users, nil
 }
