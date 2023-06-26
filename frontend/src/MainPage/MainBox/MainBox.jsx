@@ -8,9 +8,13 @@ import { getCookie, getUserId } from "../../tools/cookie";
 
 
 const MainBox = ({ profileId, type ,state}) => {
-  console.log("profileId", profileId, "state", state, "type", type)
   const sessionId = getCookie("sessionId");
   const userId = getUserId("userId")
+
+  const [refreshKey, setRefreshKey] = useState(0);
+  const refreshComponent = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
 
   if (state === "explore"){
     if (type ==="user"){
@@ -29,7 +33,7 @@ const MainBox = ({ profileId, type ,state}) => {
   } else if (state === "profile"){
     if (type === "user"){
       return(
-        <Profile sessionId={sessionId} userId={userId} profileId={profileId}/>
+        <Profile   key={refreshKey} sessionId={sessionId} userId={userId} profileId={profileId}   refreshComponent={refreshComponent}/>
         )
       } else if (type === "group"){
         console.log( "im group explore")
@@ -46,7 +50,7 @@ const MainBox = ({ profileId, type ,state}) => {
 export default MainBox;
 
 
-const Profile = ({sessionId, userId,profileId}) =>{
+const Profile = ({sessionId, userId,profileId,refreshComponent}) =>{
    const [data, setData] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
@@ -64,7 +68,10 @@ const Profile = ({sessionId, userId,profileId}) =>{
       setData(responseData.event.payload);
     };
     fetchData();
-  }, []);
+  }, [sessionId, userId, profileId]);
+  const handleRefresh = () => {
+    refreshComponent(); // Call the refresh function from the parent component
+  };
 
   
   if (data === null) {
@@ -72,7 +79,7 @@ const Profile = ({sessionId, userId,profileId}) =>{
   } else {
     return (
       <div className="main-box">
-        <Header profile={data}/>
+        <Header profile={data} handleRefresh={handleRefresh} />
         <Body user={profileId}/>
       </div>
     );

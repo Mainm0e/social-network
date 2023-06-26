@@ -1,9 +1,12 @@
+import React, { useState } from "react";
 import "../MainBox.css";
 import { getCookie, getUserId } from "../../../tools/cookie";
-const Header = ({profile}) => {
-  console.log("in header p", profile)
+const Header = ({profile,handleRefresh}) => {
+  const [requestSent, setRequestSent] = useState(false);
+  const refreshHeader = () => {
+    setRequestSent(false); // Reset the request status
+  };
   const user = profile;
-  console.log("in header u", user)
   const checkPrivacy = () => {
     if (true) {
       return (
@@ -25,7 +28,6 @@ const Header = ({profile}) => {
   const sessionId = getCookie("sessionId");
   const userId = getUserId("userId");
     const sentRequest = async () => {
-      console.log(userId)
        const response = await fetch("http://localhost:8080/api", {
         method: "POST",
         headers: {
@@ -37,7 +39,7 @@ const Header = ({profile}) => {
         }),
       });
       const responseData = await response.json();
-      console.log("expor in sentRequest", responseData)
+      handleRefresh();
     };
   
   return (
@@ -63,9 +65,7 @@ const Header = ({profile}) => {
             <span>{user.followingNum}</span>
           </div>
           {/* follow button */}
-          <div className="follow_button">
-            <button onClick={sentRequest}>Follow</button>
-          </div>
+          <Followbtn relation={user.relation} sentRequest={sentRequest} refreshHeader={refreshHeader} />
         </div>
       </div>
     </div>
@@ -73,3 +73,41 @@ const Header = ({profile}) => {
 };
 
 export default Header;
+
+const Followbtn = ({  relation, sentRequest, refreshHeader }) => {
+
+  const handleSentRequest = async () => {
+    await sentRequest();
+    // Trigger the refresh of the Header component
+    refreshHeader();
+  };
+  
+  if (relation === "you"){
+    return <></>;
+  } else if (relation === "following") {
+    return (
+      <div className="follow_btn">
+        <button className="follow_btn"  onClick={handleSentRequest}>
+          Unfollow
+        </button>
+      </div>
+    );
+  }
+  else if (relation === "follower") {
+    return (
+      <div className="follow_btn">
+        <button className="follow_btn" onClick={handleSentRequest}>
+          Accept
+        </button>
+      </div>
+    );
+  } else {
+    return (
+      <div className="follow_btn">
+        <button className="follow_btn" onClick={handleSentRequest}>
+          Follow
+        </button>
+      </div>
+    );
+  }
+}
