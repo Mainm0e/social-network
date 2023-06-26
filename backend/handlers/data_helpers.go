@@ -45,7 +45,7 @@ func fillSmallProfile(userId int) (SmallProfile, error) {
 		Avatar:    user.Avatar,
 	}
 	var imageUrl string
-	if user.Avatar != nil {
+	if user.Avatar != nil && *user.Avatar != "" {
 		imageUrl = *user.Avatar
 	} else {
 		imageUrl = "./images/avatars/default.png"
@@ -171,7 +171,7 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		return Profile{}, errors.New("Error findFollowings: " + err.Error())
 	}
 	var imageUrl string
-	if user.Avatar != nil {
+	if user.Avatar != nil && *user.Avatar != "" {
 		imageUrl = *user.Avatar
 	} else {
 		imageUrl = "./images/avatars/default.png"
