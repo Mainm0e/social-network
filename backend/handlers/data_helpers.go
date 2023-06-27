@@ -189,6 +189,7 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		user.LastName,
 		user.Avatar,
 		"",
+		user.Privacy,
 		len(followers),
 		len(followings),
 		PrivateProfile{},
