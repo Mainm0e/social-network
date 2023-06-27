@@ -89,18 +89,21 @@ var InsertRules = map[string]InsertRule{
 /*
 Global database table keys for ease of maintenance, and simplifying of the DeleteData function.
 */
-var TableKeys = map[string]string{
-	"users":         "userId",
-	"posts":         "postId",
-	"comments":      "commentId",
-	"groups":        "groupId",
-	"follow":        "followerId", // Assuming followerId uniquely identifies a follow record
-	"group_member":  "userId",     // Assuming userId uniquely identifies a group member record
-	"messages":      "messageId",
-	"semiPrivate":   "postId", // Assuming postId uniquely identifies a semiPrivate record
-	"notifications": "notificationId",
-	"events":        "eventId",
-	"event_member":  "eventId", // Assuming eventId uniquely identifies an event member record //TODO: check if this is correct
+var TableKeys = map[string][]string{
+	/*
+		these table data are not included because they are not going to be deleted from the database
+		"users":         {"userId"},
+		"posts":         {"postId"},
+		"comments":      {"commentId"},
+		"groups":        {"groupId"},
+		"messages":      {"messageId"},
+		"events":        {"eventId"},
+	*/
+	"follow":        {"followerId", "followeeId"},
+	"group_member":  {"groupId", "userId"},
+	"semiPrivate":   {"postId"},
+	"notifications": {"notificationId"},
+	"event_member":  {"eventId", "memberId"},
 }
 
 /*
@@ -111,8 +114,8 @@ var UpdateRules = map[string]string{
 	"posts":         "UPDATE posts SET image=? WHERE postId=?",
 	"comments":      "UPDATE comments SET image=? WHERE commentId=?",
 	"groups":        "UPDATE groups SET creatorId=?, title=?, description=? WHERE groupId=?",
-	"follow":        "UPDATE follow SET  status=? WHERE followerId=?",  // Assuming followerId uniquely identifies a follow record
-	"group_member":  "UPDATE group_member SET status=? WHERE userId=?", // Assuming userId uniquely identifies a group member record
+	"follow":        "UPDATE follow SET status=? WHERE followerId = ? AND followeeId = ?", // TODO check this works correctly
+	"group_member":  "UPDATE group_member SET status=? WHERE userId=?",                    // Assuming userId uniquely identifies a group member record
 	"messages":      "UPDATE messages SET senderId=?, receiverId=?, messageContent=?, sendTime=?, seen=? WHERE messageId=?",
 	"semiPrivate":   "UPDATE semiPrivate SET postId=?, userId=? WHERE postId=?", // Assuming postId uniquely identifies a semiPrivate record
 	"notifications": "UPDATE notifications SET receiverId=?, senderId=?, type=?, content=?, creationTime=? WHERE notificationId=?",

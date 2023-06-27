@@ -15,7 +15,6 @@ if there is an error, it will return a response with the error message and statu
 func HTTPEventRouter(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		var event events.Event
-		log.Println("request url", r.URL.Path)
 		err := json.NewDecoder(r.Body).Decode(&event)
 		log.Println("Event:", event.Type, "payload: ", string(event.Payload))
 		if err != nil {

@@ -1,12 +1,28 @@
 package handlers
 
 import (
+	"backend/db"
 	"backend/events"
 	"backend/utils"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
+	"time"
 )
+
+/*
+register is a function that attempts to register a new user based on the provided data.
+It takes in a byte slice `data` containing the registration information.
+It returns a boolean value indicating whether the registration was successful, and an error if any occurred.
+*/
+func (regData *RegisterData) register() error {
+	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
+	if err != nil {
+		return errors.New("Error inserting user" + err.Error())
+	}
+	return nil
+}
 
 func RegisterPage(payload json.RawMessage) (Response, error) {
 	var registerData RegisterData
@@ -19,14 +35,13 @@ func RegisterPage(payload json.RawMessage) (Response, error) {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	ok, err := IsNotUser(registerData.Email)
-	if err != nil {
-		log.Println("Error checking if user exists:", err)
+	user, err := fetchUser("email", registerData.Email)
+	if err != nil && err.Error() != "user not found" {
+		log.Println("Error fetching user:", err)
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
-	}
-	if !ok {
-		log.Println("User already exists:", registerData)
+	} else if err == nil {
+		log.Println("User already exists:", user)
 		response = Response{"User already exists", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}

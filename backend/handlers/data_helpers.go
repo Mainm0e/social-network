@@ -14,8 +14,8 @@ import (
 fetchUser get a user from the database using the userId.
 It returns the user and any error encountered during the process.
 */
-func fetchUser(userId int) (db.User, error) {
-	users, err := db.FetchData("users", "userId", userId)
+func fetchUser(key string, value any) (db.User, error) {
+	users, err := db.FetchData("users", key, value)
 	if err != nil {
 		return db.User{}, errors.New("Error fetching user data" + err.Error())
 	}
@@ -34,7 +34,7 @@ fillSmallProfile fills a SmallProfile struct with data from a db.User struct.
 It returns the filled SmallProfile struct and any error encountered during the process.
 */
 func fillSmallProfile(userId int) (SmallProfile, error) {
-	user, err := fetchUser(userId)
+	user, err := fetchUser("userId", userId)
 	if err != nil {
 		return SmallProfile{}, errors.New("Error fetchingUser:" + err.Error())
 	}
@@ -150,15 +150,10 @@ FillProfile function fill the profile struct with the data base on the relation 
 if error occur then it return error else it return profile struct and nil.
 */
 func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
-
-	users, err := db.FetchData("users", "userId", profileId)
+	user, err := fetchUser("userId", profileId)
 	if err != nil {
-		return Profile{}, errors.New("Error fetching user data" + err.Error())
+		return Profile{}, errors.New("Error fetchingUser:" + err.Error())
 	}
-	if len(users) == 0 {
-		return Profile{}, errors.New("user not found")
-	}
-	user := users[0].(db.User)
 	// check relation between current user and requested user
 	status, err := checkUserRelation(userId, profileId)
 	if err != nil {
@@ -228,79 +223,15 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 }
 
 /*
-login is a function that attempts to log in a user based on the provided data.
-It takes in a byte slice `data` containing the login information.
-It returns a boolean value indicating whether the login was successful, and an error if any occurred.
-*/
-func (lg *LoginData) login() (int, error) {
-
-	// Fetch user data from the database based on the provided email.
-	user, err := db.FetchData("users", "email", lg.Email)
-	if err != nil {
-		return 0, errors.New("Error fetching data" + err.Error())
-	}
-
-	// Check if a user with the specified email was found.
-	if len(user) == 0 {
-		return 0, errors.New("user not found")
-	}
-
-	// Compare the provided password with the password stored in the database.
-	if user[0].(db.User).Password == lg.Password {
-		return user[0].(db.User).UserId, nil
-	} else {
-		return 0, errors.New("password incorrect")
-	}
-}
-
-/*
-register is a function that attempts to register a new user based on the provided data.
-It takes in a byte slice `data` containing the registration information.
-It returns a boolean value indicating whether the registration was successful, and an error if any occurred.
-*/
-func (regData *RegisterData) register() error {
-	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
-	if err != nil {
-		return errors.New("Error inserting user" + err.Error())
-	}
-	return nil
-}
-
-/*
-IsNotUser is a function that checks if a user with the specified email already exists.
-It takes in a string `email` containing the email of the user to check.
-It returns a boolean value indicating whether the user exists, and an error if any occurred.
-*/
-func IsNotUser(email string) (bool, error) {
-	// Fetch user data from the database based on the provided email.
-	user, err := db.FetchData("users", "email", email)
-	if err != nil {
-		return false, errors.New("Error fetching data" + err.Error())
-	}
-	// Check if a user with the specified email already exists.
-	if len(user) == 0 {
-		// Insert the new user data into the database.
-		return true, nil
-	} else {
-		return false, nil
-	}
-}
-
-/*
 UpdateProfile is a function that updates the privacy of a user with the specified email.
 returns error if any occurred.
 */
-func UpdateProfile(email string, privacy string) error {
-	users, err := db.FetchData("users", "email", email)
+func UpdateProfile(userId int, privacy string) error {
+	user, err := fetchUser("userId", userId)
 	if err != nil {
 		return errors.New("Error fetching user " + err.Error())
 	}
-	if len(users) == 0 {
-		return errors.New("user not found")
-	}
-	user := users[0].(db.User)
-	// if frontend guys were too lazy to check if privacy changed really or same thing is sent again check it here before updating
-
+	// TODO:if frontend guys were too lazy to check if privacy changed really or same thing is sent again check it here before updating
 	err = db.UpdateData("users", privacy, user.UserId)
 	if err != nil {
 		return errors.New("Error updating user " + err.Error())
@@ -379,22 +310,6 @@ func InsertComment(comment Comment) error {
 	return nil
 }
 func readComments(currentUserId, postId int) ([]Comment, error) {
-	/* 	// check if user has permission to see this post
-	   	posts, err := db.FetchData("posts", "postId", postId)
-	   	if err != nil {
-	   		return []Comment{}, errors.New("Error fetching post" + err.Error())
-	   	}
-	   	if len(posts) == 0 {
-	   		return []Comment{}, errors.New("post not found")
-	   	}
-	   	post := posts[0].(db.Post)
-	   	ok, err := checkPost(post, currentUserId)
-	   	if err != nil {
-	   		return []Comment{}, errors.New("Error checking post" + err.Error())
-	   	}
-	   	if !ok {
-	   		return []Comment{}, errors.New("you don't have permission to see this post")
-	   	} */
 	// now that we know user has permission to see this post we can fetch comments
 	comments, err := db.FetchData("comments", "postId", postId)
 	if err != nil {
@@ -697,43 +612,65 @@ func GroupInvitationCheck(accept string, notifId int, userId int, groupId int) e
 	return nil
 
 }
-
-// todo: change status values in follow table (Maryam)
 func InsertFollowRequest(senderId int, receiverId int) error {
-	_, err := db.InsertData("notifications", receiverId, senderId, 0, "follow_request", "", time.Now())
+	var reqType string
+	var status string
+	relation, err := checkUserRelation(senderId, receiverId)
 	if err != nil {
-		return errors.New("Error inserting follow request" + err.Error())
+		return errors.New("Error checking users relation" + err.Error())
 	}
-	_, err = db.InsertData("follow", senderId, receiverId, "pending")
+	user, err := fetchUser("userId", receiverId)
 	if err != nil {
-		return errors.New("Error inserting follow request in follow table" + err.Error())
+		return errors.New("Error fetching user" + err.Error())
 	}
-	return nil
-}
-
-func ReadNotifications(userId int, sessionId string) ([]Notification, error) {
-	notifications, err := db.FetchData("notifications", "receiverId", userId)
-	if err != nil {
-		return []Notification{}, errors.New("Error fetching notifications" + err.Error())
+	if user.Privacy == "public" {
+		reqType = "following"
+		status = "following"
+	} else {
+		reqType = "follow_request"
+		status = "pending"
 	}
-	result := make([]Notification, len(notifications))
-	for i, n := range notifications {
-		if notification, ok := n.(db.Notification); ok {
-			profile, err := fillSmallProfile(notification.SenderId)
+	if relation == "follow" {
+		if user.Privacy == "private" {
+			_, err := db.InsertData("notifications", receiverId, senderId, 0, reqType, "", time.Now())
 			if err != nil {
-				return []Notification{}, errors.New("Error fetching profile" + err.Error())
+				return errors.New("Error inserting follow request" + err.Error())
 			}
-			result[i] = Notification{
-				SessionId:    sessionId,
-				Notification: notification,
-				Profile:      profile,
+		}
+		_, err = db.InsertData("follow", senderId, receiverId, status)
+		if err != nil {
+			return errors.New("Error inserting follow request in follow table" + err.Error())
+		}
+	} else if relation == "pending" {
+		notifs, err := db.FetchData("notifications", "senderId", senderId)
+		if err != nil {
+			return errors.New("Error fetching notifications" + err.Error())
+		}
+		for _, n := range notifs {
+			if notification, ok := n.(db.Notification); ok {
+				if notification.ReceiverId == receiverId && notification.Type == "follow_request" {
+					err := db.DeleteData("notifications", notification.NotificationId)
+					if err != nil {
+						return errors.New("Error deleting notification" + err.Error())
+					}
+					break
+				}
 			}
-		} else {
-			return nil, fmt.Errorf("invalid notification type at index %d", i)
+		}
+		err = db.UpdateData("follow", "following", senderId, receiverId)
+		if err != nil {
+			return errors.New("Error updating follow request" + err.Error())
+		}
+	} else if relation == "following" {
+
+		err = db.DeleteData("follow", senderId, receiverId)
+		if err != nil {
+			return errors.New("Error deleting follow request" + err.Error())
 		}
 	}
 
-	return result, nil
+	return nil
+
 }
 
 /*
@@ -747,7 +684,7 @@ func DeleteFollowRequest(followId int, notifId int, response string) error {
 		return errors.New("Error deleting follow request" + err.Error())
 	}
 	if response == "accept" {
-		err = db.UpdateData("follow", "follower", followId)
+		err = db.UpdateData("follow", "following", followId)
 		if err != nil {
 			return errors.New("Error updating follow request" + err.Error())
 		}
