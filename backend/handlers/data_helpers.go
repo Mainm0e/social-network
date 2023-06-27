@@ -711,15 +711,22 @@ func InsertFollowRequest(senderId int, receiverId int) error {
 	return nil
 }
 
-func ReadNotifications(userId int) ([]db.Notification, error) {
+func ReadNotifications(userId int) ([]Notification, error) {
 	notifications, err := db.FetchData("notifications", "receiverId", userId)
 	if err != nil {
-		return []db.Notification{}, errors.New("Error fetching notifications" + err.Error())
+		return []Notification{}, errors.New("Error fetching notifications" + err.Error())
 	}
-	result := make([]db.Notification, len(notifications))
+	result := make([]Notification, len(notifications))
 	for i, n := range notifications {
 		if notification, ok := n.(db.Notification); ok {
-			result[i] = notification
+			profile, err := fillSmallProfile(notification.SenderId)
+			if err != nil {
+				return []Notification{}, errors.New("Error fetching profile" + err.Error())
+			}
+			result[i] = Notification{
+				Notification: notification,
+				Profile:      profile,
+			}
 		} else {
 			return nil, fmt.Errorf("invalid notification type at index %d", i)
 		}

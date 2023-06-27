@@ -146,3 +146,7 @@ type GroupEvent struct {
 	Event        db.Event                  `json:"event"`
 	Participants map[string][]SmallProfile `json:"participants"`
 }
+type Notification struct {
+	Profile      SmallProfile    `json:"profile"`
+	Notification db.Notification `json:"notifications"`
+}
