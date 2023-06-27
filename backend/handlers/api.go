@@ -39,7 +39,7 @@ func HTTPEventRouter(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(response)
 			return
 		}
-
+		log.Println("Response:", response.Message)
 		json.NewEncoder(w).Encode(response)
 	}
 }

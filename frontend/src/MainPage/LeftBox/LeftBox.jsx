@@ -15,9 +15,10 @@ const LeftBox = ({user,link}) => {
         const userId = getUserId("userId");
         const sessionId = getCookie('sessionId');
         const method = 'POST';
-        const type = "notices";
+        const type = "requestNotif";
+
         const payload = {
-            userId: userId,
+            userId: parseInt(userId),
             sessionId:sessionId,
         };
         fetchData(method, type, payload).then((res) => {
