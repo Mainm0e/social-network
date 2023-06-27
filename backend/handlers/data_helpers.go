@@ -711,7 +711,7 @@ func InsertFollowRequest(senderId int, receiverId int) error {
 	return nil
 }
 
-func ReadNotifications(userId int) ([]Notification, error) {
+func ReadNotifications(userId int, sessionId string) ([]Notification, error) {
 	notifications, err := db.FetchData("notifications", "receiverId", userId)
 	if err != nil {
 		return []Notification{}, errors.New("Error fetching notifications" + err.Error())
@@ -724,6 +724,7 @@ func ReadNotifications(userId int) ([]Notification, error) {
 				return []Notification{}, errors.New("Error fetching profile" + err.Error())
 			}
 			result[i] = Notification{
+				SessionId:    sessionId,
 				Notification: notification,
 				Profile:      profile,
 			}

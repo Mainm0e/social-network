@@ -23,7 +23,7 @@ func RequestNotifications(payload json.RawMessage) (Response, error) {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	notifications, err := ReadNotifications(request.UserId)
+	notifications, err := ReadNotifications(request.UserId, request.SessionId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
