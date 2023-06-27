@@ -3,11 +3,29 @@
 import {logout} from "../../tools/logout";
 import NavList from "./NavList";
 import "./LeftBox.css";
+import { useEffect } from "react"; 
+import { fetchData } from "../../tools/fetchData";
+import { getUserId, getCookie } from "../../tools/cookie";
 
 const LeftBox = ({user,link}) => {
     const handleLogout = () => {
         logout();
     }
+    useEffect(() => {
+        const userId = getUserId("userId");
+        const sessionId = getCookie('sessionId');
+        const method = 'POST';
+        const type = "notices";
+        const payload = {
+            userId: userId,
+            sessionId:sessionId,
+        };
+        fetchData(method, type, payload).then((res) => {
+            console.log(res);
+        }   
+        );
+    }, [user]);
+
     const checkImage = () => {
         if (user.avatar === ''|| user.avatar === null|| user.avatar === undefined) {
             return null;
