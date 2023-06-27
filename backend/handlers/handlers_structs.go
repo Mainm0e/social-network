@@ -10,6 +10,7 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"login":          LoginPage,
 	"register":       RegisterPage,
 	"profile":        ProfilePage,
+	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
 	"createPost":     CreatePost,
 	"GetPost":        GetPost,
@@ -76,6 +77,11 @@ type Profile struct {
 	FollowerNum  int            `json:"followerNum"`
 	FollowingNum int            `json:"followingNum"`
 	PrivateData  PrivateProfile `json:"privateProfile"`
+}
+type PrivacyData struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	Privacy   string `json:"privacy"`
 }
 type PrivateProfile struct {
 	BirthDate string `json:"birthdate"`
