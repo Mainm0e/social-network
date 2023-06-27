@@ -15,6 +15,14 @@ func RequestNotifications(payload json.RawMessage) (Response, error) {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
+	if request.UserId == 0 {
+		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	if request.SessionId == "" {
+		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
 	notifications, err := ReadNotifications(request.UserId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
