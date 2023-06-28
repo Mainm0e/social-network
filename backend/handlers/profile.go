@@ -40,6 +40,34 @@ func ProfilePage(payload json.RawMessage) (Response, error) {
 	return response, nil
 
 }
+func UpdatePrivacy(payload json.RawMessage) (Response, error) {
+	var response Response
+	var data PrivacyData
+	err := json.Unmarshal(payload, &data)
+	if err != nil {
+		// handle the error
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	err = UpdateProfile(data.UserId, data.Privacy)
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	//send back sessionId
+	payload, err = json.Marshal(map[string]string{"sessionId": data.SessionId})
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	event := events.Event{
+		Type:    "updatePrivacy",
+		Payload: payload,
+	}
+	response = Response{"privacy updated", event, http.StatusOK}
+	return response, nil
+}
+
 func ProfileList(payload json.RawMessage) (Response, error) {
 	var user ProfileListRequest
 	var response Response

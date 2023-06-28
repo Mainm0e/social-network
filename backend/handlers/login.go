@@ -9,6 +9,25 @@ import (
 	"net/http"
 )
 
+/*
+login is a function that attempts to log in a user based on the provided data.
+It takes in a byte slice `data` containing the login information.
+It returns a boolean value indicating whether the login was successful, and an error if any occurred.
+*/
+func (lg *LoginData) login() (int, error) {
+	// Fetch user data from the database based on the provided email.
+	user, err := fetchUser("email", lg.Email)
+	if err != nil {
+		return 0, errors.New("user not found")
+	}
+	// Compare the provided password with the password stored in the database.
+	if user.Password == lg.Password {
+		return user.UserId, nil
+	} else {
+		return 0, errors.New("password incorrect")
+	}
+}
+
 func LoginPage(payload json.RawMessage) (Response, error) {
 	var loginData LoginData
 	err := json.Unmarshal(payload, &loginData)

@@ -10,6 +10,12 @@ const response = await fetch("http://localhost:8080/api", {
   }),
 });
 const responseData = await response.json();
+
+//this is for debugging 
+if (responseData.statusCode !== 200) {
+  console.log("type",type,"error",responseData)
+}
+
 if (type === "login"){
   if (responseData.statusCode === 200){
     console.log("set cookie",responseData)
@@ -17,19 +23,18 @@ if (type === "login"){
     localStorage.setItem("userId", responseData.event.payload.userId);
     window.location.href = '/';
     return responseData.event.payload
+  } else {
+    return responseData
   }
-
-  /*
-  // !! todo how to return error message back
-  * login page
-  * register page
-   */
-/*   else {
-    setAlertTitle("Error");
-    msg.push(responseData.message);
-    setAlertMessage(msg);
-  } */
-
+}
+if (type ==="register"){
+  if (responseData.statusCode === 200){
+    console.log("set cookie",responseData)
+    window.location.href = '/login';
+    return responseData.event.payload
+  } else {
+    return responseData
+  }
 }
 if (responseData.statusCode === 200) {
   return responseData.event.payload

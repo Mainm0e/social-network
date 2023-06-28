@@ -43,7 +43,17 @@ function LoginPage() {
     const method = "POST"
     const type = "login"
     const payload = {email: email, password: password}
-    fetchData(method,type,payload)
+    fetchData(method,type,payload).then((data) => {
+      console.log("data",data);
+      if (data.statusCode === 200) {
+        window.location.href = "/";
+      } else {
+        setAlertTitle("Login Failed");
+        msg.push(data.message);
+        setAlertMessage(msg);
+      }
+    }
+    );
   }
 
   const [loginStatus, setLoginStatus] = useState(true);

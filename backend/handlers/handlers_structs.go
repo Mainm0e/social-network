@@ -10,6 +10,7 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"login":          LoginPage,
 	"register":       RegisterPage,
 	"profile":        ProfilePage,
+	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
 	"createPost":     CreatePost,
 	"GetPost":        GetPost,
@@ -72,9 +73,15 @@ type Profile struct {
 	LastName     string         `json:"lastName"`
 	Avatar       *string        `json:"avatar"` //
 	Relation     string         `json:"relation"`
+	Status       string         `json:"privacy"`
 	FollowerNum  int            `json:"followerNum"`
 	FollowingNum int            `json:"followingNum"`
 	PrivateData  PrivateProfile `json:"privateProfile"`
+}
+type PrivacyData struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	Privacy   string `json:"privacy"`
 }
 type PrivateProfile struct {
 	BirthDate string `json:"birthdate"`
@@ -136,13 +143,19 @@ type Explore struct {
 	UserId    int    `json:"userId"`
 }
 type Follow struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-	FollowId  int    `json:"followId"`
-	Response  string `json:"response"`
+	SessionId  string `json:"sessionId"`
+	FollowerId int    `json:"followerId"`
+	FolloweeId int    `json:"followeeId"`
+	NotifId    int    `json:"notifId"`
+	Response   string `json:"response"`
 }
 type GroupEvent struct {
 	SessionId    string                    `json:"sessionId"`
 	Event        db.Event                  `json:"event"`
 	Participants map[string][]SmallProfile `json:"participants"`
+}
+type Notification struct {
+	SessionId    string          `json:"sessionId"`
+	Profile      SmallProfile    `json:"profile"`
+	Notification db.Notification `json:"notifications"`
 }

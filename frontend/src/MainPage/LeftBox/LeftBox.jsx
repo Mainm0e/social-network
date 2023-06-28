@@ -1,13 +1,34 @@
-
-
+import React, { useState } from "react";
 import {logout} from "../../tools/logout";
 import NavList from "./NavList";
+import Notification from "../../Common/Notification/Notification";
 import "./LeftBox.css";
+import { useEffect } from "react"; 
+import { fetchData } from "../../tools/fetchData";
+import { getUserId, getCookie } from "../../tools/cookie";
 
 const LeftBox = ({user,link}) => {
     const handleLogout = () => {
         logout();
     }
+    const [notificationData, setNotificationData] = useState([]);
+    useEffect(() => {
+        const userId = getUserId("userId");
+        const sessionId = getCookie('sessionId');
+        const method = 'POST';
+        const type = "requestNotif";
+
+        const payload = {
+            userId: parseInt(userId),
+            sessionId:sessionId,
+        };
+        fetchData(method, type, payload).then((data) => {
+            console.log(data);
+            setNotificationData(data);
+        }   
+        );
+    }, [user]);
+
     const checkImage = () => {
         if (user.avatar === ''|| user.avatar === null|| user.avatar === undefined) {
             return null;
@@ -34,7 +55,7 @@ const LeftBox = ({user,link}) => {
             <NavList type={"Post"} links={link[1]} />
             <NavList type={"Nav"} links={link[0]} />
             <NavList type={"Connection"} links={link[2]} />
-
+            <Notification data={notificationData}/>
         </div>
     );
 }

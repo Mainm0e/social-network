@@ -1,0 +1,32 @@
+.notification {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.notification-user {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.notification-user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.notification-content {
+    flex-grow: 1;
+}
+
+.notification-content span {
+    font-weight: bold;
+}
+
+.notification-btn button {
+    margin-right: 5px;
+}
