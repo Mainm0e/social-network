@@ -143,10 +143,11 @@ type Explore struct {
 	UserId    int    `json:"userId"`
 }
 type Follow struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-	FollowId  int    `json:"followId"`
-	Response  string `json:"response"`
+	SessionId  string `json:"sessionId"`
+	FollowerId int    `json:"followerId"`
+	FolloweeId int    `json:"followeeId"`
+	NotifId    int    `json:"notifId"`
+	Response   string `json:"response"`
 }
 type GroupEvent struct {
 	SessionId    string                    `json:"sessionId"`

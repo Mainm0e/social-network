@@ -75,18 +75,18 @@ DeleteFollowRequest function delete the follow request from notification table a
 if error occur then it return error
 */
 
-func deleteFollowRequest(followId int, notifId int, response string) error {
-	err := db.DeleteData("notifications", followId)
+func deleteFollowRequest(followerId int, followeeId int, notifId int, response string) error {
+	err := db.DeleteData("notifications", notifId)
 	if err != nil {
 		return errors.New("Error deleting follow request" + err.Error())
 	}
 	if response == "accept" {
-		err = db.UpdateData("follow", "following", followId)
+		err = db.UpdateData("follow", "following", followerId, followeeId)
 		if err != nil {
 			return errors.New("Error updating follow request" + err.Error())
 		}
 	} else if response == "reject" {
-		err = db.DeleteData("follow", followId)
+		err = db.DeleteData("follow", followeeId, followerId)
 		if err != nil {
 			return errors.New("Error deleting follow request" + err.Error())
 		}
@@ -107,15 +107,15 @@ func FollowRequest(payload json.RawMessage) (Response, error) {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.UserId == 0 {
+	if follow.FollowerId == 0 {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.FollowId == 0 {
+	if follow.FolloweeId == 0 {
 		response = Response{"followId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	err = insertFollowRequest(follow.UserId, follow.FollowId)
+	err = insertFollowRequest(follow.FollowerId, follow.FolloweeId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
@@ -145,15 +145,15 @@ func FollowResponse(payload json.RawMessage) (Response, error) {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.UserId == 0 {
+	if follow.FolloweeId == 0 {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.FollowId == 0 {
+	if follow.FollowerId == 0 {
 		response = Response{"followId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	err = deleteFollowRequest(follow.UserId, follow.FollowId, follow.Response)
+	err = deleteFollowRequest(follow.FollowerId, follow.FolloweeId, follow.NotifId, follow.Response)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
