@@ -17,7 +17,7 @@ It takes in a byte slice `data` containing the registration information.
 It returns a boolean value indicating whether the registration was successful, and an error if any occurred.
 */
 func (regData *RegisterData) register() error {
-	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
+	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "private", time.Now())
 	if err != nil {
 		return errors.New("Error inserting user" + err.Error())
 	}

@@ -67,7 +67,7 @@ var InsertRules = map[string]InsertRule{
 		NotExistErrors: []string{"post does not exist", "user does not exist"},
 	},
 	"notifications": {
-		Query:          "INSERT INTO notifications(receiverId, senderId, groupId, type, content, creationTime) VALUES(?,?,?,?,?,?)",
+		Query:          "INSERT INTO notifications(receiverId, senderId, groupId, type,creationTime) VALUES(?,?,?,?,?)",
 		NotExistTables: []string{"users", "users", "groups"},
 		NotExistFields: []string{"receiverId", "senderId", "groupId"},
 		NotExistErrors: []string{"receiver does not exist", "sender does not exist", "group does not exist"},
@@ -118,7 +118,7 @@ var UpdateRules = map[string]string{
 	"group_member":  "UPDATE group_member SET status=? WHERE userId=?",                    // Assuming userId uniquely identifies a group member record
 	"messages":      "UPDATE messages SET senderId=?, receiverId=?, messageContent=?, sendTime=?, seen=? WHERE messageId=?",
 	"semiPrivate":   "UPDATE semiPrivate SET postId=?, userId=? WHERE postId=?", // Assuming postId uniquely identifies a semiPrivate record
-	"notifications": "UPDATE notifications SET receiverId=?, senderId=?, type=?, content=?, creationTime=? WHERE notificationId=?",
+	"notifications": "UPDATE notifications SET receiverId=?, senderId=?, type=?, creationTime=? WHERE notificationId=?",
 	"events":        "UPDATE events SET creatorId=?, groupId=?, title=?, content=?, creationTime=? WHERE eventId=?",
 	"event_member":  "UPDATE event_member SET option=? WHERE eventId=? AND memberId=? ", // Assuming eventId uniquely identifies an event member record //TODO: check if this is correct
 }
@@ -215,10 +215,10 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"notifications": {
-		SelectFields: "notificationId, receiverId, senderId,groupId, type, content, creationTime",
+		SelectFields: "notificationId, receiverId, senderId,groupId, type, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var notification Notification
-			err := rows.Scan(&notification.NotificationId, &notification.ReceiverId, &notification.SenderId, &notification.GroupId, &notification.Type, &notification.Content, &notification.CreationTime)
+			err := rows.Scan(&notification.NotificationId, &notification.ReceiverId, &notification.SenderId, &notification.GroupId, &notification.Type, &notification.CreationTime)
 			return notification, err
 		},
 	},
