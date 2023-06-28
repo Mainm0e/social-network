@@ -21,6 +21,15 @@ if (type === "login"){
     return responseData
   }
 }
+if (type ==="register"){
+  if (responseData.statusCode === 200){
+    console.log("set cookie",responseData)
+    window.location.href = '/login';
+    return responseData.event.payload
+  } else {
+    return responseData
+  }
+}
 if (responseData.statusCode === 200) {
   return responseData.event.payload
 }
