@@ -1,44 +1,66 @@
-
+import { fetchData } from "../../tools/fetchData";
+import "./Notification.css"
+import { getUserId, getCookie } from "../../tools/cookie";
 
 const Notification = ({data}) => {
     console.log("Notification",data)
-    data = data ? data : dummyData
-    
+
+    const renderNotifications = () => {
+        return data.map((notification, index) => (
+          <DisplayNotification
+            key={index}
+            notifications={notification.notifications}
+            user={notification.profile}
+          />
+        ));
+        };
     return (
         <div className="notification-container">
-            {data.map((item,index) => {
-                return <DisplayNotification key={index} message={item.message} type={item.type}/>
-            }
-            )}
+               {renderNotifications()}
         </div>
     )
 }
 
 export default Notification
 
-const DisplayNotification = ({message,type}) => {
-    return (
-        <div className={`notification ${type}`}>
-            <p>{message}</p>
-        </div>
-    )
-}
+const DisplayNotification = ({ notifications, user }) => {
 
-const dummyData = [
-    {
-        message: "This is a success message",
-        type: "success"
-    },
-    {
-        message: "This is a error message",
-        type: "error"
-    },
-    {
-        message: "This is a warning message",
-        type: "warning"
-    },
-    {
-        message: "This is a info message",
-        type: "info"
+    if (notifications.type === "follow_request"){
+
+        const handleAccept = () => {
+            const method = 'POST';
+            const type = "acceptFollowRequest";
+            const payload = {
+                userId: getUserId("userId"),
+                sessionId: getCookie('sessionId'),
+                followerId: notifications.followerId,
+            };
+            fetchData(method, type, payload).then((data) => {
+                console.log(data);
+            }
+            );
+        }
+        const handleDecline = () => {
+           /*  fetchData(method, type, payload).then((data) => {
+                console.log(data);
+            }
+            ); */
+        }
+        
+        return (
+            <div className="notification">
+                <div className="notification-user">
+                    <img src={user.avatar} alt="avatar" />
+                    <span>{user.firstName} {user.lastName}</span>
+                </div>
+                <div className="notification-content">
+                    <span>sent you a follow request</span>
+                </div>
+                <div className="notification-btn">
+                    <button onClick={handleAccept}>Accept</button>
+                    <button onClick={handleDecline}>Decline</button>
+                </div>
+            </div>
+        );
     }
-]
+  };
