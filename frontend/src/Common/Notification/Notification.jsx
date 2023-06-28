@@ -27,10 +27,12 @@ const DisplayNotification = ({ notifications, user }) => {
         const type = "followResponse";
         const payload = {
           sessionId: getCookie('sessionId'),
-          userId: getUserId("userId"),
-          followId: notifications.followerId,
+          followeeId: getUserId("userId"),
+          followerId: notifications.followerId,
+          notifId: notifications.NotificationId,
           response: value // Use the value parameter here
         };
+        console.log("request response",payload);
         fetchData(method, type, payload).then((data) => {
           console.log(data);
         });

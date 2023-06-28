@@ -11,6 +11,7 @@ const UserList = ({title,id,clearBox}) => {
     const method = "POST"
     const type = "profileList"
     const payload = {sessionId:getCookie("sessionId"), userId: id, request:title}
+    console.log(payload)
     fetchData(method,type,payload).then((responseData) => {
         setData(data)
     })
