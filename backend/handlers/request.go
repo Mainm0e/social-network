@@ -54,7 +54,7 @@ func insertFollowRequest(senderId int, receiverId int) error {
 				}
 			}
 		}
-		err = db.UpdateData("follow", "following", senderId, receiverId)
+		err = db.DeleteData("follow", senderId, receiverId)
 		if err != nil {
 			return errors.New("Error updating follow request" + err.Error())
 		}
