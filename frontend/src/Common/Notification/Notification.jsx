@@ -4,6 +4,7 @@ import { getUserId, getCookie } from "../../tools/cookie";
 
 const Notification = ({ data }) => {
   console.log("Notification", data);
+  if (data === undefined||data.lenght < 1 || data === null ) return null;
 
   const renderNotifications = () => {
     return data.map((notification, index) => (

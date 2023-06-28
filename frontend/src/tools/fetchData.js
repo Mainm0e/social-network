@@ -10,6 +10,12 @@ const response = await fetch("http://localhost:8080/api", {
   }),
 });
 const responseData = await response.json();
+
+//this is for debugging 
+if (responseData.statusCode !== 200) {
+  console.log("type",type,"error",responseData)
+}
+
 if (type === "login"){
   if (responseData.statusCode === 200){
     console.log("set cookie",responseData)
