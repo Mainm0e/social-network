@@ -28,8 +28,8 @@ const DisplayNotification = ({ notifications, user }) => {
         const payload = {
           sessionId: getCookie('sessionId'),
           followeeId: getUserId("userId"),
-          followerId: notifications.followerId,
-          notifId: notifications.NotificationId,
+          followerId: notifications.senderId,
+          notifId: notifications.notificationId,
           response: value // Use the value parameter here
         };
         console.log("request response",payload);
