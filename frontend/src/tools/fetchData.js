@@ -17,19 +17,9 @@ if (type === "login"){
     localStorage.setItem("userId", responseData.event.payload.userId);
     window.location.href = '/';
     return responseData.event.payload
+  } else {
+    return responseData
   }
-
-  /*
-  // !! todo how to return error message back
-  * login page
-  * register page
-   */
-/*   else {
-    setAlertTitle("Error");
-    msg.push(responseData.message);
-    setAlertMessage(msg);
-  } */
-
 }
 if (responseData.statusCode === 200) {
   return responseData.event.payload
