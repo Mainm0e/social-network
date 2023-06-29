@@ -10,19 +10,14 @@ import { fetchData } from "../tools/fetchData";
 
 // dummy data
 function MainPage() {
-  // get userId from cookie
-  const id = getUserId("userId")
-  const userId =  parseInt(id);
 
   // !!TODO!! how to get profile id that can send to mainbox that show user that we want ???
 
   const [data, setData] = useState(null);
-  const sessionId = getCookie("sessionId");
-
   useEffect(() => {
     const method = "POST"
     const type = "profile"
-    const payload = { sessionId: sessionId, userId: userId, profileId: userId }
+    const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId"), profileId: getUserId("userId") }
     fetchData(method,type, payload).then((data) => setData(data));
   }, []);
 

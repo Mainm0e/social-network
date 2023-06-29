@@ -12,7 +12,7 @@ const UserList = ({title,id,clearBox}) => {
     const type = "profileList"
     const payload = {sessionId:getCookie("sessionId"), userId: id, request:title}
     console.log(payload)
-    fetchData(method,type,payload).then((responseData) => {
+    fetchData(method,type,payload).then((data) => {
         setData(data)
     })
     }, []);
