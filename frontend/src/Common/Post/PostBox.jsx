@@ -224,7 +224,7 @@ const PostBox = ({ id }) => {
       const payload = {
         sessionId: sessionId,
         postId: 0,
-        userId: id,
+        userId: getUserId("userId"),
         title: postData.title,
         content: postData.content,
         image: postData.image,
