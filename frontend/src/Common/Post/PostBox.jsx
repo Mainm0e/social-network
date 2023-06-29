@@ -122,6 +122,7 @@ const CreatePost = ({ onSubmit }) => {
   };
 
   const handlePrivacyChange = (e) => {
+    console.log(e.target.value);
     setPrivacy(e.target.value);
   };
 
@@ -228,7 +229,7 @@ const PostBox = ({ id }) => {
         title: postData.title,
         content: postData.content,
         image: postData.image,
-        status: "semi-private",
+        status: postData.privacy,
         groupId: 0,
         comments: [],
         date: "",
