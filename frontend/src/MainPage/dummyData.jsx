@@ -12,6 +12,7 @@ let link2 = {
 let link3 = {
     followers: "#followers",
     following: "#followings",
+    notifactions: "#notifactions",
     }
 let link4 = {
     home: "/",
