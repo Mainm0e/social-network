@@ -3,8 +3,9 @@ import React, { useState, useEffect } from "react";
 import "./Notification.css";
 import { getUserId, getCookie } from "../../tools/cookie";
 
-const Notification = ({clearBox}) => {
+const Notification = ({ clearBox }) => {
   const [notificationData, setNotificationData] = useState([]);
+  const [showNotification, setShowNotification] = useState(true);
   useEffect(() => {
     const method = "POST";
     const type = "requestNotif";
@@ -23,8 +24,12 @@ const Notification = ({clearBox}) => {
     notificationData === undefined ||
     notificationData.lenght < 1 ||
     notificationData === null
-  )
+  ) {
     return null;
+  }
+  const handleAcceptDecline = () => {
+    setShowNotification(false); // Hide the notification after accepting or declining
+  };
 
   const renderNotifications = () => {
     return notificationData.map((notification, index) => (
@@ -32,12 +37,14 @@ const Notification = ({clearBox}) => {
         key={index}
         notifications={notification.notifications}
         user={notification.profile}
+        handleAcceptDecline={handleAcceptDecline}
       />
     ));
   };
   return (
     <div className="notification-container">
-      {renderNotifications()}
+      {showNotification && renderNotifications()}{" "}
+      {/* Conditionally render the notifications */}
       <div className="user-list-footer">
         <button onClick={clearBox}>Close</button>
       </div>
@@ -47,7 +54,7 @@ const Notification = ({clearBox}) => {
 
 export default Notification;
 
-const DisplayNotification = ({ notifications, user }) => {
+const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
   if (notifications.type === "follow_request") {
     const handleAccept = (value) => {
       const method = "POST";
@@ -59,9 +66,9 @@ const DisplayNotification = ({ notifications, user }) => {
         notifId: notifications.notificationId,
         response: value, // Use the value parameter here
       };
-      console.log("request response", payload);
       fetchData(method, type, payload).then((data) => {
         console.log(data);
+        handleAcceptDecline(); // Call the handler function to hide the notification
       });
     };
 

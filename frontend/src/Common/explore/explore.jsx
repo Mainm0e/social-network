@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getCookie,getUserId } from "../../../tools/cookie";
-
-import "./explore.css";
-import { fetchData } from "../../../tools/fetchData";
+import { getCookie,getUserId } from "../../tools/cookie";
+import { fetchData } from "../../tools/fetchData";
+import "./explore.css"
+;
 
 const Explore = ({type}) => {
     const sessionId = getCookie("sessionId");
@@ -28,9 +28,6 @@ const Explore = ({type}) => {
                         <div className="explore_list_item_right">
                             <div className="explore_list_item_right_top">
                                 <h3>{user.firstName} {user.lastName}</h3>
-                            </div>
-                            <div className="explore_list_item_right_bottom">
-                                <button>Follow</button>
                             </div>
                         </div>
                     </div>
