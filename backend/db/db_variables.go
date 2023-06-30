@@ -73,7 +73,7 @@ var InsertRules = map[string]InsertRule{
 		NotExistErrors: []string{"receiver does not exist", "sender does not exist", "group does not exist"},
 	},
 	"events": {
-		Query:          "INSERT INTO events(creatorId, groupId, title, content, creationTime) VALUES(?,?,?,?,?)",
+		Query:          "INSERT INTO events(creatorId, groupId, title, content, creationTime, date) VALUES(?,?,?,?,?,?)",
 		NotExistTables: []string{"users", "groups"},
 		NotExistFields: []string{"creatorId", "groupId"},
 		NotExistErrors: []string{"creator does not exist", "group does not exist"},
@@ -119,7 +119,7 @@ var UpdateRules = map[string]string{
 	"messages":      "UPDATE messages SET senderId=?, receiverId=?, messageContent=?, sendTime=?, seen=? WHERE messageId=?",
 	"semiPrivate":   "UPDATE semiPrivate SET postId=?, userId=? WHERE postId=?", // Assuming postId uniquely identifies a semiPrivate record
 	"notifications": "UPDATE notifications SET receiverId=?, senderId=?, type=?, creationTime=? WHERE notificationId=?",
-	"events":        "UPDATE events SET creatorId=?, groupId=?, title=?, content=?, creationTime=? WHERE eventId=?",
+	"events":        "UPDATE events SET creatorId=?, groupId=?, title=?, content=?, creationTime=? date=? WHERE eventId=?",
 	"event_member":  "UPDATE event_member SET option=? WHERE eventId=? AND memberId=? ", // Assuming eventId uniquely identifies an event member record //TODO: check if this is correct
 }
 
@@ -226,7 +226,7 @@ var FetchRules = map[string]struct {
 		SelectFields: "eventId, creatorId, groupId, title, content, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var event Event
-			err := rows.Scan(&event.EventId, &event.CreatorId, &event.GroupId, &event.Title, &event.Content, &event.CreationTime)
+			err := rows.Scan(&event.EventId, &event.CreatorId, &event.GroupId, &event.Title, &event.Content, &event.CreationTime, &event.Date)
 			return event, err
 		},
 	},
