@@ -185,6 +185,7 @@ const CreatePost = ({ onSubmit }) => {
           <select value={privacy} onChange={handlePrivacyChange}>
             <option value="public">Public</option>
             <option value="private">Private</option>
+            <option value="semi-private">Semi-Private</option>
           </select>
         </div>
       </form>
@@ -233,7 +234,7 @@ const PostBox = ({ id }) => {
         groupId: 0,
         comments: [],
         date: "",
-        followers: [2, 3, 19],
+        followers: [5],
       }
       fetchData(method, type, payload).then((data) => {
         /*  herf = "#postlist"; */
