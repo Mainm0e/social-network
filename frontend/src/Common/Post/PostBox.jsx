@@ -288,14 +288,10 @@ const PostBox = ({ id }) => {
         date: "",
         followers: postData.followers,
       };
-      const test = () => {
-        console.log(payload);
-      };
-      test();
-      /*       fetchData(method, type, payload).then((data) => {
+      fetchData(method, type, payload).then((data) => {
       
         window.location.hash = "postlist";
-      }); */
+      });
     } else {
       alert(check.message);
     }
