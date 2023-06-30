@@ -22,12 +22,18 @@ const Header = ({profile,handleRefresh}) => {
       return <></>;
     }
   };
-  const sessionId = getCookie("sessionId");
-  const userId = getUserId("userId");
-    const sentRequest = async () => {
+    const followRequest = async () => {
       const method = "POST"
       const type = "followRequest"
-      const payload ={ sessionId: sessionId, followerId: parseInt(userId), followeeId:user.userId,response:""}
+      const payload ={ sessionId: getCookie("sessionId"), followerId: getUserId("userId"), followeeId:user.userId,response:""}
+      fetchData(method,type,payload).then((data) => {console.log(data)})
+      handleRefresh();
+    };
+  
+    const changePrivacy = async () => {
+      const method = "POST"
+      const type = "updatePrivacy"
+      const payload ={ sessionId: getCookie("sessionId"), userId:getUserId("userId"),privacy:user.privacy}
       fetchData(method,type,payload).then((data) => {console.log(data)})
       handleRefresh();
     };
@@ -55,7 +61,7 @@ const Header = ({profile,handleRefresh}) => {
             <span>{user.followingNum}</span>
           </div>
           {/* follow button */}
-          <Followbtn relation={user.relation} sentRequest={sentRequest}/>
+          <Followbtn relation={user.relation} privacy={user.privacy} followRequest={followRequest} changePrivacy={changePrivacy} />
         </div>
       </div>
     </div>
@@ -64,15 +70,40 @@ const Header = ({profile,handleRefresh}) => {
 
 export default Header;
 
-const Followbtn = ({  relation, sentRequest }) => {
+const Followbtn = ({  relation, privacy ,followRequest , changePrivacy}) => {
 
   const handleSentRequest = async () => {
-    await sentRequest();
+    if (relation === "you"){
+      await changePrivacy();
+    } else {
+      await followRequest();
+    }
     // Trigger the refresh of the Header component
   };
   
   if (relation === "you"){
-    return <></>;
+    if (privacy === "private"){
+      return (
+        <div className="follow_btn">
+          <button className="follow_btn" onClick={handleSentRequest}>
+            private
+          </button>
+        </div>
+      )
+    } else if (privacy === "public"){
+      return (
+        <div className="follow_btn">
+          <button className="follow_btn" onClick={handleSentRequest}>
+            public
+          </button>
+        </div>
+      )
+    } else {
+      return (
+        <></>
+      )
+    }
+   
   } else if (relation === "following") {
     return (
       <div className="follow_btn">
