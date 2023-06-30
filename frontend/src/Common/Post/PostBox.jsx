@@ -117,8 +117,8 @@ const CreatePost = ({ onSubmit }) => {
   const [follower, setFollower] = useState(null)
   useEffect(() => {
     const method = "POST"
-    const type = "exploreUsers"
-    const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId")}
+    const type = "profileList"
+    const payload = {sessionId:getCookie("sessionId"), userId: getUserId("userId"), request:"followers"}
     fetchData(method,type,payload).then((data)=>{
         setFollower(data)
     })
