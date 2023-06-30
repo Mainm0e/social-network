@@ -273,7 +273,9 @@ func ReadPostsByProfile(currentUserId int, userId int) ([]Post, error) {
 		if err != nil {
 			return []Post{}, errors.New("Error checking post" + err.Error())
 		}
-		posts = append(posts, post)
+		if post.PostId != 0 {
+			posts = append(posts, post)
+		}
 	}
 	return posts, nil
 }
