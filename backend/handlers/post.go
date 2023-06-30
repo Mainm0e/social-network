@@ -181,7 +181,7 @@ readPosts function read all posts base on key that's the column name and value t
 it use readPost function to read each post and check if user has permission to see it.
 it return list of posts if found, error if error occur or posts not found.
 */
-func readPosts(currentUserId int, key string, value int) ([]Post, error) {
+func readPosts(currentUserId int, key string, value int, groupFlag bool) ([]Post, error) {
 	var posts []Post
 	dbPosts, err := db.FetchData("posts", key, value)
 	if err != nil {
@@ -191,11 +191,17 @@ func readPosts(currentUserId int, key string, value int) ([]Post, error) {
 		return []Post{}, errors.New("posts not found")
 	}
 	for _, dbPost := range dbPosts {
+		if groupFlag && dbPost.(db.Post).GroupId == 0 || !groupFlag && dbPost.(db.Post).GroupId != 0 {
+			continue
+		}
+
 		post, err := readPost(dbPost.(db.Post).PostId, currentUserId)
 		if err != nil {
 			return []Post{}, errors.New("Error checking post" + err.Error())
 		}
-		posts = append(posts, post)
+		if post.PostId != 0 {
+			posts = append(posts, post)
+		}
 	}
 	return posts, nil
 }
@@ -219,13 +225,13 @@ func GetPosts(payload json.RawMessage) (Response, error) {
 	//get posts from database
 	var posts []Post
 	if request.From == "group" {
-		posts, err = readPosts(request.UserId, "groupId", request.GroupId)
+		posts, err = readPosts(request.UserId, "groupId", request.GroupId, true)
 		if err != nil {
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, err
 		}
 	} else if request.From == "profile" {
-		posts, err = readPosts(request.UserId, "userId", request.ProfileId)
+		posts, err = readPosts(request.UserId, "userId", request.ProfileId, false)
 		if err != nil {
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, err
