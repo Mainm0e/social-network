@@ -4,7 +4,6 @@ import (
 	"backend/db"
 	"backend/utils"
 	"errors"
-	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -240,48 +239,6 @@ func UpdateProfile(userId int, privacy string) error {
 	return nil
 }
 
-/*
-InsertPost function insert the post into database and check if it is semi-private then it insert the followers that user selected to semiPrivate table
-if error occur then it return error
-*/
-func InsertPost(post Post) error {
-
-	id, err := db.InsertData("posts", post.UserId, post.GroupId, post.Title, post.Content, time.Now(), post.Status, "")
-	if err != nil {
-		return errors.New("Error inserting post " + err.Error())
-	}
-	if id == 0 {
-		return errors.New("error inserting post ")
-	}
-	fmt.Println("post image", post.Image)
-	if post.Image != "" {
-		// Process the image and save it to the local storage
-		str := strconv.Itoa(int(id))
-		url := "./images/posts/" + str
-		url, err := utils.ProcessImage(post.Image, url)
-		if err != nil {
-			log.Println("Error processing post image:", err)
-			//response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-			return err
-		}
-		post.Image = url
-	} else {
-		post.Image = ""
-	}
-	err = db.UpdateData("posts", post.Image, id)
-	if err != nil {
-		return errors.New("Error updating post " + err.Error())
-	}
-	if post.Status == "semi-private" {
-		for _, followerId := range post.Followers {
-			_, err := db.InsertData("semiPrivate", id, followerId)
-			if err != nil {
-				return errors.New("Error inserting semiPrivate" + err.Error())
-			}
-		}
-	}
-	return nil
-}
 func InsertComment(comment Comment) error {
 	id, err := db.InsertData("comments", comment.UserId, comment.PostId, comment.Content, "", time.Now())
 	if err != nil {
@@ -309,30 +266,6 @@ func InsertComment(comment Comment) error {
 		return errors.New("Error updating comment image" + err.Error())
 	}
 	return nil
-}
-
-/*
-ReadPostsByGroup function read all posts of a group from database
-and returns it if user have permission to see it if user is a member of the group
-if error occur then it return error.
-*/
-func ReadPostsByGroup(currentUserId int, groupId int) ([]Post, error) {
-	var posts []Post
-	dbPosts, err := db.FetchData("posts", "groupId", groupId)
-	if err != nil {
-		return []Post{}, errors.New("Error fetching posts" + err.Error())
-	}
-	if len(dbPosts) == 0 {
-		return []Post{}, errors.New("posts not found")
-	}
-	for _, dbPost := range dbPosts {
-		post, err := ReadPost(dbPost.(db.Post).PostId, currentUserId)
-		if err != nil {
-			return []Post{}, errors.New("Error checking post" + err.Error())
-		}
-		posts = append(posts, post)
-	}
-	return posts, nil
 }
 
 func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {

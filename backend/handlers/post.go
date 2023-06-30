@@ -6,57 +6,22 @@ import (
 	"backend/utils"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 /*
 Here we have the handlers for the post requests
 - CreatePost: creates a new post in the database and returns the sessionId
-- GetPost: gets a post from the database and returns the post and the sessionId
 - GetPosts: gets all posts related to a user from the database and returns the posts and the sessionId
 */
-func CreatePost(payload json.RawMessage) (Response, error) {
-	var response Response
-	var post Post
-	err := json.Unmarshal(payload, &post)
-	log.Println("User: ", post)
-	if err != nil {
-		// handle the error
-		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
 
-	//insert new post into database
-	err = InsertPost(post)
-	if err != nil {
-		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	//send back sessionId
-	payload, err = json.Marshal(map[string]string{"sessionId": post.SessionId})
-	if err != nil {
-		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	event := events.Event{
-		Type:    "createPost",
-		Payload: payload,
-	}
-
-	response = Response{"post created successfully!", event, http.StatusOK}
-	return response, nil
-}
-
-func reverseString(s string) string {
-	runes := []rune(s)
-	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
-		runes[i], runes[j] = runes[j], runes[i]
-	}
-	return string(runes)
-}
-func readComments(currentUserId, postId int) ([]Comment, error) {
+/*
+readComments function read all comments related to a post and return it as a list of comments. if error occur it return error.
+*/
+func readComments(postId int) ([]Comment, error) {
 	// now that we know user has permission to see this post we can fetch comments
 	comments, err := db.FetchData("comments", "postId", postId)
 	if err != nil {
@@ -105,7 +70,6 @@ func checkPostPermission(dbPost db.Post, userId int) (bool, error) {
 	if dbPost.UserId == userId {
 		return true, nil
 	}
-	fmt.Println("status", dbPost.Status)
 	switch dbPost.Status {
 	case "semi-private":
 		{
@@ -163,7 +127,7 @@ func checkPostPermission(dbPost db.Post, userId int) (bool, error) {
 ReadPost function read post from database and check if current user has permission to see it, using checkPost function.
 it return post if user has permission, error if error occur or post not found.
 */
-func ReadPost(postId int, userId int) (Post, error) {
+func readPost(postId int, userId int) (Post, error) {
 	dbPosts, err := db.FetchData("posts", "postId", postId)
 	if err != nil {
 		return Post{}, errors.New("Error fetching post" + err.Error())
@@ -186,7 +150,7 @@ func ReadPost(postId int, userId int) (Post, error) {
 		GroupId:        dbPost.GroupId,
 		Date:           dbPost.CreationTime,
 	}
-	comments, err := readComments(userId, postId)
+	comments, err := readComments(postId)
 	if err != nil {
 		return Post{}, errors.New("Error reading comments" + err.Error())
 	}
@@ -211,57 +175,15 @@ func ReadPost(postId int, userId int) (Post, error) {
 	return post, nil
 
 }
-func GetPost(payload json.RawMessage) (Response, error) {
-	var response Response
-	var request RequestPost
-	err := json.Unmarshal(payload, &request)
-	log.Println("User: ", request)
-	if err != nil {
-		// handle the error
-		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	if request.SessionId == "" {
-		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	if request.PostId == 0 {
-		response = Response{"postId is required", events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	// TODO: check if the userId is necessary to get from request
-	if request.UserId == 0 {
-		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-
-	//get post from database
-	post, err := ReadPost(request.PostId, request.UserId)
-	if err != nil {
-		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	post.SessionId = request.SessionId
-	payload, err = json.Marshal(post)
-	if err != nil {
-		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	event := events.Event{
-		Type:    "requestPost",
-		Payload: payload,
-	}
-	return Response{"post retrieved successfully!", event, http.StatusOK}, nil
-}
 
 /*
-ReadPostsByProfile function read all posts of a profile from database
-and returns it if user have permission to see it base on post status and user relation to the post creator.
-if error occur then it return error.
+readPosts function read all posts base on key that's the column name and value that's the value of the column(posts could be group posts or user posts).
+it use readPost function to read each post and check if user has permission to see it.
+it return list of posts if found, error if error occur or posts not found.
 */
-func ReadPostsByProfile(currentUserId int, userId int) ([]Post, error) {
+func readPosts(currentUserId int, key string, value int) ([]Post, error) {
 	var posts []Post
-	dbPosts, err := db.FetchData("posts", "userId", userId)
+	dbPosts, err := db.FetchData("posts", key, value)
 	if err != nil {
 		return []Post{}, errors.New("Error fetching posts" + err.Error())
 	}
@@ -269,22 +191,18 @@ func ReadPostsByProfile(currentUserId int, userId int) ([]Post, error) {
 		return []Post{}, errors.New("posts not found")
 	}
 	for _, dbPost := range dbPosts {
-		post, err := ReadPost(dbPost.(db.Post).PostId, currentUserId)
+		post, err := readPost(dbPost.(db.Post).PostId, currentUserId)
 		if err != nil {
 			return []Post{}, errors.New("Error checking post" + err.Error())
 		}
-		if post.PostId != 0 {
-			posts = append(posts, post)
-		}
+		posts = append(posts, post)
 	}
 	return posts, nil
 }
-
 func GetPosts(payload json.RawMessage) (Response, error) {
 	var response Response
 	var request ReqAllPosts
 	err := json.Unmarshal(payload, &request)
-	log.Println("User: ", request)
 	if err != nil {
 		// handle the error
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
@@ -301,13 +219,13 @@ func GetPosts(payload json.RawMessage) (Response, error) {
 	//get posts from database
 	var posts []Post
 	if request.From == "group" {
-		posts, err = ReadPostsByGroup(request.UserId, request.GroupId)
+		posts, err = readPosts(request.UserId, "groupId", request.GroupId)
 		if err != nil {
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, err
 		}
 	} else if request.From == "profile" {
-		posts, err = ReadPostsByProfile(request.UserId, request.ProfileId)
+		posts, err = readPosts(request.UserId, "userId", request.ProfileId)
 		if err != nil {
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, err
@@ -327,4 +245,78 @@ func GetPosts(payload json.RawMessage) (Response, error) {
 		Payload: payload,
 	}
 	return Response{"posts retrieved successfully!", event, http.StatusOK}, nil
+}
+
+/*
+InsertPost function insert the post into database and check if it is semi-private then it insert the followers that user selected to semiPrivate table
+if error occur then it return error
+*/
+func insertPost(post Post) error {
+
+	id, err := db.InsertData("posts", post.UserId, post.GroupId, post.Title, post.Content, time.Now(), post.Status, "")
+	if err != nil {
+		return errors.New("Error inserting post " + err.Error())
+	}
+	if id == 0 {
+		return errors.New("error inserting post ")
+	}
+	if post.Image != "" {
+		// Process the image and save it to the local storage
+		str := strconv.Itoa(int(id))
+		url := "./images/posts/" + str
+		url, err := utils.ProcessImage(post.Image, url)
+		if err != nil {
+			log.Println("Error processing post image:", err)
+			//response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return err
+		}
+		post.Image = url
+	} else {
+		post.Image = ""
+	}
+	err = db.UpdateData("posts", post.Image, id)
+	if err != nil {
+		return errors.New("Error updating post " + err.Error())
+	}
+	if post.Status == "semi-private" {
+		for _, followerId := range post.Followers {
+			_, err := db.InsertData("semiPrivate", id, followerId)
+			if err != nil {
+				return errors.New("Error inserting semiPrivate" + err.Error())
+			}
+		}
+	}
+	return nil
+}
+
+func CreatePost(payload json.RawMessage) (Response, error) {
+	var response Response
+	var post Post
+	err := json.Unmarshal(payload, &post)
+	log.Println("User: ", post)
+	if err != nil {
+		// handle the error
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+
+	//insert new post into database
+	err = insertPost(post)
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	//send back sessionId
+	payload, err = json.Marshal(map[string]string{"sessionId": post.SessionId})
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	event := events.Event{
+		Type:    "createPost",
+		Payload: payload,
+	}
+
+	response = Response{"post created successfully!", event, http.StatusOK}
+	return response, nil
 }
