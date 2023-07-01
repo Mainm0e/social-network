@@ -4,6 +4,7 @@ import (
 	"backend/db"
 	"backend/utils"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -232,6 +233,12 @@ func UpdateProfile(userId int, privacy string) error {
 		return errors.New("Error fetching user " + err.Error())
 	}
 	// TODO:if frontend guys were too lazy to check if privacy changed really or same thing is sent again check it here before updating
+	fmt.Println("privacy:", privacy)
+	if user.Privacy == "public" {
+		privacy = "private"
+	} else {
+		privacy = "public"
+	}
 	err = db.UpdateData("users", privacy, user.UserId)
 	if err != nil {
 		return errors.New("Error updating user " + err.Error())
