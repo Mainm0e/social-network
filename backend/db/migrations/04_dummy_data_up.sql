@@ -2,7 +2,13 @@
 INSERT INTO users (NickName, firstName, lastName, birthDate, email, password, aboutMe, avatar, creationTime)
 VALUES ('johnny', 'John', 'Doe', '1990-05-15', 'john.doe@example.com', 'password123', 'About John', NULL, '2023-05-31 10:00:00'),
        ('jane23', 'Jane', 'Smith', '1988-08-22', 'jane.smith@example.com', 'pass321word', 'About Jane', NULL, '2023-05-31 11:00:00'),
-       ('sam87', 'Sam', 'Johnson', '1995-02-10', 'sam.johnson@example.com', 'testpass', 'About Sam', NULL, '2023-05-31 12:00:00');
+       ('sam87', 'Sam', 'Johnson', '1995-02-10', 'sam.johnson@example.com', 'testpass', 'About Sam', NULL, '2023-05-31 12:00:00'),
+       ('admin', 'admin', 'admin', '1995-02-10', 'admin', 'admin', 'About admin', NULL, '2023-05-31 12:00:00'),
+       ('steve', 'steve', 'steve', '1995-02-10', 'steve', 'steve', 'About steve', NULL, '2023-05-31 12:00:00'),
+       ('adi', 'adi', 'adi', '1995-02-10', 'adi', 'adi', 'About adi', NULL, '2023-05-31 12:00:00'),
+       ('maryam', 'maryam', 'maryam', '1995-02-10', 'maryam', 'maryam', 'About maryam', NULL, '2023-05-31 12:00:00'),
+       ('rick', 'rick', 'rick', '1995-02-10', 'rick', 'rick', 'About rick', NULL, '2023-05-31 12:00:00'),
+       ('salam', 'salam', 'salam', '1995-02-10', 'salam', 'salam', 'About salam', NULL, '2023-05-31 12:00:00');
 
 INSERT INTO groups (creatorId, title, description)
 VALUES (1, 'Group 1', 'Description for Group 1'),

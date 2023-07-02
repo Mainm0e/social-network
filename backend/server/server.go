@@ -73,7 +73,7 @@ This pattern facilitates ease of maintenance should additional middleware functi
 */
 func loggerMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("Request received at: %s\n", r.URL.Path) // ** ONLY FOR DEVELOPMENT, REMOVE LATER **
+		/* fmt.Printf("Request received at: %s\n", r.URL.Path) // ** ONLY FOR DEVELOPMENT, REMOVE LATER ** */
 		log.Println("Request received at: ", r.URL.Path)
 		handler.ServeHTTP(w, r)
 	})
