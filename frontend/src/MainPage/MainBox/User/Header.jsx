@@ -85,16 +85,24 @@ const Followbtn = ({  relation, privacy ,followRequest , changePrivacy}) => {
     if (privacy === "private"){
       return (
         <div className="follow_btn">
-          <button className="follow_btn" onClick={handleSentRequest}>
+          <label>Status: </label>
+          <button className="follow_btn hover">
             private
+          </button>
+          <button className="follow_btn" onClick={handleSentRequest}>
+            public
           </button>
         </div>
       )
     } else if (privacy === "public"){
       return (
         <div className="follow_btn">
-          <button className="follow_btn" onClick={handleSentRequest}>
+          <label>Status: </label>
+          <button className="follow_btn hover" >
             public
+          </button>
+          <button className="follow_btn" onClick={handleSentRequest}>
+            private
           </button>
         </div>
       )
