@@ -8,7 +8,7 @@ import (
 )
 
 func InsertEvent(event db.Event) error {
-	_, err := db.InsertData("events", event.CreatorId, event.GroupId, event.Title, event.Content, time.Now())
+	_, err := db.InsertData("events", event.CreatorId, event.GroupId, event.Title, event.Content, time.Now(), event.Date)
 	if err != nil {
 		return errors.New("Error inserting event" + err.Error())
 	}

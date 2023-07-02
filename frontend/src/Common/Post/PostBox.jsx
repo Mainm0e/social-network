@@ -112,6 +112,18 @@ const CreatePost = ({ onSubmit }) => {
   const [privacy, setPrivacy] = useState("public");
   const [image, setImage] = useState(null);
   const [showImage, setShowImage] = useState(null);
+  const [followers, setFollowers] = useState([]);
+
+  const [follower, setFollower] = useState(null)
+  useEffect(() => {
+    const method = "POST"
+    const type = "profileList"
+    const payload = {sessionId:getCookie("sessionId"), userId: getUserId("userId"), request:"followers"}
+    fetchData(method,type,payload).then((data)=>{
+        setFollower(data)
+    })
+    }, []);
+  
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
@@ -122,7 +134,6 @@ const CreatePost = ({ onSubmit }) => {
   };
 
   const handlePrivacyChange = (e) => {
-    console.log(e.target.value);
     setPrivacy(e.target.value);
   };
 
@@ -136,6 +147,17 @@ const CreatePost = ({ onSubmit }) => {
     };
     reader.readAsDataURL(file);
   };
+
+  const handleFollowerChange = (followerId) => {
+    if (followers.includes(followerId)) {
+      // If follower is already selected, remove it
+      setFollowers(followers.filter((follower) => follower !== followerId));
+    } else {
+      // If follower is not selected, add it
+      setFollowers([...followers, followerId]);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const postData = {
@@ -143,11 +165,13 @@ const CreatePost = ({ onSubmit }) => {
       content: content,
       image: image,
       privacy: privacy,
+      followers: followers,
     };
     onSubmit(postData);
     setTitle("");
     setContent("");
     setImage(null);
+    setFollowers([]);
   };
 
   return (
@@ -185,9 +209,38 @@ const CreatePost = ({ onSubmit }) => {
           <select value={privacy} onChange={handlePrivacyChange}>
             <option value="public">Public</option>
             <option value="private">Private</option>
+            <option value="semi-private">Semi-Private</option>
           </select>
         </div>
+        {privacy === "semi-private" && (
+          <FollowerList
+            users={follower}
+            followers={followers}
+            handleFollowerChange={handleFollowerChange}
+          />
+        )}
       </form>
+    </div>
+  );
+};
+
+const FollowerList = ({ users, followers, handleFollowerChange }) => {
+  console.log("users", users)
+  return (
+    <div className="create_post_follower_list">
+      {users.map((user) => (
+        <div key={user.userId}>
+          <label>
+            <input
+              type="checkbox"
+              value={user.userId}
+              checked={followers.includes(user.userId)}
+              onChange={() => handleFollowerChange(user.userId)}
+            />
+            {user.firstName}
+          </label>
+        </div>
+      ))}
     </div>
   );
 };
@@ -233,10 +286,10 @@ const PostBox = ({ id }) => {
         groupId: 0,
         comments: [],
         date: "",
-        followers: [2, 3, 19],
-      }
+        followers: postData.followers,
+      };
       fetchData(method, type, payload).then((data) => {
-        /*  herf = "#postlist"; */
+      
         window.location.hash = "postlist";
       });
     } else {

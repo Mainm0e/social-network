@@ -95,12 +95,13 @@ type Event struct {
 	GroupId      int    `json:"groupId"`
 	Title        string `json:"title"`
 	Content      string `json:"content"`
+	Date         string `json:"date"`
 	CreationTime string `json:"creationTime"`
 }
 type EventMember struct {
 	EventId  int    `json:"eventId"`
 	MemberId int    `json:"memberId"`
-	Option   string `json:"option"`
+	Option   string `json:"option"` // going, not_going
 }
 
 type InsertRule struct {
