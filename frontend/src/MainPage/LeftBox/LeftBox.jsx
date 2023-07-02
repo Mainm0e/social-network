@@ -1,5 +1,4 @@
-
-
+import React from "react";
 import {logout} from "../../tools/logout";
 import NavList from "./NavList";
 import "./LeftBox.css";
@@ -34,7 +33,6 @@ const LeftBox = ({user,link}) => {
             <NavList type={"Post"} links={link[1]} />
             <NavList type={"Nav"} links={link[0]} />
             <NavList type={"Connection"} links={link[2]} />
-
         </div>
     );
 }

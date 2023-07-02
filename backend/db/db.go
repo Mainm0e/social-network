@@ -241,7 +241,7 @@ func InsertData(tableName string, args ...any) (int64, error) {
 	}
 
 	for i := range rule.NotExistTables {
-		if tableName == "posts" && rule.NotExistFields[i] == "groupId" && args[i] == 0 {
+		if tableName == "posts" || tableName == "notifications" && rule.NotExistFields[i] == "groupId" && args[i] == 0 {
 			continue
 		}
 		err := CheckDataDoesNotExist(rule.NotExistTables[i], rule.NotExistFields[i], args[i])
@@ -266,7 +266,7 @@ the table does not exist, or if the keyValue does not exist). If no rows are
 affected by the DELETE operation, it returns an "item not found" error. If the
 operation is successful, it returns nil.
 */
-func DeleteData(tableName string, keyValue any) error {
+func DeleteData(tableName string, keyValues ...any) error {
 	// Table validity check
 	key, ok := TableKeys[tableName]
 	if !ok {
@@ -274,19 +274,24 @@ func DeleteData(tableName string, keyValue any) error {
 	}
 
 	// keyValue validity check
-	if err := CheckDataDoesNotExist(tableName, key, keyValue); err == nil {
-		return errors.New("data does not exist")
+	for i, keyValue := range keyValues {
+		if err := CheckDataDoesNotExist(tableName, key[i], keyValue); err == nil {
+			return errors.New("data does not exist")
+		}
 	}
-
-	myQuery := fmt.Sprintf("DELETE FROM %s WHERE %s = ?", tableName, key)
-
+	var myQuery string
+	if len(keyValues) == 1 {
+		myQuery = fmt.Sprintf("DELETE FROM %s WHERE %s = ?", tableName, key[0])
+	} else {
+		myQuery = fmt.Sprintf("DELETE FROM %s WHERE %s = ? AND %s = ?", tableName, key[0], key[1])
+	}
 	statement, err := DB.Prepare(myQuery)
 	if err != nil {
 		return err
 	}
 	defer statement.Close()
 
-	result, err := statement.Exec(keyValue)
+	result, err := statement.Exec(keyValues...)
 	if err != nil {
 		return err
 	}

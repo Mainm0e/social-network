@@ -6,32 +6,19 @@ import RightBox from "./RightBox/RightBox";
 import ChatBox from "../Common/ChatBox/ChatBox";
 import { navGroupLinkData } from "./dummyData";
 import { getCookie, getUserId} from "../tools/cookie";
+import { fetchData } from "../tools/fetchData";
 
 // dummy data
 function MainPage() {
-  // get userId from cookie
-  const id = getUserId("userId")
-  const userId =  parseInt(id);
 
   // !!TODO!! how to get profile id that can send to mainbox that show user that we want ???
 
   const [data, setData] = useState(null);
-  const sessionId = getCookie("sessionId");
-
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://localhost:8080/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type: "profile", payload: {sessionId:sessionId, userId: userId, profileId: userId} }),
-      });
-      const responseData = await response.json();
-      setData(responseData.event.payload);
-    };
-
-    fetchData();
+    const method = "POST"
+    const type = "profile"
+    const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId"), profileId: getUserId("userId") }
+    fetchData(method,type, payload).then((data) => setData(data));
   }, []);
 
  

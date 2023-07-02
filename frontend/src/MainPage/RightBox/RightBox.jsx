@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./RightBox.css";
 import UserList from "../../Common/UserList/UserList";
+import Notification from "../../Common/Notification/Notification";
 import { getUserId } from "../../tools/cookie";
 
 const RightBox = () => {
@@ -18,6 +19,9 @@ const RightBox = () => {
           setBox(<UserList title="followers" id={userId} clearBox={clearBox} />);
         } else if (hash === "followings") {
           setBox(<UserList title="followings" id={userId} clearBox={clearBox} />);
+        } else if (hash === "notifactions") {
+          setBox(<Notification  clearBox={clearBox}/>);
+
         } else {
           setBox(<div className="loading">Loading...</div>);
         }

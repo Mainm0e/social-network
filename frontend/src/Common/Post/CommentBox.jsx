@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { getCookie, getUserId } from '../../tools/cookie';
 import "./CommentBox.css"
 import { checkCommentData } from '../../tools/checkdata';
+import { fetchData } from '../../tools/fetchData';
 const CommentBox = ({id,comments,activePost}) => {
 // return createcomment and commentlist button and default commentlist
     const [boxState, setBoxState] = useState(null);
@@ -93,19 +94,15 @@ const CreateComment = ({ id , showComment }) => {
   const check = checkCommentData(commentData);
   if
    (check.status === true ){
-    // Make API requests or perform other operations here
-    // request to create post
-    const createComment = async () => {
-      const response = await fetch("http://localhost:8080/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type: "createComment", payload: commentData}),
-      });
-      const responseData = await response.json();
-    }
-    createComment();
+    const method = "POST";
+    const type = "createComment"
+    const payload = commentData
+    fetchData(method,type,payload).then((data) => {
+
+        /* !!todo!! if comment is sended it will go too comment list */
+        console.log(data)
+    })
+
   } else {
     alert(check.message)
   }

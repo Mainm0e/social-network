@@ -11,7 +11,7 @@ export function getCookie(name) {
 export function getUserId(name){
     const value = `${localStorage.getItem(name)}`;
     if (value){
-        return value
+        return parseInt(value)
     } else {
         return null
     }

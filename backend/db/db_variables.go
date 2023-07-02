@@ -67,33 +67,43 @@ var InsertRules = map[string]InsertRule{
 		NotExistErrors: []string{"post does not exist", "user does not exist"},
 	},
 	"notifications": {
-		Query:          "INSERT INTO notifications(receiverId, senderId, type, content, creationTime) VALUES(?,?,?,?,?)",
-		NotExistTables: []string{"users", "users"},
-		NotExistFields: []string{"receiverId", "senderId"},
-		NotExistErrors: []string{"receiver does not exist", "sender does not exist"},
+		Query:          "INSERT INTO notifications(receiverId, senderId, groupId, type,creationTime) VALUES(?,?,?,?,?)",
+		NotExistTables: []string{"users", "users", "groups"},
+		NotExistFields: []string{"receiverId", "senderId", "groupId"},
+		NotExistErrors: []string{"receiver does not exist", "sender does not exist", "group does not exist"},
 	},
 	"events": {
-		Query:          "INSERT INTO events(creatorId, receiverId, groupId, title, content, creationTime, option) VALUES(?,?,?,?,?,?,?)",
-		NotExistTables: []string{"users", "users", "groups"},
-		NotExistFields: []string{"creatorId", "receiverId", "groupId"},
-		NotExistErrors: []string{"creator does not exist", "receiver does not exist", "group does not exist"},
+		Query:          "INSERT INTO events(creatorId, groupId, title, content, creationTime) VALUES(?,?,?,?,?)",
+		NotExistTables: []string{"users", "groups"},
+		NotExistFields: []string{"creatorId", "groupId"},
+		NotExistErrors: []string{"creator does not exist", "group does not exist"},
+	},
+	"event_member": {
+		Query:          "INSERT INTO event_member(eventId, memberId, option) VALUES(?,?,?)",
+		NotExistTables: []string{"events", "users"},
+		NotExistFields: []string{"eventId", "userId"},
+		NotExistErrors: []string{"event does not exist", "user does not exist"},
 	},
 }
 
 /*
 Global database table keys for ease of maintenance, and simplifying of the DeleteData function.
 */
-var TableKeys = map[string]string{
-	"users":         "userId",
-	"posts":         "postId",
-	"comments":      "commentId",
-	"groups":        "groupId",
-	"follow":        "followerId", // Assuming followerId uniquely identifies a follow record
-	"group_member":  "userId",     // Assuming userId uniquely identifies a group member record
-	"messages":      "messageId",
-	"semiPrivate":   "postId", // Assuming postId uniquely identifies a semiPrivate record
-	"notifications": "notificationId",
-	"events":        "eventId",
+var TableKeys = map[string][]string{
+	/*
+		these table data are not included because they are not going to be deleted from the database
+		"users":         {"userId"},
+		"posts":         {"postId"},
+		"comments":      {"commentId"},
+		"groups":        {"groupId"},
+		"messages":      {"messageId"},
+		"events":        {"eventId"},
+	*/
+	"follow":        {"followerId", "followeeId"},
+	"group_member":  {"groupId", "userId"},
+	"semiPrivate":   {"postId"},
+	"notifications": {"notificationId"},
+	"event_member":  {"eventId", "memberId"},
 }
 
 /*
@@ -104,12 +114,13 @@ var UpdateRules = map[string]string{
 	"posts":         "UPDATE posts SET image=? WHERE postId=?",
 	"comments":      "UPDATE comments SET image=? WHERE commentId=?",
 	"groups":        "UPDATE groups SET creatorId=?, title=?, description=? WHERE groupId=?",
-	"follow":        "UPDATE follow SET followerId=?, followeeId=?, status=? WHERE followerId=?", // Assuming followerId uniquely identifies a follow record
-	"group_member":  "UPDATE group_member SET userId=?, groupId=?, status=? WHERE userId=?",      // Assuming userId uniquely identifies a group member record
+	"follow":        "UPDATE follow SET status=? WHERE followerId = ? AND followeeId = ?", // TODO check this works correctly
+	"group_member":  "UPDATE group_member SET status=? WHERE userId=?",                    // Assuming userId uniquely identifies a group member record
 	"messages":      "UPDATE messages SET senderId=?, receiverId=?, messageContent=?, sendTime=?, seen=? WHERE messageId=?",
 	"semiPrivate":   "UPDATE semiPrivate SET postId=?, userId=? WHERE postId=?", // Assuming postId uniquely identifies a semiPrivate record
-	"notifications": "UPDATE notifications SET receiverId=?, senderId=?, type=?, content=?, creationTime=? WHERE notificationId=?",
-	"events":        "UPDATE events SET creatorId=?, receiverId=?, groupId=?, title=?, content=?, creationTime=?, option=? WHERE eventId=?",
+	"notifications": "UPDATE notifications SET receiverId=?, senderId=?, type=?, creationTime=? WHERE notificationId=?",
+	"events":        "UPDATE events SET creatorId=?, groupId=?, title=?, content=?, creationTime=? WHERE eventId=?",
+	"event_member":  "UPDATE event_member SET option=? WHERE eventId=? AND memberId=? ", // Assuming eventId uniquely identifies an event member record //TODO: check if this is correct
 }
 
 /*
@@ -204,19 +215,27 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"notifications": {
-		SelectFields: "notificationId, receiverId, senderId, type, content, creationTime",
+		SelectFields: "notificationId, receiverId, senderId,groupId, type, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var notification Notification
-			err := rows.Scan(&notification.NotificationId, &notification.ReceiverId, &notification.SenderId, &notification.Type, &notification.Content, &notification.CreationTime)
+			err := rows.Scan(&notification.NotificationId, &notification.ReceiverId, &notification.SenderId, &notification.GroupId, &notification.Type, &notification.CreationTime)
 			return notification, err
 		},
 	},
 	"events": {
-		SelectFields: "eventId, creatorId, receiverId, groupId, title, content, creationTime, option",
+		SelectFields: "eventId, creatorId, groupId, title, content, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var event Event
-			err := rows.Scan(&event.EventId, &event.CreatorId, &event.ReceiverId, &event.GroupId, &event.Title, &event.Content, &event.CreationTime, &event.Option)
+			err := rows.Scan(&event.EventId, &event.CreatorId, &event.GroupId, &event.Title, &event.Content, &event.CreationTime)
 			return event, err
+		},
+	},
+	"event_member": {
+		SelectFields: "eventId, memberId, option",
+		ScanFields: func(rows *sql.Rows) (interface{}, error) {
+			var eventMember EventMember
+			err := rows.Scan(&eventMember.EventId, &eventMember.MemberId, &eventMember.Option)
+			return eventMember, err
 		},
 	},
 }

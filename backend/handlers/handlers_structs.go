@@ -1,21 +1,26 @@
 package handlers
 
 import (
+	"backend/db"
 	"backend/events"
 	"encoding/json"
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":         LoginPage,
-	"register":      RegisterPage,
-	"profile":       ProfilePage,
-	"profileList":   ProfileList,
-	"createPost":    CreatePost,
-	"GetPost":       GetPost,
-	"GetPosts":      GetPosts,
-	"createComment": CreateComment,
-	"exploreUsers":  ExploreUsers,
-	"exploreGroups": ExploreGroups,
+	"login":          LoginPage,
+	"register":       RegisterPage,
+	"profile":        ProfilePage,
+	"updatePrivacy":  UpdatePrivacy,
+	"profileList":    ProfileList,
+	"createPost":     CreatePost,
+	"GetPost":        GetPost,
+	"GetPosts":       GetPosts,
+	"createComment":  CreateComment,
+	"exploreUsers":   ExploreUsers,
+	"exploreGroups":  ExploreGroups,
+	"followRequest":  FollowRequest,
+	"followResponse": FollowResponse,
+	"requestNotif":   RequestNotifications,
 }
 
 type Response struct {
@@ -68,9 +73,15 @@ type Profile struct {
 	LastName     string         `json:"lastName"`
 	Avatar       *string        `json:"avatar"` //
 	Relation     string         `json:"relation"`
+	Status       string         `json:"privacy"`
 	FollowerNum  int            `json:"followerNum"`
 	FollowingNum int            `json:"followingNum"`
 	PrivateData  PrivateProfile `json:"privateProfile"`
+}
+type PrivacyData struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	Privacy   string `json:"privacy"`
 }
 type PrivateProfile struct {
 	BirthDate string `json:"birthdate"`
@@ -126,12 +137,25 @@ type Group struct {
 	Description    string       `json:"description"`
 	Date           string       `json:"date"`
 }
-type Follow struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-	FollowId  int    `json:"followId"`
-}
+
 type Explore struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
+}
+type Follow struct {
+	SessionId  string `json:"sessionId"`
+	FollowerId int    `json:"followerId"`
+	FolloweeId int    `json:"followeeId"`
+	NotifId    int    `json:"notifId"`
+	Response   string `json:"response"`
+}
+type GroupEvent struct {
+	SessionId    string                    `json:"sessionId"`
+	Event        db.Event                  `json:"event"`
+	Participants map[string][]SmallProfile `json:"participants"`
+}
+type Notification struct {
+	SessionId    string          `json:"sessionId"`
+	Profile      SmallProfile    `json:"profile"`
+	Notification db.Notification `json:"notifications"`
 }

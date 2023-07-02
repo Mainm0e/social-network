@@ -83,6 +83,7 @@ type Notification struct {
 	NotificationId int    `json:"notificationId"`
 	ReceiverId     int    `json:"receiverId"`
 	SenderId       int    `json:"senderId"`
+	GroupId        int    `json:"groupId"`
 	Type           string `json:"type"`
 	Content        string `json:"content"`
 	CreationTime   string `json:"creationTime"`
@@ -91,12 +92,15 @@ type Notification struct {
 type Event struct {
 	EventId      int    `json:"eventId"`
 	CreatorId    int    `json:"creatorId"`
-	ReceiverId   int    `json:"receiverId"`
 	GroupId      int    `json:"groupId"`
 	Title        string `json:"title"`
 	Content      string `json:"content"`
 	CreationTime string `json:"creationTime"`
-	Option       string `json:"option"`
+}
+type EventMember struct {
+	EventId  int    `json:"eventId"`
+	MemberId int    `json:"memberId"`
+	Option   string `json:"option"`
 }
 
 type InsertRule struct {
