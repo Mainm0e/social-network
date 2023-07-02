@@ -4,6 +4,7 @@ import (
 	"backend/db"
 	"backend/handlers"
 	"backend/server/sessions"
+	"backend/sockets"
 	"backend/utils"
 	"context"
 	"errors"
@@ -177,10 +178,13 @@ func initialiseRoutes() http.Handler {
 	// Create a new ServeMux
 	mux := http.NewServeMux()
 
+	// Create a websocket manager
+	wsManager := sockets.NewManager()
+
 	// Register handler functions for various routes
 	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
 	mux.HandleFunc("/api", handlers.HTTPEventRouter)
-	//mux.HandleFunc("/ws", sockets.WebSocketEventRouter)
+	mux.HandleFunc("/ws", wsManager.ServeWS)
 
 	// Wrap the mux with the CORS middleware and return it
 	// Although the return type is an http.Handler, it is actually a wrapped *mux.Router which
