@@ -5,8 +5,6 @@ import (
 	"backend/utils"
 	"errors"
 	"fmt"
-	"log"
-	"strconv"
 	"time"
 )
 
@@ -242,35 +240,6 @@ func UpdateProfile(userId int, privacy string) error {
 	err = db.UpdateData("users", privacy, user.UserId)
 	if err != nil {
 		return errors.New("Error updating user " + err.Error())
-	}
-	return nil
-}
-
-func InsertComment(comment Comment) error {
-	id, err := db.InsertData("comments", comment.UserId, comment.PostId, comment.Content, "", time.Now())
-	if err != nil {
-		return errors.New("Error inserting comment " + err.Error())
-	}
-	if id == 0 {
-		return errors.New("error inserting comment ")
-	}
-	if comment.Image != "" {
-		// Process the image and save it to the local storage
-		str := strconv.Itoa(int(id))
-		url := "./images/comments/" + str
-		url, err := utils.ProcessImage(comment.Image, url)
-		if err != nil {
-			log.Println("Error processing comment image:", err)
-			//response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-			return err
-		}
-		comment.Image = url
-	} else {
-		comment.Image = ""
-	}
-	err = db.UpdateData("comments", comment.Image, id)
-	if err != nil {
-		return errors.New("Error updating comment image" + err.Error())
 	}
 	return nil
 }
