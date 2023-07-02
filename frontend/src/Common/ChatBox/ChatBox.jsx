@@ -4,7 +4,7 @@ import ChatList from './ChatList/ChatList';
 import ChatRoom from './ChatRoom/ChatRoom';
 const ChatBox = () => {
 
-  //start socket connection
+/*   //start socket connection
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:8080.ws');
 
@@ -28,7 +28,7 @@ const ChatBox = () => {
       socket.close();
     };
   }, []); // Empty dependency array to run the effect only once
-
+ */
   
 
     const [chat_list, setChatlist] = useState(false);
