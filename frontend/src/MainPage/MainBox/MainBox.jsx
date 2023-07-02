@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./User/Header";
 import Body from "./User/Body";
-import Explore from "./explore/explore";
+import Explore from "../../Common/explore/explore";
 import "./MainBox.css";
 import { getCookie, getUserId } from "../../tools/cookie";
 import { fetchData } from "../../tools/fetchData";

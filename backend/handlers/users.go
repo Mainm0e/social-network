@@ -3,7 +3,6 @@ package handlers
 import (
 	"backend/events"
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -11,7 +10,6 @@ func ExploreUsers(payload json.RawMessage) (Response, error) {
 	var response Response
 	var explore Explore
 	err := json.Unmarshal(payload, &explore)
-	log.Println("User: ", explore)
 	if err != nil {
 		// handle the error
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}

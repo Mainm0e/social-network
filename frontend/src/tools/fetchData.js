@@ -37,6 +37,7 @@ export async function fetchData(method, type, payload) {
     }
   }
   if (responseData.statusCode === 200) {
+    console.log("responseData", responseData)
     return responseData.event.payload;
   }
 }
