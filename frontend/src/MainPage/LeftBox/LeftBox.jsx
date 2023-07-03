@@ -2,6 +2,7 @@ import React from "react";
 import {logout} from "../../tools/logout";
 import NavList from "./NavList";
 import "./LeftBox.css";
+import {home} from "../../tools/link";
 
 const LeftBox = ({user,link}) => {
     const handleLogout = () => {
@@ -22,10 +23,10 @@ const LeftBox = ({user,link}) => {
                 </div>
                 <div className="user_info">
                     <div className="username">
-                        <span>{user.firstName}</span>
+                        <span onClick={home}>{user.firstName}</span>
                     </div>
                     <div className="logout_btn">
-                        <button onClick={handleLogout}>logout</button>
+                        <button className="btn" onClick={handleLogout}>logout</button>
                     </div>
                 </div>
             </div>

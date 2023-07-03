@@ -89,7 +89,7 @@ const Followbtn = ({  relation, privacy ,followRequest , changePrivacy}) => {
           <button className="follow_btn hover">
             private
           </button>
-          <button className="follow_btn" onClick={handleSentRequest}>
+          <button className="follow_btn" onClick={handleSentRequest} style={{ cursor: 'pointer' }}>
             public
           </button>
         </div>
@@ -101,7 +101,7 @@ const Followbtn = ({  relation, privacy ,followRequest , changePrivacy}) => {
           <button className="follow_btn hover" >
             public
           </button>
-          <button className="follow_btn" onClick={handleSentRequest}>
+          <button className="follow_btn" onClick={handleSentRequest} style={{ cursor: 'pointer' }}>
             private
           </button>
         </div>

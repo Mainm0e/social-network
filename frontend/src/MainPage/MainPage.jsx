@@ -7,6 +7,7 @@ import ChatBox from "../Common/ChatBox/ChatBox";
 import { navGroupLinkData } from "./dummyData";
 import { getCookie, getUserId} from "../tools/cookie";
 import { fetchData } from "../tools/fetchData";
+import { home } from "../tools/link";
 
 function MainPage() {
 
@@ -23,7 +24,7 @@ function MainPage() {
  
 
   if (!data) {
-    return <div>Loading...</div>;
+    return <div className="loading"><div>Loading...</div></div>;
   } else {
   return (
     <div className="main-page">
@@ -59,8 +60,7 @@ const BoxState = ({userData, navLink}) => {
       return <Explore userData={userData} navLink={navLink} type={"group"}/>
     }
   } else if (url.pathname === "/"){
-    const id = getUserId("userId")
-    return <Profile userData={userData} profileId={parseInt(id)} navLink={navLink} type={"user"}/>
+    home();
   }
 }
 

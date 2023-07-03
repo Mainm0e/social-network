@@ -15,3 +15,10 @@
     margin-top: 20px;
     position: relative;
 }
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
