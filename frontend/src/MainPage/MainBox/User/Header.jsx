@@ -8,11 +8,11 @@ const Header = ({profile,handleRefresh}) => {
     if (true) {
       return (
         <>
-          <div className="birthdate">
+          <div className="birthdate info">
             <label>Birthdate: </label>
             <span>{user.privateProfile.birthdate}</span>
           </div>
-          <div className="email">
+          <div className="email info">
             <label>Email: </label>
             <span>{user.privateProfile.email}</span>
           </div>
@@ -45,18 +45,18 @@ const Header = ({profile,handleRefresh}) => {
       </div>
       <div className="info_box">
         <div className="user_info">
-          <div className="fullName">
+          <div className="fullName info">
             <label> Name: </label>
             <span>{user.firstName}</span>
             <span> </span>
             <span>{user.lastName}</span>
           </div>
           {checkPrivacy()}
-          <div className="followers">
+          <div className="followers info">
             <label>Followers: </label>
             <span>{user.followerNum}</span>
           </div>
-          <div className="following">
+          <div className="following info">
             <label>Following: </label>
             <span>{user.followingNum}</span>
           </div>

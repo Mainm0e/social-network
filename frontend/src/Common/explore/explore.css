@@ -3,8 +3,21 @@
 } */
 
 .explore {
-    background-color: #f7f7f7;
+    width: 800px;
+    height: 90vh;
+    max-width: 1000px;
+    max-height: 1000px;
+    overflow: scroll;
+    scroll-behavior: smooth;
     padding: 20px;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.explore::-webkit-scrollbar {
+    display: none;
 }
 
 .explore_top {

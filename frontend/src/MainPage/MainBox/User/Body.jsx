@@ -1,4 +1,4 @@
-import "./user.css";
+import "../MainBox.css"
 import PostBox from "../../../Common/Post/PostBox";
 
 import React from 'react';

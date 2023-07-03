@@ -1,13 +1,17 @@
-
-.main-page{
+.main-page {
     display: flex;
+    width: 100vw;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    width: 100vw;
+    justify-content: flex-start;
 }
-.main-page-container{
+
+.main-page-container {
     display: flex;
-    width: 1000px;
+    width: 1400px;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-top: 20px;
     position: relative;
 }

@@ -23,7 +23,7 @@ const RightBox = () => {
           setBox(<Notification  clearBox={clearBox}/>);
 
         } else {
-          setBox(<div className="loading">Loading...</div>);
+          setBox(<></>);
         }
       }, 10);
     };

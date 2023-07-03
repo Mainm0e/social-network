@@ -1,13 +1,12 @@
-@font-face{
+@font-face {
     font-family: myFancyFont;
     src: url(./fontstyle/Bodo\ Amat.ttf);
 }
+
 .App {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 }
+
 .hidden {
     display: none;
 }

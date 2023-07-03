@@ -1,9 +1,26 @@
 .main-box {
-    width: 100vw;
+    width: 800px;
+    height: 90vh;
     max-width: 1000px;
     max-height: 1000px;
     overflow: scroll;
     scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.main-box::-webkit-scrollbar {
+    display: none;
+}
+
+.info {
+    width: 400px;
+    /* Adjust this value to fit your layout */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .main_header {
@@ -12,7 +29,6 @@
     align-items: flex-end;
     justify-content: flex-start;
     height: 300px;
-    width: 100%;
     position: relative;
     overflow: hidden;
 }
@@ -60,6 +76,8 @@
     color: #333;
 }
 
+.user_info {}
+
 .user_info .follow_btn button {
     font-size: 20px;
     background: transparent;
@@ -74,4 +92,14 @@
 
 .user_info .follow_btn button:hover {
     color: #fff;
+}
+
+
+/* body */
+
+.main_body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
 }

@@ -8,7 +8,6 @@ import { navGroupLinkData } from "./dummyData";
 import { getCookie, getUserId} from "../tools/cookie";
 import { fetchData } from "../tools/fetchData";
 
-// dummy data
 function MainPage() {
 
   // !!TODO!! how to get profile id that can send to mainbox that show user that we want ???
@@ -30,7 +29,6 @@ function MainPage() {
     <div className="main-page">
       <div className="main-page-container">
         <BoxState userData={data} navLink={navGroupLinkData}/>
-        <ChatBox />
       </div>
     </div>
   );
