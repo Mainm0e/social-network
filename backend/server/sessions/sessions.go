@@ -137,14 +137,26 @@ func (store *SessionStore) Get(sessionID string) (*Session, bool, error) {
 }
 
 /*
-Check() checks if the user is authenticated by taking a session cookie
+CookieCheck() checks if the user is authenticated by taking a session cookie
 as input and checking if the session ID is present in the SessionStore sync.Map data
 structure by calling the *SessionStore Get() method. It returns a boolean indicating
 whether the user is authenticated or not, and an error, which is non-nil if an error
 occurs during the authentication check.
 */
-func Check(cookie *http.Cookie) (bool, error) {
+func CookieCheck(cookie *http.Cookie) (bool, error) {
 	_, isValidSession, err := Store.Get(cookie.Value)
+	return isValidSession, err
+}
+
+/*
+SessionCheck() checks if the user is authenticated by taking a session ID as input
+and checking if the session ID is present in the SessionStore sync.Map data structure
+by calling the *SessionStore Get() method. It returns a boolean indicating whether the
+user is authenticated or not, and an error, which is non-nil if an error occurs during
+the authentication check.
+*/
+func SessionCheck(sessionID string) (bool, error) {
+	_, isValidSession, err := Store.Get(sessionID)
 	return isValidSession, err
 }
 
