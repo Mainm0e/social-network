@@ -4,7 +4,6 @@ import (
 	"backend/db"
 	"backend/utils"
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -219,29 +218,6 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 	} else {
 		return Profile{}, errors.New("error checkUserRelation: wtf:" + status)
 	}
-}
-
-/*
-UpdateProfile is a function that updates the privacy of a user with the specified email.
-returns error if any occurred.
-*/
-func UpdateProfile(userId int, privacy string) error {
-	user, err := fetchUser("userId", userId)
-	if err != nil {
-		return errors.New("Error fetching user " + err.Error())
-	}
-	// TODO:if frontend guys were too lazy to check if privacy changed really or same thing is sent again check it here before updating
-	fmt.Println("privacy:", privacy)
-	if user.Privacy == "public" {
-		privacy = "private"
-	} else {
-		privacy = "public"
-	}
-	err = db.UpdateData("users", privacy, user.UserId)
-	if err != nil {
-		return errors.New("Error updating user " + err.Error())
-	}
-	return nil
 }
 
 func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {

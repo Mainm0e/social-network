@@ -1,12 +1,67 @@
 package handlers
 
 import (
+	"backend/db"
 	"backend/events"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 )
+
+/*
+Update Follow requests to be accepted when user change their privacy to public
+*/
+func UpdateFollowRequests(userId int) error {
+	notifications, err := db.FetchData("notifications", "receiverId", userId)
+	if err != nil {
+		return errors.New("Error fetching notifications" + err.Error())
+	}
+	for _, n := range notifications {
+		if notification, ok := n.(db.Notification); ok {
+			if notification.Type == "follow_request" {
+				err := db.UpdateData("notifications", "following", notification.NotificationId)
+				if err != nil {
+					return errors.New("Error updating notification" + err.Error())
+				}
+				err = db.UpdateData("follow", "following", notification.SenderId, notification.ReceiverId)
+				if err != nil {
+					return errors.New("Error updating follow request" + err.Error())
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+/*
+UpdateProfile is a function that updates the privacy of a user with the specified email.
+returns error if any occurred.
+*/
+func UpdateProfile(userId int, privacy string) error {
+	user, err := fetchUser("userId", userId)
+	if err != nil {
+		return errors.New("Error fetching user " + err.Error())
+	}
+	fmt.Println("privacy:", privacy)
+	if user.Privacy == "public" {
+		privacy = "private"
+	} else {
+		privacy = "public"
+		err = UpdateFollowRequests(userId)
+		if err != nil {
+			log.Println("Error updating follow requests", err.Error())
+			return errors.New("Error updating follow requests " + err.Error())
+		}
+	}
+	err = db.UpdateData("users", privacy, user.UserId)
+	if err != nil {
+		return errors.New("Error updating user " + err.Error())
+	}
+	return nil
+}
 
 func ProfilePage(payload json.RawMessage) (Response, error) {
 	var response Response
