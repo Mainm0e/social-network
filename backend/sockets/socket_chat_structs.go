@@ -43,6 +43,8 @@ type ChatMsg interface {
 	GetType() string
 }
 
+/*********** NOTE TO SELF: NEVER FORGET HOW COOL INTERFACES ARE! ************/
+
 func (p *PrivateMsg) GetSender() string {
 	return p.SenderUsername
 }
