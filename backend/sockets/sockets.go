@@ -2,6 +2,7 @@ package sockets
 
 import (
 	"backend/events"
+	"backend/server/sessions"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -223,14 +224,22 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Extract the identifier from the query parameters.
-	// "id" is the query parameter key.
-	id := r.URL.Query().Get("id")
-
-	//	TODO: Validate the id.
+	// Extract the sessionID from the cookie.
+	cookie, err := r.Cookie(sessions.COOKIE_NAME)
+	if err != nil {
+		// TODO: Handle error: No valid sessionID cookie found.
+		return
+	} else {
+		isValid, err := sessions.Check(cookie)
+		if !isValid || err != nil {
+			// TODO: Handle error: Invalid sessionID cookie.
+			return
+		}
+	}
+	sessionID := cookie.Value
 
 	// Create a new client for the WebSocket connection.
-	client := NewClient(conn, m, id)
+	client := NewClient(conn, m, sessionID)
 
 	// Register the new client with the Manager.
 	m.Register <- client
