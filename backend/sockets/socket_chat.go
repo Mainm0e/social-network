@@ -63,3 +63,25 @@ func (m *Manager) BroadcastMessage(msg ChatMsg) error {
 
 	return nil
 }
+
+/*
+HandleMessage() takes a ChatMsg interface, which is either a PrivateMsg or a
+GroupMsg, and handles it. This means that it records the message to the database
+and broadcasts it to all clients in the chat. It returns an error value, which
+is non-nil if any of the operations failed.
+*/
+func (m *Manager) HandleMessage(msg ChatMsg) error {
+	// Store message in database
+	err := RecordMsgToDB(msg)
+	if err != nil {
+		return err
+	}
+
+	// Broadcast message to clients
+	err = m.BroadcastMessage(msg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
