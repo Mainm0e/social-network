@@ -40,6 +40,7 @@ type ChatMsg interface {
 	GetReceiver() string
 	GetMessage() string
 	GetTimestamp() string
+	GetType() string
 }
 
 func (p *PrivateMsg) GetSender() string {
@@ -72,4 +73,12 @@ func (g *GroupMsg) GetMessage() string {
 
 func (g *GroupMsg) GetTimestamp() string {
 	return g.Timestamp
+}
+
+func (p *PrivateMsg) GetType() string {
+	return "PrivateMsg"
+}
+
+func (g *GroupMsg) GetType() string {
+	return "GroupMsg"
 }
