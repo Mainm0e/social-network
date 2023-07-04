@@ -2,7 +2,23 @@ package sockets
 
 import "encoding/json"
 
-/* COMMON LOGIC / FUNCTIONS */
+/********************** PRIVATE MESSAGE LOGIC *******************************/
+
+/*
+UnmarshalJSONToPrivateMsg() takes a json byte array, which is usually received
+from the frontend in the form of a websocket message, and unmarshals it into
+a PrivateMsg struct. It then returns a pointer to this PrivateMsg struct, along
+with an error value, which is non-nil if the unmarshalling process failed.
+*/
+func UnmarshalJSONToPrivateMsg(jsonMsg []byte) (*PrivateMsg, error) {
+	var privateMsg PrivateMsg
+	if err := json.Unmarshal(jsonMsg, &privateMsg); err != nil {
+		return nil, err
+	}
+	return &privateMsg, nil
+}
+
+/********************** COMMON LOGIC / FUNCTIONS *****************************/
 
 /*
 RecordMsgToDB() takes a ChatMsg interface, which is either a PrivateMsg or a
@@ -20,18 +36,30 @@ func RecordMsgToDB(msg ChatMsg) error {
 	return nil
 }
 
-/* PRIVATE MESSAGE LOGIC */
-
 /*
-UnmarshalJSONToPrivateMsg() takes a json byte array, which is usually received
-from the frontend in the form of a websocket message, and unmarshals it into
-a PrivateMsg struct. It then returns a pointer to this PrivateMsg struct, along
-with an error value, which is non-nil if the unmarshalling process failed.
+BroadcastMessage() takes a ChatMsg interface, which is either a PrivateMsg or a
+GroupMsg, and broadcasts it to all clients in the chat. It returns an error value,
+which is non-nil if any of the broadcasting operations failed.
 */
-func UnmarshalJSONToPrivateMsg(jsonMsg []byte) (*PrivateMsg, error) {
-	var privateMsg PrivateMsg
-	if err := json.Unmarshal(jsonMsg, &privateMsg); err != nil {
-		return nil, err
+func (m *Manager) BroadcastMessage(msg ChatMsg) error {
+	receiver := msg.GetReceiver()
+	sender := msg.GetSender()
+	message := msg.GetMessage()
+	timestamp := msg.GetTimestamp()
+	msgType := msg.GetType()
+
+	// payload to be sent to clients
+	payload := map[string]interface{}{
+		"type": msgType,
+		"payload": map[string]string{
+			"senderUsername": sender,
+			"receiver":       receiver,
+			"message":        message,
+			"timeStamp":      timestamp,
+		},
 	}
-	return &privateMsg, nil
+
+	// TODO: Logic to broadcast message to all clients in the chat
+
+	return nil
 }
