@@ -184,6 +184,7 @@ const CreatePost = ({ onSubmit }) => {
             className="create_post_title"
             value={title}
             onChange={handleTitleChange}
+            maxLength="20"
           />
         </div>
         <div className="create_post_bottom">

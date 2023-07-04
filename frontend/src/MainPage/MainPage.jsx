@@ -7,8 +7,8 @@ import ChatBox from "../Common/ChatBox/ChatBox";
 import { navGroupLinkData } from "./dummyData";
 import { getCookie, getUserId} from "../tools/cookie";
 import { fetchData } from "../tools/fetchData";
+import { home } from "../tools/link";
 
-// dummy data
 function MainPage() {
 
   // !!TODO!! how to get profile id that can send to mainbox that show user that we want ???
@@ -24,13 +24,12 @@ function MainPage() {
  
 
   if (!data) {
-    return <div>Loading...</div>;
+    return <div className="loading"><div>Loading...</div></div>;
   } else {
   return (
     <div className="main-page">
       <div className="main-page-container">
         <BoxState userData={data} navLink={navGroupLinkData}/>
-        <ChatBox />
       </div>
     </div>
   );
@@ -61,8 +60,7 @@ const BoxState = ({userData, navLink}) => {
       return <Explore userData={userData} navLink={navLink} type={"group"}/>
     }
   } else if (url.pathname === "/"){
-    const id = getUserId("userId")
-    return <Profile userData={userData} profileId={parseInt(id)} navLink={navLink} type={"user"}/>
+    home();
   }
 }
 
