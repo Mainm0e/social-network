@@ -230,7 +230,7 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 		// TODO: Handle error: No valid sessionID cookie found.
 		return
 	} else {
-		isValid, err := sessions.Check(cookie)
+		isValid, err := sessions.CookieCheck(cookie)
 		if !isValid || err != nil {
 			// TODO: Handle error: Invalid sessionID cookie.
 			return
