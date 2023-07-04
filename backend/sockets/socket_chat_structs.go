@@ -29,7 +29,7 @@ type ChatHistory struct {
 
 type IsTyping struct {
 	ChatType       string `json:"chatType"`
-	ClientUsername string `json:"clientUsername"` // Username of the clientthat is typing
+	ClientUsername string `json:"clientUsername"` // Username of the client that is typing
 	TargetName     string `json:"targetName"`     // Username / GroupTitle to identify chat in which typing is happening
 }
 
