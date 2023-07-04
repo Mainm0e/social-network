@@ -2,9 +2,28 @@ import React, {useEffect, useState} from "react";
 import {logout} from "../../tools/logout";
 import NavList from "./NavList";
 import "./LeftBox.css";
-import {home} from "../../tools/link";
+import {home,link_notifications} from "../../tools/link";
+import {getUserId, getCookie} from "../../tools/cookie";
+import {fetchData} from "../../tools/fetchData";
 
 const LeftBox = ({user,link}) => {
+
+    //get notication number
+    const [notification, setNotification] = useState(0);
+    useEffect(() => {
+        const method = "POST";
+        const type = "requestNotif";
+    
+        const payload = {
+          userId: getUserId("userId"),
+          sessionId: getCookie("sessionId"),
+        };
+        fetchData(method, type, payload).then((data) => {
+          console.log(data.length);
+          setNotification(data.length);
+        });
+        }, []);
+
     /* get screen side */
     const [screensize, setScreensize] = useState("");
     useEffect(() => {
@@ -34,7 +53,7 @@ const LeftBox = ({user,link}) => {
         if (user.avatar === ''|| user.avatar === null|| user.avatar === undefined) {
             return null;
         } else {
-            return  <div className="post_image"> <img src={user.avatar} alt="content" /> </div>;
+            return  <div className="post_image"> <img src={user.avatar} alt="content" onClick={link_notifications}/> </div>;
         }
     };
     const [show, setShow] = useState(false);
@@ -77,8 +96,6 @@ const LinkBox = ({link,type,show}) => {
             <div className="links_full">
             <NavList type={"Main"} links={link[3]} />
             <NavList type={"Post"} links={link[1]} />
-            <NavList type={"Nav"} links={link[0]} />
-            <NavList type={"Connection"} links={link[2]} />
             </div>
         )
     }
@@ -87,8 +104,6 @@ const LinkBox = ({link,type,show}) => {
        <div className="links_medium">
             <NavList type={"Main"} links={link[3]} />
             <NavList type={"Post"} links={link[1]} />
-            <NavList type={"Nav"} links={link[0]} />
-            <NavList type={"Connection"} links={link[2]} />
         </div>
        )
     }

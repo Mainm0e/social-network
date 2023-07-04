@@ -80,7 +80,7 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
         response: value, // Use the value parameter here
       };
       fetchData(method, type, payload).then((data) => {
-        console.log(data);
+        window.location.reload();
         handleAcceptDecline(); // Call the handler function to hide the notification
       });
     };

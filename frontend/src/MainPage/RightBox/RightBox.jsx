@@ -31,7 +31,7 @@ const RightBox = () => {
           setBox(
             <UserList title="followings" id={parseInt(id)} clearBox={clearBox} />
           );
-        } else if (hash === "notifactions") {
+        } else if (hash === "notifications") {
           setBox(<Notification clearBox={clearBox} />);
         } else {
           setBox(null);
