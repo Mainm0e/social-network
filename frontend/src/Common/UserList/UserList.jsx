@@ -4,6 +4,11 @@ import "./UserList.css";
 import { fetchData } from "../../tools/fetchData";
 
 const UserList = ({ title, id, clearBox }) => {
+  
+  const closeBox = () => {
+    window.location.hash = "";
+    clearBox();
+  };
   const [data, setData] = useState(null);
   useEffect(() => {
     const method = "POST";
@@ -28,7 +33,7 @@ const UserList = ({ title, id, clearBox }) => {
             </div>
           </div>
           <div className="user-list-footer">
-            <button onClick={clearBox}>Close</button>
+            <button onClick={closeBox}>Close</button>
           </div>
         </div>
       );
@@ -58,7 +63,7 @@ const UserList = ({ title, id, clearBox }) => {
             </ul>
           </div>
           <div className="user-list-footer">
-            <button onClick={clearBox}>Close</button>
+            <button onClick={closeBox}>Close</button>
           </div>
         </div>
       </div>

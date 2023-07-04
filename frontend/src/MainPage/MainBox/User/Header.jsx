@@ -2,6 +2,7 @@ import React from "react";
 import "../MainBox.css";
 import { getCookie, getUserId } from "../../../tools/cookie";
 import { fetchData } from "../../../tools/fetchData";
+import { link_followers, link_following } from "../../../tools/link";
 const Header = ({profile,handleRefresh}) => {
   const user = profile;
   const checkPrivacy = () => {
@@ -53,11 +54,11 @@ const Header = ({profile,handleRefresh}) => {
           </div>
           {checkPrivacy()}
           <div className="followers info">
-            <label>Followers: </label>
+            {user.followerNum > 0 && <label onClick={link_followers}>Followers: </label>||<label>Followers: </label>}
             <span>{user.followerNum}</span>
           </div>
           <div className="following info">
-            <label>Following: </label>
+            {user.followingNum > 0 && <label onClick={link_following} >Following: </label>||<label>Following: </label>}
             <span>{user.followingNum}</span>
           </div>
           {/* follow button */}

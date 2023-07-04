@@ -53,6 +53,20 @@
     justify-content: center;
 }
 
+.user_info .followers label:hover {
+    transition: all 0.5s ease-in-out;
+    text-shadow: 1px 3px 0 #969696, 2px 2px 5px #aba8a8, 2px 2px 2px rgba(206, 89, 55, 0);
+    color: #FFEA00;
+    background: #FFFFFF;
+}
+
+.user_info .following label:hover {
+    transition: all 0.5s ease-in-out;
+    text-shadow: 1px 3px 0 #969696, 2px 2px 5px #aba8a8, 2px 2px 2px rgba(206, 89, 55, 0);
+    color: #FFEA00;
+    background: #FFFFFF;
+}
+
 .info_box .user_info {
     display: flex;
     flex-direction: column;

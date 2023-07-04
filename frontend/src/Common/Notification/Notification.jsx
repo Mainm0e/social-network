@@ -22,6 +22,11 @@ const Notification = ({ clearBox }) => {
   const handleAcceptDecline = () => {
     setShowNotification(false); // Hide the notification after accepting or declining
   };
+  const closeBox = () => {
+    window.location.hash = "";
+    clearBox();
+  };
+
 
   const renderNotifications = () => {
     return notificationData.map((notification, index) => (
@@ -39,7 +44,7 @@ const Notification = ({ clearBox }) => {
       {showNotification && renderNotifications()}{" "}
       {/* Conditionally render the notifications */}
       <div className="user-list-footer">
-        <button onClick={clearBox}>Close</button>
+        <button onClick={closeBox}>Close</button>
       </div>
     </div>
   );
@@ -53,7 +58,7 @@ else {
         </div>
       </div>
       <div className="user-list-footer">
-        <button onClick={clearBox}>Close</button>
+        <button onClick={closeBox}>Close</button>
       </div>
     </div>
   )
@@ -75,7 +80,7 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
         response: value, // Use the value parameter here
       };
       fetchData(method, type, payload).then((data) => {
-        console.log(data);
+        window.location.reload();
         handleAcceptDecline(); // Call the handler function to hide the notification
       });
     };
