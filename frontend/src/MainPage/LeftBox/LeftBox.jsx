@@ -1,10 +1,32 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {logout} from "../../tools/logout";
 import NavList from "./NavList";
 import "./LeftBox.css";
 import {home} from "../../tools/link";
 
 const LeftBox = ({user,link}) => {
+    /* get screen side */
+    const [screensize, setScreensize] = useState("");
+    useEffect(() => {
+    let size = window.innerWidth
+    if (size < 1400) {
+        setScreensize("medium");
+    }
+    if (size > 1400) {
+        setScreensize("rare");
+    }
+    }, []);
+    window.addEventListener("resize", () => {
+       let  size = window.innerWidth
+        if (size < 1400) {
+            setScreensize("medium");
+        }
+        if (size > 1400) {
+            setScreensize("rare");
+        }
+
+        //
+    });
     const handleLogout = () => {
         logout();
     }
@@ -15,6 +37,10 @@ const LeftBox = ({user,link}) => {
             return  <div className="post_image"> <img src={user.avatar} alt="content" /> </div>;
         }
     };
+    const [show, setShow] = useState(false);
+    const showLinks = () => {
+        setShow(!show);
+    }
     return (
         <div className="left-box">
             <div className="user_box">
@@ -25,17 +51,50 @@ const LeftBox = ({user,link}) => {
                     <div className="username">
                         <span onClick={home}>{user.firstName}</span>
                     </div>
+                    <div className="btns">
                     <div className="logout_btn">
                         <button className="btn" onClick={handleLogout}>logout</button>
                     </div>
+                    <div className="link_btn">
+                        <button className="btn" onClick={showLinks}>menu </button>
+                    </div>
+                    </div>
                 </div>
             </div>
-            <NavList type={"Main"} links={link[3]} />
-            <NavList type={"Post"} links={link[1]} />
-            <NavList type={"Nav"} links={link[0]} />
-            <NavList type={"Connection"} links={link[2]} />
+            {screensize === "medium" && <LinkBox link={link} type={"medium"} show={show} /> ||
+            screensize === "rare" && <LinkBox link={link} type={"rare"} show={true}/> }
         </div>
     );
 }
 
 export default LeftBox;
+
+const LinkBox = ({link,type,show}) => {
+    
+    if (show === true) {
+    if (type ==="rare"){
+        return (
+            <div className="links_full">
+            <NavList type={"Main"} links={link[3]} />
+            <NavList type={"Post"} links={link[1]} />
+            <NavList type={"Nav"} links={link[0]} />
+            <NavList type={"Connection"} links={link[2]} />
+            </div>
+        )
+    }
+    if (type === "medium"){
+       return ( 
+       <div className="links_medium">
+            <NavList type={"Main"} links={link[3]} />
+            <NavList type={"Post"} links={link[1]} />
+            <NavList type={"Nav"} links={link[0]} />
+            <NavList type={"Connection"} links={link[2]} />
+        </div>
+       )
+    }
+    } else {
+        return null;
+    }
+
+}
+
