@@ -33,6 +33,11 @@ func insertFollowRequest(senderId int, receiverId int) error {
 			if err != nil {
 				return errors.New("Error inserting follow request" + err.Error())
 			}
+		} else {
+			_, err := db.InsertData("notifications", receiverId, senderId, 0, reqType, time.Now())
+			if err != nil {
+				return errors.New("Error inserting follow request" + err.Error())
+			}
 		}
 		_, err = db.InsertData("follow", senderId, receiverId, status)
 		if err != nil {
