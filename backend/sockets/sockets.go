@@ -30,19 +30,20 @@ func NewManager() *Manager {
 }
 
 /*
-NewClient is a function that creates a new Client. It takes two parameters:
-a pointer to a websocket.Conn (which represents the WebSocket connection
-between the server and the client) and a pointer to a Manager (which manages
-the client and other clients). The function returns a pointer to a newly
-created Client.  This function is typically called after a new WebSocket
-connection has been established and a new Client needs to be created to
+NewClient is a function that creates a new Client. It takes three parameters:
+a pointer to a websocket.Conn (which represents the WebSocket connection between
+the server and the client), a pointer to a Manager (which manages the client and
+other clients), and a string (which is the client's ID). The function returns a
+pointer to a newly created Client.  This function is typically called after a new
+WebSocket connection has been established and a new Client needs to be created to
 manage the connection.
 */
-func NewClient(conn *websocket.Conn, wsManager *Manager) *Client {
+func NewClient(conn *websocket.Conn, wsManager *Manager, id string) *Client {
 	return &Client{
 		Connection: conn,
 		Manager:    wsManager,
 		Egress:     make(chan []byte),
+		ID:         id,
 	}
 }
 
@@ -209,10 +210,9 @@ func (m *Manager) Run() {
 }
 
 /*
-ServeWS is an HTTP handler function that upgrades an HTTP(S)
-connection to a WebSocket connection. It creates a new client and then
-initiates the reading and writing goroutines for that client.
-Parameters:
+ServeWS is an HTTP handler function that upgrades an HTTP(S) connection to
+a WebSocket connection. It creates a new client and then initiates the
+reading and writing goroutines for that client. Parameters:
 - w: The HTTP ResponseWriter that the handler will use to send HTTP responses.
 - r: The HTTP Request that has been received by the handler.
 */
@@ -223,8 +223,14 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Extract the identifier from the query parameters.
+	// "id" is the query parameter key.
+	id := r.URL.Query().Get("id")
+
+	//	TODO: Validate the id.
+
 	// Create a new client for the WebSocket connection.
-	client := NewClient(conn, m)
+	client := NewClient(conn, m, id)
 
 	// Register the new client with the Manager.
 	m.Register <- client
