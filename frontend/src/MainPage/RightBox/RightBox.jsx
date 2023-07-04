@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import "./RightBox.css";
 import UserList from "../../Common/UserList/UserList";
 import Notification from "../../Common/Notification/Notification";
-import { getUserId } from "../../tools/cookie";
 
 const RightBox = () => {
   const [box, setBox] = useState(null);
@@ -57,7 +56,6 @@ const RightBox = () => {
   if (box === null) {
     return null;
   } else {
-    console.log("what is box",box)
     return <div className="right-box">{box}</div>;
   }
 
