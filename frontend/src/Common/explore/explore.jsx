@@ -61,5 +61,5 @@ const navigateToProfile = (type,userId) => {
     } else if (type ==="exploreGroups"){
         linkType = "group"
     }
-    return window.location.href = `/${linkType}?id=${userId}`;
+    return window.location.href = `/${linkType}?id=${userId}#postlist`;
   };

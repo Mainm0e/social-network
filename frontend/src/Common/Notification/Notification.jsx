@@ -19,14 +19,6 @@ const Notification = ({ clearBox }) => {
       setNotificationData(data);
     });
   }, []);
-
-  if (
-    notificationData === undefined ||
-    notificationData.lenght < 1 ||
-    notificationData === null
-  ) {
-    return null;
-  }
   const handleAcceptDecline = () => {
     setShowNotification(false); // Hide the notification after accepting or declining
   };
@@ -41,6 +33,7 @@ const Notification = ({ clearBox }) => {
       />
     ));
   };
+  if (notificationData.length  > 0) {
   return (
     <div className="notification-container">
       {showNotification && renderNotifications()}{" "}
@@ -50,6 +43,21 @@ const Notification = ({ clearBox }) => {
       </div>
     </div>
   );
+}
+else {
+  return (
+    <div className="notification-container">
+      <div className="notification">
+        <div className="notification-content">
+          <span>No notifications</span>
+        </div>
+      </div>
+      <div className="user-list-footer">
+        <button onClick={clearBox}>Close</button>
+      </div>
+    </div>
+  )
+}
 };
 
 export default Notification;
