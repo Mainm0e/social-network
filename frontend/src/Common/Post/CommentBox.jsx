@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getCookie, getUserId } from "../../tools/cookie";
 import "./CommentBox.css";
 import { checkCommentData } from "../../tools/checkdata";
@@ -139,13 +139,25 @@ const CreateComment = ({ id, showComment }) => {
 };
 
 const CommentList = ({ comments }) => {
-  console.log(comments);
+  const textareaRefs = useRef([]);
+
+  useEffect(() => {
+    textareaRefs.current.forEach((textarea) => {
+      console.log(textarea.scrollHeight);
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    });
+  }, [comments]);
   const loopComment = (comments) => {
-    return comments.map((comment) => (
+    return comments.map((comment,index) => (
       <div className="comment_list_item" key={comment.commentId}>
         <div className="comment_list_item_header">
           <div className="comment_list_item_body">
-            <p className="content">{comment.content}</p>
+            <textarea
+              ref={(el) => (textareaRefs.current[index] = el)}
+              className="content"
+              readOnly
+              defaultValue={comment.content}
+            ></textarea>
           </div>
           <div className="comment_list_item_header_right">
             <div className="comment_list_item_header_user">

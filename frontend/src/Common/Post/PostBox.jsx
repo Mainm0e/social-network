@@ -43,7 +43,7 @@ const PostList = ({ profileId }) => {
   };
 
   if (!postData) {
-    return <div>Loading...</div>;
+    return null
   } else {
     return <div className="post_list">{createPost()}</div>;
   }
@@ -226,7 +226,6 @@ const CreatePost = ({ onSubmit }) => {
 };
 
 const FollowerList = ({ users, followers, handleFollowerChange }) => {
-  console.log("users", users)
   return (
     <div className="create_post_follower_list">
       {users.map((user) => (
