@@ -67,7 +67,7 @@ const Profile = ({sessionId, userId,profileId,refreshComponent}) =>{
 
   
   if (data === null) {
-    return <div>Loading...</div>;
+
   } else {
     return (
       <div className="main-box">

@@ -31,9 +31,13 @@
         box-shadow: 1px 3px 0 #969696, 1px 13px 5px #aba8a8, 2px 2px 2px rgba(206, 89, 55, 0);
         background: #FFFFFF;
     }
-    .user_info {
+    .user_box .user_info {
         font-size: 20px;
         font-family: myFancyFont;
+        width: 100px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .user_info .username {
         font-size: 20px;
@@ -185,8 +189,13 @@
     .user_box .user_info {
         display: flex;
         align-items: center;
-        gap: 300px;
+        gap: 200px;
+        font-family: myFancyFont;
     }
+    /* .user_box .user_info {
+        overflow: hidden;
+        font-size: 20px;
+    } */
     .user_box .user_info .username {
         font-family: myFancyFont;
         margin: 0;
@@ -194,10 +203,16 @@
         width: 100%;
         text-align: start;
         padding: 5px 0;
-        font-size: 30px;
+        font-size: 20px;
         color: #000;
         cursor: pointer;
         text-decoration: none;
+        font-size: 20px;
+        font-family: myFancyFont;
+        width: 100px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .user_box .user_info .username :hover {
         transition: all 0.5s ease-in-out;
