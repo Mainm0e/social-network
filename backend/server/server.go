@@ -182,9 +182,9 @@ func initialiseRoutes() http.Handler {
 	wsManager := sockets.NewManager()
 
 	// Register handler functions for various routes
-	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
 	mux.HandleFunc("/api", handlers.HTTPEventRouter)
 	mux.HandleFunc("/ws", wsManager.ServeWS)
+	log.Println("Websocket initialisation complete")
 
 	// Wrap the mux with the CORS middleware and return it
 	// Although the return type is an http.Handler, it is actually a wrapped *mux.Router which
@@ -290,8 +290,6 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	// Setup channel to receive the server instance, enabling graceful shutdown
 	serverCh := make(chan *http.Server)
-
-	// TODO: initialise websocket manager and associated event handlers
 
 	// If HTTP is specified, setup HTTP server in a goroutine
 	if protocol == "http" {
