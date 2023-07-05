@@ -77,10 +77,10 @@ func (g *GroupMsg) GetTimestamp() string {
 	return g.Timestamp
 }
 
-func (p *PrivateMsg) GetType() string {
+func (p *PrivateMsg) GetChatType() string {
 	return "PrivateMsg"
 }
 
-func (g *GroupMsg) GetType() string {
+func (g *GroupMsg) GetChatType() string {
 	return "GroupMsg"
 }
