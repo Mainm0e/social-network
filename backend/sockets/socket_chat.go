@@ -74,21 +74,24 @@ func UnmarshalJSONToGroupMsg(jsonMsg []byte) (*GroupMsg, error) {
 }
 
 /*
-BroadcastGroupMessage() is a method of the Manager struct, which takes a groupID int and a
-json byte array as input parameters. It then broadcasts the json byte array to all clients
-in the group chat. It returns an error value, which is non-nil if any of the broadcasting
-operations failed or if there are no members in the group.
+BroadcastGroupMessage() is a method of the Manager struct, which takes a
+groupID int and a json byte array as input parameters. It then broadcasts
+the json byte array to all clients in the group chat. It returns an error
+value, which is non-nil if any of the broadcasting operations failed or if
+there are no members in the group.
 */
 func (m *Manager) BroadcastGroupMsg(groupID int, payloadJSON []byte) error {
 	// Retrieve the userIDs of the group members from the database
 	memberUserIDs, err := handlers.GetAllGroupMemberIDs(groupID)
 	if err != nil {
-		return fmt.Errorf("BroadCastGroupMsg() error - unable to retrieve group \" %v \" members: %v", groupID, err)
+		return fmt.Errorf("BroadCastGroupMsg() error - unable to retrieve group "+
+			"\" %v \" members: %v", groupID, err)
 	}
 
 	// Check if there are any members in the group
 	if len(memberUserIDs) == 0 {
-		return fmt.Errorf("BroadCastGroupMsg() - no members in group \" %v \": message could not be broadcast", groupID)
+		return fmt.Errorf("BroadCastGroupMsg() - no members in group "+
+			"\" %v \": message could not be broadcast", groupID)
 	}
 
 	// Flag to track if message was sent to at least one member
@@ -119,7 +122,8 @@ func (m *Manager) BroadcastGroupMsg(groupID int, payloadJSON []byte) error {
 
 	// Check if the message was sent to at least one member
 	if !sent {
-		return fmt.Errorf("BroadCastGroupMsg() - no active connections in group \" %v \": message could not be broadcast", groupID)
+		return fmt.Errorf("BroadCastGroupMsg() - no active connections in group "+
+			"\" %v \": message could not be broadcast", groupID)
 	}
 
 	// Return nil if there were no errors
@@ -151,27 +155,66 @@ GroupMsg, and broadcasts it to all clients in the chat. It returns an error valu
 which is non-nil if any of the broadcasting operations failed.
 */
 func (m *Manager) BroadcastMessage(msg ChatMsg) error {
+	senderID := msg.GetSenderID()
+	receiverID := msg.GetReceiverID() // Can be a userID or groupID
+	message := msg.GetMessage()
+	timestamp := msg.GetTimestamp()
+	msgType := msg.GetMsgType()
 
+	// payload to be sent to clients
+	payload := map[string]interface{}{
+		"type": msgType,
+		"payload": map[string]string{
+			"senderID":   string(senderID),
+			"receiverID": string(receiverID),
+			"message":    message,
+			"timeStamp":  timestamp,
+		},
+	}
+
+	// Convert payload to JSON
+	payloadJSON, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	// Decide broadcasting logic based on message type
+	switch msgType {
+
+	// For private messages, only broadcast to the receiver
+	case "PrivateMsg":
+		err = m.BroadcastPrivateMsg(receiverID, payloadJSON)
+		if err != nil {
+			return errors.Errorf("BroadcastMessage() error - %v", err)
+		}
+
+	// For group messages, broadcast to all clients within a group
+	case "GroupMsg":
+		err = m.BroadcastGroupMsg(receiverID, payloadJSON)
+		if err != nil {
+			return errors.Errorf("BroadcastMessage() error - %v", err)
+		}
+	
 	return nil
 }
 
 /*
-HandleMessage() takes a ChatMsg interface, which is either a PrivateMsg or a
+HandleChatMessage() takes a ChatMsg interface, which is either a PrivateMsg or a
 GroupMsg, and handles it. This means that it records the message to the database
 and broadcasts it to all clients in the chat. It returns an error value, which
 is non-nil if any of the operations failed.
 */
-func (m *Manager) HandleMessage(msg ChatMsg) error {
+func (m *Manager) HandleChatMessage(msg ChatMsg) error {
 	// Store message in database
 	err := RecordMsgToDB(msg)
 	if err != nil {
-		return err
+		return errors.Errorf("HandleMessage() error - %v", err)
 	}
 
 	// Broadcast message to clients
 	err = m.BroadcastMessage(msg)
 	if err != nil {
-		return err
+		return errors.Errorf("HandleMessage() error - %v", err)
 	}
 
 	return nil
