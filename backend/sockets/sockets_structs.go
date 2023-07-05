@@ -90,5 +90,5 @@ type Client struct {
 	Connection *websocket.Conn
 	Manager    *Manager
 	Egress     chan []byte // A channel for outgoing messages
-	ID         string
+	ID         int         // UserID of client
 }
