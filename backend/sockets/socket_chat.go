@@ -1,10 +1,12 @@
 package sockets
 
 import (
+	"backend/db"
 	"backend/handlers"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 )
 
 /********************** PRIVATE MESSAGE LOGIC *******************************/
@@ -141,10 +143,14 @@ func RecordMsgToDB(msg ChatMsg) error {
 	msgType := msg.GetMsgType()
 	senderID := msg.GetSenderID()
 	receiverID := msg.GetReceiverID()
-	message := msg.GetMessage()
-	timestamp := msg.GetTimestamp()
+	messageContent := msg.GetMessage()
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
 
-	// TODO: Write database logic to record message to database
+	// Insert message into database
+	_, err := db.InsertData("messages", senderID, receiverID, messageContent, timestamp, msgType)
+	if err != nil {
+		return fmt.Errorf("RecordMsgToDB() error - unable to record message to database: %v", err)
+	}
 
 	return nil
 }
@@ -155,25 +161,12 @@ GroupMsg, and broadcasts it to all clients in the chat. It returns an error valu
 which is non-nil if any of the broadcasting operations failed.
 */
 func (m *Manager) BroadcastMessage(msg ChatMsg) error {
-	senderID := msg.GetSenderID()
-	receiverID := msg.GetReceiverID() // Can be a userID or groupID
-	message := msg.GetMessage()
-	timestamp := msg.GetTimestamp()
 	msgType := msg.GetMsgType()
+	receiverID := msg.GetReceiverID()
+	msgEvent := msg.WrapMsg()
 
-	// payload to be sent to clients
-	payload := map[string]interface{}{
-		"type": msgType,
-		"payload": map[string]string{
-			"senderID":   string(senderID),
-			"receiverID": string(receiverID),
-			"message":    message,
-			"timeStamp":  timestamp,
-		},
-	}
-
-	// Convert payload to JSON
-	payloadJSON, err := json.Marshal(payload)
+	// Convert event to JSON
+	msgEventJSON, err := json.Marshal(msgEvent)
 	if err != nil {
 		return err
 	}
@@ -183,14 +176,14 @@ func (m *Manager) BroadcastMessage(msg ChatMsg) error {
 
 	// For private messages, only broadcast to the receiver
 	case "PrivateMsg":
-		err = m.BroadcastPrivateMsg(receiverID, payloadJSON)
+		err = m.BroadcastPrivateMsg(receiverID, msgEventJSON)
 		if err != nil {
 			return fmt.Errorf("BroadcastMessage() error - %v", err)
 		}
 
 	// For group messages, broadcast to all clients within a group
 	case "GroupMsg":
-		err = m.BroadcastGroupMsg(receiverID, payloadJSON)
+		err = m.BroadcastGroupMsg(receiverID, msgEventJSON)
 		if err != nil {
 			return fmt.Errorf("BroadcastMessage() error - %v", err)
 		}
