@@ -107,4 +107,19 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
       </div>
     );
   }
+  if (notifications.type === "following") {
+    return (
+      <div className="notification">
+        <div className="notification-user">
+          <img src={user.avatar} alt="avatar" />
+          <span>
+            {user.firstName} {user.lastName}
+          </span>
+        </div>
+        <div className="notification-content">
+          <span>started following you</span>
+        </div>
+      </div>
+    );
+  }
 };
