@@ -2,28 +2,38 @@ import React, { useState, useEffect } from "react";
 import "./RightBox.css";
 import UserList from "../../Common/UserList/UserList";
 import Notification from "../../Common/Notification/Notification";
-import { getUserId } from "../../tools/cookie";
 
 const RightBox = () => {
   const [box, setBox] = useState(null);
-  const userId = getUserId("userId")
-
   useEffect(() => {
+    console.log("what is box",box)
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1); // Remove the '#' character
+      // Get the URL
+       // Get the query parameters from the URL
+    const searchParams = new URLSearchParams(window.location.search);
+
+    // Get the value of the 'id' parameter
+    const id = searchParams.get('id');
+
+      // Use the id value as needed
+      console.log(id);
 
       // Clear the box and create a new UserList component after a slight delay
       clearBox();
       setTimeout(() => {
         if (hash === "followers") {
-          setBox(<UserList title="followers" id={userId} clearBox={clearBox} />);
+          setBox(
+            <UserList title="followers" id={parseInt(id)} clearBox={clearBox} />
+          );
         } else if (hash === "followings") {
-          setBox(<UserList title="followings" id={userId} clearBox={clearBox} />);
-        } else if (hash === "notifactions") {
-          setBox(<Notification  clearBox={clearBox}/>);
-
+          setBox(
+            <UserList title="followings" id={parseInt(id)} clearBox={clearBox} />
+          );
+        } else if (hash === "notifications") {
+          setBox(<Notification clearBox={clearBox} />);
         } else {
-          setBox(<div className="loading">Loading...</div>);
+          setBox(null);
         }
       }, 10);
     };
@@ -37,13 +47,18 @@ const RightBox = () => {
       // Cleanup the event listener on component unmount
       window.removeEventListener("hashchange", handleHashChange);
     };
-  }, [userId]);
+  }, []);
 
   const clearBox = () => {
+    // delete # from url
     setBox(null);
   };
+  if (box === null) {
+    return null;
+  } else {
+    return <div className="right-box">{box}</div>;
+  }
 
-  return <div className="right-box">{box}</div>;
 };
 
 export default RightBox;

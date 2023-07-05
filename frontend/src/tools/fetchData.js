@@ -1,3 +1,4 @@
+import { logout } from "./logout"
 export async function fetchData(method, type, payload) {
   const response = await fetch("http://localhost:8080/api", {
     method: method,
@@ -39,5 +40,10 @@ export async function fetchData(method, type, payload) {
   if (responseData.statusCode === 200) {
     console.log("responseData", responseData)
     return responseData.event.payload;
+  }
+  if (responseData.statusCode === 400) {
+    if (responseData.message === "Error handling event:Error fetchingUser:user not found"){
+      logout();
+    }
   }
 }

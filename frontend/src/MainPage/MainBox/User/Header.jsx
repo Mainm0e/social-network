@@ -2,17 +2,18 @@ import React from "react";
 import "../MainBox.css";
 import { getCookie, getUserId } from "../../../tools/cookie";
 import { fetchData } from "../../../tools/fetchData";
+import { link_followers, link_following } from "../../../tools/link";
 const Header = ({profile,handleRefresh}) => {
   const user = profile;
   const checkPrivacy = () => {
     if (true) {
       return (
         <>
-          <div className="birthdate">
+          <div className="birthdate info">
             <label>Birthdate: </label>
             <span>{user.privateProfile.birthdate}</span>
           </div>
-          <div className="email">
+          <div className="email info">
             <label>Email: </label>
             <span>{user.privateProfile.email}</span>
           </div>
@@ -45,19 +46,19 @@ const Header = ({profile,handleRefresh}) => {
       </div>
       <div className="info_box">
         <div className="user_info">
-          <div className="fullName">
+          <div className="fullName info">
             <label> Name: </label>
-            <span>{user.firstName}</span>
+            <span id="profile-firstName">{user.firstName}</span>
             <span> </span>
             <span>{user.lastName}</span>
           </div>
           {checkPrivacy()}
-          <div className="followers">
-            <label>Followers: </label>
+          <div className="followers info">
+            {user.followerNum > 0 && <label onClick={link_followers}>Followers: </label>||<label>Followers: </label>}
             <span>{user.followerNum}</span>
           </div>
-          <div className="following">
-            <label>Following: </label>
+          <div className="following info">
+            {user.followingNum > 0 && <label onClick={link_following} >Following: </label>||<label>Following: </label>}
             <span>{user.followingNum}</span>
           </div>
           {/* follow button */}
@@ -89,7 +90,7 @@ const Followbtn = ({  relation, privacy ,followRequest , changePrivacy}) => {
           <button className="follow_btn hover">
             private
           </button>
-          <button className="follow_btn" onClick={handleSentRequest}>
+          <button className="follow_btn" onClick={handleSentRequest} style={{ cursor: 'pointer' }}>
             public
           </button>
         </div>
@@ -101,7 +102,7 @@ const Followbtn = ({  relation, privacy ,followRequest , changePrivacy}) => {
           <button className="follow_btn hover" >
             public
           </button>
-          <button className="follow_btn" onClick={handleSentRequest}>
+          <button className="follow_btn" onClick={handleSentRequest} style={{ cursor: 'pointer' }}>
             private
           </button>
         </div>
