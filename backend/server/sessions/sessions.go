@@ -103,7 +103,7 @@ func (store *SessionStore) Create(username string, admin bool) (string, error) {
 	}
 
 	session := &Session{
-		SessionID: sessionID,
+		SessionID: sessionID, // Possibly redundant as it is the key in the sync.Map
 		UserID:    userID,
 		Admin:     admin,
 		Expires:   expires,
