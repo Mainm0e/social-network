@@ -5,12 +5,14 @@ import (
 	"backend/events"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"time"
 )
 
-func InsertGroup(group Group) error {
+/*
+InsertGroup is defined as a method on the Group struct type. It inserts a new group into the database.
+*/
+func (group *Group) InsertGroup() error {
 	_, err := db.InsertData("groups", group.CreatorProfile.UserId, group.Title, group.Description, time.Now())
 	if err != nil {
 		return errors.New("Error inserting group" + err.Error())
@@ -24,28 +26,39 @@ func InsertGroupMember(groupId int, userId int) error {
 	}
 	return nil
 }
-func ReadGroup(groupId int) (Group, error) {
+
+/*
+ReadGroup is defined as a method on the Group struct type.
+it takes groupId as an argument fill the group struct with the group data from the database.
+returns error if any occurred otherwise returns nil.
+*/
+func (group *Group) ReadGroup(groupId int) error {
 	dbGroups, err := db.FetchData("groups", "groupId", groupId)
 	if err != nil {
-		return Group{}, errors.New("Error fetching group" + err.Error())
+		return errors.New("Error fetching group" + err.Error())
 	}
 	if len(dbGroups) == 0 {
-		return Group{}, errors.New("group not found")
+		return errors.New("group not found")
 	}
 	dbGroup := dbGroups[0].(db.Group)
 	creator, err := fillSmallProfile(dbGroup.CreatorId)
 	if err != nil {
-		return Group{}, errors.New("Error fetching group creator" + err.Error())
+		return errors.New("Error fetching group creator" + err.Error())
 	}
-	group := Group{
-		GroupId:        dbGroup.GroupId,
-		CreatorProfile: creator,
-		Title:          dbGroup.Title,
-		Description:    dbGroup.Description,
-		Date:           dbGroup.CreationTime,
-	}
-	return group, nil
+	group.GroupId = dbGroup.GroupId
+	group.CreatorProfile = creator
+	group.Title = dbGroup.Title
+	group.Description = dbGroup.Description
+	group.Date = dbGroup.CreationTime
+
+	return nil
 }
+
+/*
+ReadAllGroups is a function that returns all existing groups in the database as a slice of Group struct.
+it used in exploreGroups handler. and uses fillSmallProfile function to fill the creator profile.
+if any error occurred it returns an error with a descriptive message.
+*/
 func ReadAllGroups(sessionId string) ([]Group, error) {
 	dbGroups, err := db.FetchData("groups", "")
 	if err != nil {
@@ -74,11 +87,15 @@ func ReadAllGroups(sessionId string) ([]Group, error) {
 	return groups, nil
 }
 
+/*
+ExploreGroups gets userId and sessionId as jsonified payload from frontend.
+it calls ReadAllGroups function to get all groups from database.
+it returns a response with a descriptive message and an event with the groups payload. or an error if any occurred.
+*/
 func ExploreGroups(payload json.RawMessage) (Response, error) {
 	var response Response
 	var explore Explore
 	err := json.Unmarshal(payload, &explore)
-	log.Println("User: ", explore)
 	if err != nil {
 		// handle the error
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
