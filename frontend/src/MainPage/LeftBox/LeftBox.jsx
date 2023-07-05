@@ -53,7 +53,7 @@ const LeftBox = ({user,link}) => {
         if (user.avatar === ''|| user.avatar === null|| user.avatar === undefined) {
             return null;
         } else {
-            return  <div className="post_image"> <img src={user.avatar} alt="content" onClick={link_notifications}/> </div>;
+            return  <div className="post_image "> <img src={user.avatar} alt="content"  onClick={link_notifications}/> </div>;
         }
     };
     const [show, setShow] = useState(false);

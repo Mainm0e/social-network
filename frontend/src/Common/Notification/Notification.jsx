@@ -108,6 +108,22 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
     );
   }
   if (notifications.type === "following") {
+    const handleDeleteNotif = () => {
+      const method = "POST";
+      const type = "followResponse";
+      const payload = {
+        sessionId: getCookie("sessionId"),
+        followeeId: getUserId("userId"),
+        followerId: notifications.senderId,
+        notifId: notifications.notificationId,
+        response: "", // Use the value parameter here
+      };
+      fetchData(method, type, payload).then((data) => {
+        window.location.reload();
+        handleAcceptDecline(); // Call the handler function to hide the notification
+      });
+    };
+
     return (
       <div className="notification">
         <div className="notification-user">
@@ -118,6 +134,9 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
         </div>
         <div className="notification-content">
           <span>started following you</span>
+        </div>
+        <div className="notification-btn">
+          <span onClick={handleDeleteNotif}>x</span>
         </div>
       </div>
     );
