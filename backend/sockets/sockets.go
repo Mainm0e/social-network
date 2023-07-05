@@ -238,8 +238,15 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	}
 	sessionID := cookie.Value
 
+	// Retrieve the associated UserID from the sessions Store.
+	userSession, sessionExists, err := sessions.Store.Get(sessionID)
+	if err != nil || !sessionExists {
+		log.Printf("sockets.ServeWS() error - Failed to retrieve UserID from sessions Store: %v", err)
+		return
+	}
+
 	// Create a new client for the WebSocket connection.
-	client := NewClient(conn, m, sessionID)
+	client := NewClient(conn, m, userSession.UserID)
 
 	// Register the new client with the Manager.
 	m.Register <- client
