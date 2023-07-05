@@ -10,21 +10,70 @@ import (
 )
 
 /*
-InsertGroup is defined as a method on the Group struct type. It inserts a new group into the database.
+InsertGroup is defined as a method on the Group struct type.
+It inserts a new group into the database and fills the groupId field in the group struct with given groupId.
 */
 func (group *Group) InsertGroup() error {
-	_, err := db.InsertData("groups", group.CreatorProfile.UserId, group.Title, group.Description, time.Now())
+	id, err := db.InsertData("groups", group.CreatorProfile.UserId, group.Title, group.Description, time.Now())
 	if err != nil {
 		return errors.New("Error inserting group" + err.Error())
 	}
+	group.GroupId = int(id)
 	return nil
 }
+
+/*
+InsertGroupMember inserts a new group member into "group_member" table. return error if any occurred otherwise returns nil.
+*/
 func InsertGroupMember(groupId int, userId int) error {
 	_, err := db.InsertData("group_member", groupId, userId)
 	if err != nil {
 		return errors.New("Error inserting group member" + err.Error())
 	}
 	return nil
+}
+
+/*
+CreateGroup gets sessionId and creation group data as jsonified payload from frontend.
+it calls CreateGroup function to insert group into database which after inserting group into database it fill groupId field in group struct.
+then it calls InsertGroupMember function to insert creator of the group into group_member table.
+it returns a response with a descriptive message and an event with the group payload. or an error if any occurred.
+*/
+func CreateGroup(payload json.RawMessage) (Response, error) {
+	var response Response
+	var group Group
+	err := json.Unmarshal(payload, &group)
+	if err != nil {
+		// handle the error
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	if group.SessionId == "" {
+		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	//insert group into database
+	err = group.InsertGroup()
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	//insert creator of the group into database
+	err = InsertGroupMember(group.GroupId, group.CreatorProfile.UserId)
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	payload, err = json.Marshal(map[string]string{"sessionId": group.SessionId})
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	event := events.Event{
+		Type:    "createGroup",
+		Payload: payload,
+	}
+	return Response{"group created successfully!", event, http.StatusOK}, nil
 }
 
 /*
