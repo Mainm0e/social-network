@@ -55,6 +55,7 @@ func insertFollowRequest(senderId int, receiverId int) error {
 		if err != nil {
 			return errors.New("Error fetching notifications" + err.Error())
 		}
+		//TODO: ask if Adi could send notificationId if its exist in frontend so we don't need this shitty for loop
 		for _, n := range notifications {
 			if notification, ok := n.(db.Notification); ok {
 				// finding the follow request notification
