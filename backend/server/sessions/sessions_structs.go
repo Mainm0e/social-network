@@ -44,10 +44,10 @@ indicate if the user is an admin or not (this is for future use, if admin functi
 is implemented).
 */
 type Session struct {
-	ID       string
-	Username string
-	Admin    bool
-	Expires  time.Time
+	SessionID string
+	UserID    int
+	Admin     bool
+	Expires   time.Time
 }
 
 /*
