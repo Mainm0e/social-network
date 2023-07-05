@@ -40,16 +40,16 @@ type ChatMsg interface {
 	GetReceiverID() int
 	GetMessage() string
 	GetTimestamp() string
-	GetChatType() string
+	GetMsgType() string
 }
 
 /*********** NOTE TO SELF: NEVER FORGET HOW COOL INTERFACES ARE! ************/
 
-func (p *PrivateMsg) GetSender() int {
+func (p *PrivateMsg) GetSenderID() int {
 	return p.SenderID
 }
 
-func (p *PrivateMsg) GetReceiver() int {
+func (p *PrivateMsg) GetReceiverID() int {
 	return p.ReceiverID
 }
 
@@ -61,11 +61,11 @@ func (p *PrivateMsg) GetTimestamp() string {
 	return p.Timestamp
 }
 
-func (g *GroupMsg) GetSender() int {
+func (g *GroupMsg) GetSenderID() int {
 	return g.SenderID
 }
 
-func (g *GroupMsg) GetReceiver() int {
+func (g *GroupMsg) GetReceiverID() int {
 	return g.ReceiverID
 }
 
@@ -77,10 +77,10 @@ func (g *GroupMsg) GetTimestamp() string {
 	return g.Timestamp
 }
 
-func (p *PrivateMsg) GetChatType() string {
+func (p *PrivateMsg) GetMsgType() string {
 	return "PrivateMsg"
 }
 
-func (g *GroupMsg) GetChatType() string {
+func (g *GroupMsg) GetMsgType() string {
 	return "GroupMsg"
 }
