@@ -5,6 +5,7 @@ import (
 	"backend/events"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -17,7 +18,7 @@ For "private" accounts, the function keeps the request as "follow_request" pendi
 Handles insertions and deletions in "notifications" and "follow" tables.
 Returns nil on success; otherwise, returns an error with a descriptive message.
 */
-func insertFollowRequest(senderId int, receiverId int) error {
+func insertFollowRequest(senderId int, receiverId int, notifId int) error {
 	var reqType string
 	var status string
 	relation, err := checkUserRelation(senderId, receiverId)
@@ -51,6 +52,7 @@ func insertFollowRequest(senderId int, receiverId int) error {
 		// if sender requested to follow the receiver before then they's trying to take it back by click on follow button.
 		// so we delete that follow_requset notification.
 	} else if relation == "pending" {
+		fmt.Println("pending and notifId", notifId)
 		notifications, err := db.FetchData("notifications", "senderId", senderId)
 		if err != nil {
 			return errors.New("Error fetching notifications" + err.Error())
@@ -107,7 +109,7 @@ func FollowRequest(payload json.RawMessage) (Response, error) {
 		response = Response{"followId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	err = insertFollowRequest(follow.FollowerId, follow.FolloweeId)
+	err = insertFollowRequest(follow.FollowerId, follow.FolloweeId, follow.NotifId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
