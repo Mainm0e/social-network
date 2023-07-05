@@ -218,6 +218,7 @@ reading and writing goroutines for that client. Parameters:
 - r: The HTTP Request that has been received by the handler.
 */
 func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
+	log.Println("Websocket initialisation started...")
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("Failed to set websocket upgrade: %+v", err)
