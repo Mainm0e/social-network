@@ -36,8 +36,8 @@ type IsTyping struct {
 // ChatMsg is an interface that is implemented by both PrivateMsg and GroupMsg.
 // This allows us to use the same functions for both types of messages.
 type ChatMsg interface {
-	GetSender() string
-	GetReceiver() string
+	GetSenderID() int
+	GetReceiverID() int
 	GetMessage() string
 	GetTimestamp() string
 	GetType() string
