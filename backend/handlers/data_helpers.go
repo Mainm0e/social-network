@@ -220,6 +220,12 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 	}
 }
 
+/*
+ReadAllUsers function return all users in database except current user
+for each user it call FillProfile function to fill the profile struct
+base on the relation between current user and requested user profile
+if error occur then it return error else it returns profile struct and nil.
+*/
 func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
 	dbUsers, err := db.FetchData("users", "")
 	if err != nil {
@@ -276,7 +282,8 @@ func InsertGroupInvitation(senderId int, groupId int, receiverId int, content st
 	// TODO: send notification to receiver
 }
 func InsertGroupRequest(senderId int, groupId int) error {
-	group, err := ReadGroup(groupId)
+	var group Group
+	err := group.ReadGroup(groupId)
 	if err != nil {
 		return errors.New("Error fetching group" + err.Error())
 	}
@@ -295,7 +302,8 @@ func InsertGroupRequest(senderId int, groupId int) error {
 }
 
 /*
-GroupInvitationCheck function check if user accept or reject or ignore the group invitation, then insert or delete the user from group_member table base on user decision
+GroupInvitationCheck function check if user accept or reject or ignore the group invitation,
+then insert or delete the user from group_member table base on user decision.
 if error occur then it return error
 */
 func GroupInvitationCheck(accept string, notifId int, userId int, groupId int) error {
