@@ -1,36 +1,36 @@
 package sockets
 
 type PrivateMsg struct {
-	SenderUsername   string `json:"senderUsername"`
-	ReceiverUsername string `json:"receiverUsername"`
-	Message          string `json:"message"`
-	Timestamp        string `json:"timeStamp"`
+	SenderID   int    `json:"senderID"`
+	ReceiverID int    `json:"receiverID"`
+	Message    string `json:"message"`
+	Timestamp  string `json:"timeStamp"`
 }
 
 type GroupMsg struct {
-	SenderUsername string `json:"senderUsername"`
-	GroupTitle     string `json:"groupTitle"`
-	Message        string `json:"message"`
-	Timestamp      string `json:"timeStamp"`
+	SenderID   int    `json:"senderID"`
+	ReceiverID int    `json:"receiverID"`
+	Message    string `json:"message"`
+	Timestamp  string `json:"timeStamp"`
 }
 
 type ChatHistoryRequest struct {
-	ChatType       string `json:"chatType"`
-	ClientUsername string `json:"clientUsername"`
-	TargetName     string `json:"targetName"` // Username or GroupTitle
+	ChatType string `json:"chatType"`
+	ClientID int    `json:"clientID"`
+	TargetID int    `json:"targetID"` // UserID or GroupID
 }
 
 type ChatHistory struct {
-	ChatType       string   `json:"chatType"`
-	ClientUsername string   `json:"clientUsername"`
-	TargetName     string   `json:"targetName"` // Username or GroupTitle
-	ChatHistory    []string `json:"chatHistory"`
+	ChatType    string   `json:"chatType"`
+	ClientID    int      `json:"clientID"`
+	TargetID    int      `json:"targetID"` // UserID or GroupID
+	ChatHistory []string `json:"chatHistory"`
 }
 
 type IsTyping struct {
-	ChatType       string `json:"chatType"`
-	ClientUsername string `json:"clientUsername"` // Username of the client that is typing
-	TargetName     string `json:"targetName"`     // Username / GroupTitle to identify chat in which typing is happening
+	ChatType string `json:"chatType"`
+	ClientID int    `json:"clientID"` // UserID of the client that is typing
+	TargetID int    `json:"targetID"` // UserID / GroupID to identify chat in which typing is happening
 }
 
 // ChatMsg is an interface that is implemented by both PrivateMsg and GroupMsg.
@@ -45,12 +45,12 @@ type ChatMsg interface {
 
 /*********** NOTE TO SELF: NEVER FORGET HOW COOL INTERFACES ARE! ************/
 
-func (p *PrivateMsg) GetSender() string {
-	return p.SenderUsername
+func (p *PrivateMsg) GetSender() int {
+	return p.SenderID
 }
 
-func (p *PrivateMsg) GetReceiver() string {
-	return p.ReceiverUsername
+func (p *PrivateMsg) GetReceiver() int {
+	return p.ReceiverID
 }
 
 func (p *PrivateMsg) GetMessage() string {
@@ -61,12 +61,12 @@ func (p *PrivateMsg) GetTimestamp() string {
 	return p.Timestamp
 }
 
-func (g *GroupMsg) GetSender() string {
-	return g.SenderUsername
+func (g *GroupMsg) GetSender() int {
+	return g.SenderID
 }
 
-func (g *GroupMsg) GetReceiver() string {
-	return g.GroupTitle
+func (g *GroupMsg) GetReceiver() int {
+	return g.ReceiverID
 }
 
 func (g *GroupMsg) GetMessage() string {
