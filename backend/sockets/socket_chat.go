@@ -185,16 +185,17 @@ func (m *Manager) BroadcastMessage(msg ChatMsg) error {
 	case "PrivateMsg":
 		err = m.BroadcastPrivateMsg(receiverID, payloadJSON)
 		if err != nil {
-			return errors.Errorf("BroadcastMessage() error - %v", err)
+			return fmt.Errorf("BroadcastMessage() error - %v", err)
 		}
 
 	// For group messages, broadcast to all clients within a group
 	case "GroupMsg":
 		err = m.BroadcastGroupMsg(receiverID, payloadJSON)
 		if err != nil {
-			return errors.Errorf("BroadcastMessage() error - %v", err)
+			return fmt.Errorf("BroadcastMessage() error - %v", err)
 		}
-	
+	}
+
 	return nil
 }
 
@@ -208,13 +209,13 @@ func (m *Manager) HandleChatMessage(msg ChatMsg) error {
 	// Store message in database
 	err := RecordMsgToDB(msg)
 	if err != nil {
-		return errors.Errorf("HandleMessage() error - %v", err)
+		return fmt.Errorf("HandleMessage() error - %v", err)
 	}
 
 	// Broadcast message to clients
 	err = m.BroadcastMessage(msg)
 	if err != nil {
-		return errors.Errorf("HandleMessage() error - %v", err)
+		return fmt.Errorf("HandleMessage() error - %v", err)
 	}
 
 	return nil
