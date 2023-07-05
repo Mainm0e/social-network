@@ -39,7 +39,7 @@ pointer to a newly created Client.  This function is typically called after a ne
 WebSocket connection has been established and a new Client needs to be created to
 manage the connection.
 */
-func NewClient(conn *websocket.Conn, wsManager *Manager, id string) *Client {
+func NewClient(conn *websocket.Conn, wsManager *Manager, id int) *Client {
 	return &Client{
 		Connection: conn,
 		Manager:    wsManager,
