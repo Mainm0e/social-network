@@ -40,7 +40,7 @@ type ChatMsg interface {
 	GetReceiverID() int
 	GetMessage() string
 	GetTimestamp() string
-	GetType() string
+	GetChatType() string
 }
 
 /*********** NOTE TO SELF: NEVER FORGET HOW COOL INTERFACES ARE! ************/
