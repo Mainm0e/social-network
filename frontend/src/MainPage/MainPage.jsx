@@ -4,11 +4,9 @@ import MainBox from "./MainBox/MainBox";
 import LeftBox from "./LeftBox/LeftBox";
 import RightBox from "./RightBox/RightBox";
 import ChatBox from "../Common/ChatBox/ChatBox";
-import { navGroupLinkData } from "./dummyData";
 import { getCookie, getUserId} from "../tools/cookie";
 import { fetchData } from "../tools/fetchData";
 import { home } from "../tools/link";
-
 function MainPage() {
 
   // !!TODO!! how to get profile id that can send to mainbox that show user that we want ???
@@ -29,7 +27,7 @@ function MainPage() {
   return (
     <div className="main-page">
       <div className="main-page-container">
-        <BoxState userData={data} navLink={navGroupLinkData}/>
+        <BoxState userData={data}/>
       </div>
     </div>
   );
@@ -42,7 +40,7 @@ export default MainPage;
 // first check url pathname 
 // then if is looking for state value that is null or not if state have some value 
 // it will sent state value to profile componen
-const BoxState = ({userData, navLink}) => {
+const BoxState = ({userData}) => {
   /*  !!todo!!
       - error handler that if mainbox cant find user profile with that id what need todo */
   const url = new URL(window.location.href);
@@ -50,14 +48,14 @@ const BoxState = ({userData, navLink}) => {
   const state = searchParams.get("id");
   if (url.pathname === "/user") {
     if (state !== null){
-      return <Profile userData={userData} profileId={state} navLink={navLink} type={"user"}/>
+      return <Profile userData={userData} profileId={state} type={"user"}/>
     } else if (state === null){
-     return  <Explore userData={userData} navLink={navLink} type={"user"}/>
+     return  <Explore userData={userData} type={"user"}/>
     }
   } else if (url.pathname === "/group"){
     if (state !== null){
     } else if (state === null){
-      return <Explore userData={userData} navLink={navLink} type={"group"}/>
+      return <Explore userData={userData} type={"group"}/>
     }
   } else if (url.pathname === "/"){
     home();
@@ -66,10 +64,10 @@ const BoxState = ({userData, navLink}) => {
 
 
 
-const Profile = ({userData, profileId, navLink ,type}) => {
+const Profile = ({userData, profileId ,type}) => {
   return (
   <>
-  <LeftBox user={userData} link={navLink} />
+  <LeftBox user={userData} />
   <MainBox profileId={parseInt(profileId)} type={type} state={"profile"}/>
   <RightBox/>
   <ChatBox/>
@@ -77,11 +75,10 @@ const Profile = ({userData, profileId, navLink ,type}) => {
   )
 }
 
-const Explore = ({userData, navLink, type}) => {
-  console.log("userDat",userData,"navLink", navLink,"type",type)
+const Explore = ({userData, type}) => {
   return (
     <>
-      <LeftBox user={userData} link={navLink}/>
+      <LeftBox user={userData}/>
       <MainBox userId={null} type={type} state={"explore"}/>
       <RightBox/>
       <ChatBox/>

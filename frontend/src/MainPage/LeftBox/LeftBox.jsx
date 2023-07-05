@@ -5,6 +5,7 @@ import "./LeftBox.css";
 import {home,link_notifications} from "../../tools/link";
 import {getUserId, getCookie} from "../../tools/cookie";
 import {fetchData} from "../../tools/fetchData";
+import { profile_link, your_link , default_link} from "../../tools/link_links";
 
 const LeftBox = ({user,link}) => {
 
@@ -53,7 +54,7 @@ const LeftBox = ({user,link}) => {
         if (user.avatar === ''|| user.avatar === null|| user.avatar === undefined) {
             return null;
         } else {
-            return  <div className="post_image "> <img src={user.avatar} alt="content"  onClick={link_notifications}/> </div>;
+            return   <img src={user.avatar} alt="content" className={`img_box ${notification > 0 ? 'have_notification' : ''}`} onClick={link_notifications}/>;
         }
     };
     const [show, setShow] = useState(false);
@@ -63,9 +64,7 @@ const LeftBox = ({user,link}) => {
     return (
         <div className="left-box">
             <div className="user_box">
-                <div className="img_box">
                     {checkImage()}
-                </div>
                 <div className="user_info">
                     <div className="username">
                         <span onClick={home}>{user.firstName}</span>
@@ -88,22 +87,36 @@ const LeftBox = ({user,link}) => {
 
 export default LeftBox;
 
-const LinkBox = ({link,type,show}) => {
-    
+const LinkBox = ({type,show}) => {
+    // read url fine value
+    const url = new URL(window.location.href);
+    const [link, setLink] = useState(default_link);
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        if (url.pathname ==="/user"){
+            console.log(id + " " + getUserId("userId") )
+            if (parseInt(id) === getUserId("userId")){
+                setLink(your_link)
+            } else {
+                setLink(profile_link)
+            }
+        } else if (url.pathname === "/group"){
+            console.log("group")
+        }
+    }, [])
     if (show === true) {
     if (type ==="rare"){
         return (
             <div className="links_full">
-            <NavList type={"Main"} links={link[3]} />
-            <NavList type={"Post"} links={link[1]} />
+            <NavList type={"Main"} links={link} />
             </div>
         )
     }
     if (type === "medium"){
        return ( 
        <div className="links_medium">
-            <NavList type={"Main"} links={link[3]} />
-            <NavList type={"Post"} links={link[1]} />
+            <NavList type={"Main"} links={link} />
         </div>
        )
     }

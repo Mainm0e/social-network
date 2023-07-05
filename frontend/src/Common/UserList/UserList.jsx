@@ -49,10 +49,10 @@ const UserList = ({ title, id, clearBox }) => {
         <div className="user-list-container">
           <div className="user-list-header">
             {title === "followers" ? (
-              <h2>This is {profilename} {title}</h2>
+              <h2>{profilename} is being followed by:</h2>
             ) : (<></>)}
             {title === "followings" ? (
-              <h2>{profilename} is {title}</h2>
+              <h2>{profilename} is following</h2>
             ) : (<></>)}
           </div>
           <div className="user-list-body">
