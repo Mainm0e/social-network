@@ -1,13 +1,33 @@
 package sessions
 
 import (
+	"backend/db"
 	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
 )
+
+/*
+getUserID is a helper function for the sessions package, which takes a user's email
+address as a string and returns the user's ID as an integer. It is used when a user
+logs in to generate a Session struct (which has a userID field). The function also
+returns an error value, which is non-nil if an error occurs during the database query.
+*/
+func getUserID(email string) (int, error) {
+	var userID int
+
+	user, err := db.FetchData("users", "email", email)
+	userID = user[0].(db.User).UserId
+	if err != nil {
+		return 0, fmt.Errorf("sessions.getUserID() error: %v", err)
+	}
+
+	return userID, nil
+}
 
 /*
 Initialise is a method for the *SessionStore struct, which allows for initialisation of the
@@ -77,11 +97,16 @@ func (store *SessionStore) Create(username string, admin bool) (string, error) {
 
 	expires := time.Now().Add(time.Duration(SESSION_DURATION) * time.Second)
 
+	userID, err := getUserID(username)
+	if err != nil {
+		return "", errors.New("sessions.Create() error in retrieving userID: " + err.Error())
+	}
+
 	session := &Session{
-		ID:       sessionID,
-		Username: username,
-		Admin:    admin,
-		Expires:  expires,
+		SessionID: sessionID,
+		UserID:    userID,
+		Admin:     admin,
+		Expires:   expires,
 	}
 
 	store.Data.Store(sessionID, session)
