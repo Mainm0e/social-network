@@ -25,35 +25,6 @@ func InsertGroupMember(groupId int, userId int) error {
 	return nil
 }
 
-/*
-GetAllGroupMemberIDs returns all the user ids of the members of a group.
-It takes a groupID integer as an argument and returns a slice of integers
-and an error value, which is non-nil if any of the database operations
-failed.
-*/
-func GetAllGroupMemberIDs(groupId int) ([]int, error) {
-	var userIds []int
-
-	// Fetch all group members from the database
-	dbGroupMembers, err := db.FetchData("group_member", "groupId", groupId)
-	if err != nil {
-		return userIds, errors.New("Error fetching group members" + err.Error())
-	}
-
-	// If no group members were found, return an error
-	if len(dbGroupMembers) == 0 {
-		return userIds, errors.New("no group member found")
-	}
-
-	// Iterate over all group members and append their user ids to the slice
-	for _, dbGroupMember := range dbGroupMembers {
-		dbGroupMember := dbGroupMember.(db.GroupMember)
-		userIds = append(userIds, dbGroupMember.UserId)
-	}
-
-	return userIds, nil
-}
-
 func ReadGroup(groupId int) (Group, error) {
 	dbGroups, err := db.FetchData("groups", "groupId", groupId)
 	if err != nil {
