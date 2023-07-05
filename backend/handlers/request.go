@@ -5,7 +5,6 @@ import (
 	"backend/events"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -52,12 +51,10 @@ func insertFollowRequest(senderId int, receiverId int, notifId int) error {
 		// if sender requested to follow the receiver before then they's trying to take it back by click on follow button.
 		// so we delete that follow_requset notification.
 	} else if relation == "pending" {
-		fmt.Println("pending and notifId", notifId)
 		notifications, err := db.FetchData("notifications", "senderId", senderId)
 		if err != nil {
 			return errors.New("Error fetching notifications" + err.Error())
 		}
-		//TODO: ask if Adi could send notificationId if its exist in frontend so we don't need this shitty for loop
 		for _, n := range notifications {
 			if notification, ok := n.(db.Notification); ok {
 				// finding the follow request notification
