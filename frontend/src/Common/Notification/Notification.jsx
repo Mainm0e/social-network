@@ -19,17 +19,14 @@ const Notification = ({ clearBox }) => {
       setNotificationData(data);
     });
   }, []);
-
-  if (
-    notificationData === undefined ||
-    notificationData.lenght < 1 ||
-    notificationData === null
-  ) {
-    return null;
-  }
   const handleAcceptDecline = () => {
     setShowNotification(false); // Hide the notification after accepting or declining
   };
+  const closeBox = () => {
+    window.location.hash = "";
+    clearBox();
+  };
+
 
   const renderNotifications = () => {
     return notificationData.map((notification, index) => (
@@ -41,15 +38,31 @@ const Notification = ({ clearBox }) => {
       />
     ));
   };
+  if (notificationData.length  > 0) {
   return (
     <div className="notification-container">
       {showNotification && renderNotifications()}{" "}
       {/* Conditionally render the notifications */}
       <div className="user-list-footer">
-        <button onClick={clearBox}>Close</button>
+        <button onClick={closeBox}>Close</button>
       </div>
     </div>
   );
+}
+else {
+  return (
+    <div className="notification-container">
+      <div className="notification">
+        <div className="notification-content">
+          <span>No notifications</span>
+        </div>
+      </div>
+      <div className="user-list-footer">
+        <button onClick={closeBox}>Close</button>
+      </div>
+    </div>
+  )
+}
 };
 
 export default Notification;
@@ -67,7 +80,7 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
         response: value, // Use the value parameter here
       };
       fetchData(method, type, payload).then((data) => {
-        console.log(data);
+        window.location.reload();
         handleAcceptDecline(); // Call the handler function to hide the notification
       });
     };
@@ -90,6 +103,40 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
           <button value="reject" onClick={() => handleAccept("reject")}>
             Decline
           </button>
+        </div>
+      </div>
+    );
+  }
+  if (notifications.type === "following") {
+    const handleDeleteNotif = () => {
+      const method = "POST";
+      const type = "followResponse";
+      const payload = {
+        sessionId: getCookie("sessionId"),
+        followeeId: getUserId("userId"),
+        followerId: notifications.senderId,
+        notifId: notifications.notificationId,
+        response: "", // Use the value parameter here
+      };
+      fetchData(method, type, payload).then((data) => {
+        window.location.reload();
+        handleAcceptDecline(); // Call the handler function to hide the notification
+      });
+    };
+
+    return (
+      <div className="notification">
+        <div className="notification-user">
+          <img src={user.avatar} alt="avatar" />
+          <span>
+            {user.firstName} {user.lastName}
+          </span>
+        </div>
+        <div className="notification-content">
+          <span>started following you</span>
+        </div>
+        <div className="notification-btn">
+          <span onClick={handleDeleteNotif}>x</span>
         </div>
       </div>
     );

@@ -236,6 +236,12 @@ func GetPosts(payload json.RawMessage) (Response, error) {
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, err
 		}
+	} else if request.From == "home" {
+		posts, err = readPosts(request.UserId, "userId", request.UserId, false)
+		if err != nil {
+			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return response, err
+		}
 	} else {
 		response = Response{"from is required", events.Event{}, http.StatusBadRequest}
 		return response, err
