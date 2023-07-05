@@ -48,7 +48,7 @@ const Header = ({profile,handleRefresh}) => {
         <div className="user_info">
           <div className="fullName info">
             <label> Name: </label>
-            <span>{user.firstName}</span>
+            <span id="profile-firstName">{user.firstName}</span>
             <span> </span>
             <span>{user.lastName}</span>
           </div>

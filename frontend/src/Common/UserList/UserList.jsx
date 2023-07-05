@@ -4,12 +4,17 @@ import "./UserList.css";
 import { fetchData } from "../../tools/fetchData";
 
 const UserList = ({ title, id, clearBox }) => {
-  
+  const [profilename, setProfilename] = useState("");
+  const [data, setData] = useState(null);
   const closeBox = () => {
     window.location.hash = "";
     clearBox();
   };
-  const [data, setData] = useState(null);
+  const getProfileName = () => {
+    // get element by id profile-firstName
+    const firstName = document.getElementById("profile-firstName");
+    setProfilename(firstName.innerHTML);
+  }
   useEffect(() => {
     const method = "POST";
     const type = "profileList";
@@ -22,6 +27,7 @@ const UserList = ({ title, id, clearBox }) => {
     fetchData(method, type, payload).then((data) => {
       setData(data);
     });
+    getProfileName();
   }, []);
   if (data === null) {
     //no follower or following
@@ -42,7 +48,12 @@ const UserList = ({ title, id, clearBox }) => {
       <div className="user-list">
         <div className="user-list-container">
           <div className="user-list-header">
-            <h2>{title}</h2>
+            {title === "followers" ? (
+              <h2>This is {profilename} {title}</h2>
+            ) : (<></>)}
+            {title === "followings" ? (
+              <h2>{profilename} is {title}</h2>
+            ) : (<></>)}
           </div>
           <div className="user-list-body">
             <ul>

@@ -1,12 +1,13 @@
 .notification {
     display: flex;
     align-items: center;
-    background-color: #f0f0f0;
+    background-color: white;
     padding: 10px;
     margin-bottom: 10px;
     position: relative;
-    border-radius: 10px;
-    border: #FFEA00 4px solid;
+    border: black 1px solid;
+    -webkit-box-shadow: -10px 0px 13px -7px #FFEA00, 10px 0px 13px -7px #FFEA00, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+    box-shadow: -10px 0px 13px -7px #FFEA00, 10px 0px 13px -7px #FFEA00, 5px 5px 15px 5px rgba(0, 0, 0, 0);
 }
 
 .notification-user {
@@ -38,6 +39,7 @@
 
 .notification-content span {
     font-weight: bold;
+    font-family: myFancyFont;
 }
 
 .notification-btn button {
