@@ -19,38 +19,38 @@ directly into the specified database file. An error value is returned, which is
 non-nil in the event errors are encountered in opening / creating the database file
 or the sql file.
 */
-func initialise(databasePathAndName, sqlFilePathAndName string) error {
-	// Initialise specified database
-	database, err := sql.Open("sqlite3", databasePathAndName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	// Open sql database creation file
-	file, err := os.Open(sqlFilePathAndName)
-	if os.IsNotExist(err) {
-		return errors.New("database sql creation file ( " +
-			sqlFilePathAndName + " ) not found")
-	} else {
-		// Read the file into a buffer
-		buf := make([]byte, 1024)
-		var str string
-		for {
-			n, err := file.Read(buf)
-			if err != nil {
-				break
-			}
-			str += string(buf[:n])
-		}
+// func initialise(databasePathAndName, sqlFilePathAndName string) error {
+// 	// Initialise specified database
+// 	database, err := sql.Open("sqlite3", databasePathAndName)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer database.Close()
+// 	// Open sql database creation file
+// 	file, err := os.Open(sqlFilePathAndName)
+// 	if os.IsNotExist(err) {
+// 		return errors.New("database sql creation file ( " +
+// 			sqlFilePathAndName + " ) not found")
+// 	} else {
+// 		// Read the file into a buffer
+// 		buf := make([]byte, 1024)
+// 		var str string
+// 		for {
+// 			n, err := file.Read(buf)
+// 			if err != nil {
+// 				break
+// 			}
+// 			str += string(buf[:n])
+// 		}
 
-		// Execute the SQL
-		_, err = database.Exec(str)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+// 		// Execute the SQL
+// 		_, err = database.Exec(str)
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
+// 	return nil
+// }
 
 /*
 executeMigration is a function used to migrate the database to the latest version.
@@ -225,8 +225,7 @@ Please note:
   - If the tableName is not defined in the InsertRules map, an error will be returned.
     (i.e. make sure database_variables.go is updated with the new table name!)
   - The args parameter should strictly follow the order and data type expectations of
-
-the corresponding table schema.
+    the corresponding table schema.
 */
 func InsertData(tableName string, args ...any) (int64, error) {
 	rule, ok := InsertRules[tableName]
