@@ -43,7 +43,7 @@ var InsertRules = map[string]InsertRule{
 		NotExistErrors: []string{"creator does not exist"},
 	},
 	"messages": {
-		Query:          "INSERT INTO messages(senderId, receiverId, messageContent, sendTime, seen) VALUES(?,?,?,?,?)",
+		Query:          "INSERT INTO messages(senderId, receiverId, messageContent, sendTime, msgType) VALUES(?,?,?,?,?)",
 		NotExistTables: []string{"users", "users"},
 		NotExistFields: []string{"senderId", "receiverId"},
 		NotExistErrors: []string{"sender does not exist", "receiver does not exist"},
@@ -199,10 +199,10 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"messages": {
-		SelectFields: "messageId, senderId, receiverId, messageContent, sendTime, seen",
+		SelectFields: "messageId, senderId, receiverId, messageContent, sendTime, msgType",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var message Message
-			err := rows.Scan(&message.MessageId, &message.SenderId, &message.ReceiverId, &message.MessageContent, &message.SendTime, &message.Seen)
+			err := rows.Scan(&message.MessageId, &message.SenderId, &message.ReceiverId, &message.MessageContent, &message.SendTime, &message.MsgType)
 			return message, err
 		},
 	},
