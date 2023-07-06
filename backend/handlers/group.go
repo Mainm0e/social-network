@@ -15,6 +15,7 @@ It inserts a new group into the database and fills the groupId field in the grou
 */
 func (group *Group) InsertGroup() error {
 	id, err := db.InsertData("groups", group.CreatorProfile.UserId, group.Title, group.Description, time.Now())
+	// print type of group.CreatorProfile.UserId
 	if err != nil {
 		return errors.New("Error inserting group" + err.Error())
 	}
@@ -26,7 +27,7 @@ func (group *Group) InsertGroup() error {
 InsertGroupMember inserts a new group member into "group_member" table. return error if any occurred otherwise returns nil.
 */
 func InsertGroupMember(groupId int, userId int, status string) error {
-	_, err := db.InsertData("group_member", groupId, userId, status)
+	_, err := db.InsertData("group_member", userId, groupId, status)
 	if err != nil {
 		return errors.New("Error inserting group member" + err.Error())
 	}
