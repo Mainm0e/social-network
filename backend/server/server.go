@@ -22,6 +22,40 @@ import (
 )
 
 /*
+logAndResetRequest() is a middleware helper function that logs the request body
+and resets the request body so that it can be read again by later middleware or
+handlers. This function takes a pointer to an http.Request and returns a pointer
+to an http.Request. It is also used for debugging purposes.
+*/
+func logAndResetRequest(r *http.Request) *http.Request {
+	// Read the request body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return r
+	}
+	// Always close the request body after reading it to free up resources
+	defer r.Body.Close()
+
+	var event events.Event
+
+	// Decode json byte slice
+	if err := json.Unmarshal(body, &event); err != nil {
+		// If problem decoding, log the error, reset the request body and return
+		log.Println("logAndResetRequest() error - Error decoding event:", err)
+		r.Body = io.NopCloser(bytes.NewBuffer(body))
+		return r
+	}
+
+	// Print the event type
+	log.Println("logAndResetRequest() -- Event:", event.Type)
+
+	// Reset the request body
+	r.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	return r
+}
+
+/*
 initiateLogging creates a log file with each instance of server startup, and sets
 the output of the log package to the log file. All log messages will be written to
 the log file which allows for easier debugging and a less cluttered terminal.
@@ -77,8 +111,9 @@ This pattern facilitates ease of maintenance should additional middleware functi
 */
 func loggerMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		/* fmt.Printf("Request received at: %s\n", r.URL.Path) // ** ONLY FOR DEVELOPMENT, REMOVE LATER ** */
-		log.Println("Request received at: ", r.URL.Path)
+		// Print out entire request body for debugging purposes
+		r = logAndResetRequest(r)
+
 		handler.ServeHTTP(w, r)
 	})
 }
@@ -96,12 +131,14 @@ function.
 */
 func corsMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Allow requests with the "credentials" header set to "true"
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		// Allow requests from the specific origin of the frontend application
 		w.Header().Set("Access-Control-Allow-Origin", FRONTEND_ORIGIN) // Change this to your frontend origin
 		// Allow specific HTTP methods, which provides some protection against CSRF attacks
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		// Allow the Content-Type header, which is required to be sent with POST requests
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, credentials, withCredentials")
 		// Set the Access-Control-Max-Age header to cache preflight request (600 seconds = 10 minutes)
 		w.Header().Set("Access-Control-Max-Age", "600")
 
@@ -159,7 +196,7 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 				cookie, err := r.Cookie(sessions.COOKIE_NAME)
 				if err != nil {
 					// Handle error: No sessionID cookie found.
-					log.Printf("No sessionID cookie found: %v", err)
+					log.Printf("authenticationWiddleware() error - No sessionID cookie found: %v", err)
 					http.Error(w, "Invalid session", http.StatusUnauthorized)
 					return
 				}
@@ -168,7 +205,7 @@ func authenticationMiddleware(handler http.Handler) http.Handler {
 				isValid, err := sessions.CookieCheck(cookie)
 				if !isValid || err != nil {
 					// Handle error: Invalid sessionID cookie.
-					log.Printf("Invalid sessionID cookie: %v", err)
+					log.Printf("authenticationWiddleware() error - Invalid sessionID cookie: %v", err)
 					http.Error(w, "Invalid session", http.StatusUnauthorized)
 					return
 				}
