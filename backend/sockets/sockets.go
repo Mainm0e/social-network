@@ -219,21 +219,24 @@ reading and writing goroutines for that client. Parameters:
 */
 func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	log.Println("Websocket initialisation started...")
+
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("Failed to set websocket upgrade: %+v", err)
 		return
 	}
 
-	// Extract the sessionID from the cookie.
+	// Perform validation checks on the session cookie.
 	cookie, err := r.Cookie(sessions.COOKIE_NAME)
 	if err != nil {
-		// TODO: Handle error: No valid sessionID cookie found.
+		log.Printf("sessions.ServeWS() error - No sessionID cookie found: %v", err)
+		http.Error(w, "Invalid session", http.StatusUnauthorized)
 		return
 	} else {
 		isValid, err := sessions.CookieCheck(cookie)
 		if !isValid || err != nil {
-			// TODO: Handle error: Invalid sessionID cookie.
+			log.Printf("sessions.ServeWS() error - Invalid sessionID cookie: %v", err)
+			http.Error(w, "Invalid session", http.StatusUnauthorized)
 			return
 		}
 	}
@@ -255,4 +258,6 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	// Starts the read and write goroutines for the client.
 	go client.ReadData()
 	go client.WriteData()
+
+	log.Println("Websocket initialisation complete")
 }
