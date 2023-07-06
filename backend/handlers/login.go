@@ -28,6 +28,12 @@ func (lg *LoginData) login() (int, error) {
 	}
 }
 
+/*
+LoginPage is a function receiving a byte slice `payload` containing the login information.
+It checks if the login information is valid, using the login() function. if it is,
+it calls the sessions.Login() function to create a session for the user.
+It then returns a Response struct containing the appropriate message and status code and an error if any occurred.
+*/
 func LoginPage(payload json.RawMessage) (Response, error) {
 	var loginData LoginData
 	err := json.Unmarshal(payload, &loginData)
