@@ -41,7 +41,7 @@ export async function fetchData(method, type, payload) {
     console.log("responseData", responseData)
     return responseData.event.payload;
   }
-  if (responseData.statusCode === 400) {
+  if (responseData.statusCode !== 200) {
     if (responseData.message === "Error handling event:Error fetchingUser:user not found"){
       logout();
     }

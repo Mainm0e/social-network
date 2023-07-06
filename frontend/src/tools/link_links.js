@@ -8,7 +8,6 @@ export const your_link ={
 }
 export const profile_link ={
     "Home": '/',
-    "Postlists": '#postlist',
     "Explore user": "/user",
     "Explore groups": "/group",
 }

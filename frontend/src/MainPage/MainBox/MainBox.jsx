@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./User/Header";
 import GroupHeader from "./Group/GroupHeader";
+import GroupBody from "./Group/GroupBody";
 import Body from "./User/Body";
 import Explore from "../../Common/explore/explore";
 import RegisterGroup from "./Group/RegisterGroup";
@@ -37,11 +38,8 @@ const MainBox = ({ profileId, type ,state}) => {
         <Profile   key={refreshKey} profileId={profileId}   refreshComponent={refreshComponent}/>
         )
       } else if (type === "group"){
-        <Group key={refreshKey} groupId={profileId} refreshComponent={refreshComponent} />
-        return(
-          <>
-          <p>hello</p>
-          </>
+        return (
+          <Group key={refreshKey} groupId={profileId} refreshComponent={refreshComponent} />
         )
       }
 } else if (state === "create_group"){
@@ -75,7 +73,7 @@ const Profile = ({profileId,refreshComponent}) =>{
     return (
       <div className="main-box">
         <Header profile={data} handleRefresh={handleRefresh} />
-        <Body user={profileId}/>
+        <Body id={profileId}/>
       </div>
     );
   }
@@ -118,6 +116,7 @@ const Group = ({ groupId, refreshComponent }) => {
     return (
       <div className="main-box">
         <GroupHeader group={data} handleRefresh={handleRefresh} />
+        <GroupBody id={groupId}/>
       </div>
     );
   }

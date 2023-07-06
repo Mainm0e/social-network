@@ -1,8 +1,43 @@
-const GroupHeader = ({ groupid, type, state, refreshComponent }) => {
+const GroupHeader = ({ group, handleRefresh }) => {
+  const test = () => {
+    console.log("test", group);
+  };
+  group = dummyGroup;
+
   return (
     <div className="group-header">
       <div className="group-header-title">
-        <h1>Group</h1>
+        <label htmlFor="group-title">Title:</label>
+        <span id="group-title">{group.title}</span>
+      </div>
+      <div className="group-header-description">
+        <label htmlFor="group-description">Description:</label>
+        <span id="group-description">{group.description}</span>
+      </div>
+      <div className="group-header-followers">
+        <label htmlFor="group-followers">Member:</label>
+        <span id="group-followers">{group.followers}</span>
+      </div>
+      <div className="group-header-creater">
+        <label htmlFor="group-creater">Creater:</label>
+        <div className="group-header-creater-info">
+          <div className="group-header-creater-avatar">
+            <img src={group.creatorProfile.avatar} alt="creater-avatar" />
+          </div>
+          <div className="group-header-creater-name">
+            <span id="group-creater-firstName">
+              {group.creatorProfile.firstName}
+            </span>
+            <span> </span>
+            <span id="group-creater-lastName">
+              {group.creatorProfile.lastName}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="group-header-date">
+        <label htmlFor="group-date">Date:</label>
+        <span id="group-date">{group.date}</span>
       </div>
     </div>
   );
@@ -11,10 +46,17 @@ const GroupHeader = ({ groupid, type, state, refreshComponent }) => {
 export default GroupHeader;
 
 //group dummy data
-// const group = {
-//     id: 1,
-//     name: "group1",
-//     description: "this is group1",
-//     createrId: 1,
-//     createrName: "user1",
-//     followers: 10,
+/* dummy avatar image for test
+ */
+const testAvatar = "https://i.imgur.com/3tC5ZnA.png";
+const dummyGroup = {
+  title: "test",
+  description: "test",
+  followers: 10,
+  creatorProfile: {
+    firstName: "test",
+    lastName: "test",
+    avatar: testAvatar,
+  },
+  date: "test",
+};
