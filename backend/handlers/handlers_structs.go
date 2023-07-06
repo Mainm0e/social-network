@@ -153,12 +153,15 @@ type Request struct {
 	Content    string `json:"content"`
 }
 type Group struct {
-	SessionId      string       `json:"sessionId"`
-	CreatorProfile SmallProfile `json:"creatorProfile"`
-	GroupId        int          `json:"groupId"`
-	Title          string       `json:"title"`
-	Description    string       `json:"description"`
-	Date           string       `json:"date"`
+	SessionId      string         `json:"sessionId"`
+	CreatorProfile SmallProfile   `json:"creatorProfile"`
+	GroupId        int            `json:"groupId"`
+	Title          string         `json:"title"`
+	Description    string         `json:"description"`
+	Status         string         `json:"status"`
+	NoMembers      int            `json:"noMembers"`
+	Members        []SmallProfile `json:"members"`
+	Date           string         `json:"date"`
 }
 type GroupEvent struct {
 	SessionId    string                    `json:"sessionId"`
