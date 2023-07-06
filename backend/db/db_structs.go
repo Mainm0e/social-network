@@ -51,7 +51,7 @@ type Message struct {
 	ReceiverId     int    `json:"receiverId"`
 	MessageContent string `json:"messageContent"`
 	SendTime       string `json:"sendTime"`
-	Seen           int    `json:"seen"`
+	MsgType        string `json:"msgType"`
 }
 
 type Follow struct {

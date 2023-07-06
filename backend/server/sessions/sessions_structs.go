@@ -26,7 +26,7 @@ import (
 
 const (
 	// Cookie name for user session
-	COOKIE_NAME = "supercalafragalisticexpialadoshus"
+	COOKIE_NAME = "sessionId"
 	// Session duration in seconds
 	SESSION_DURATION = 3600 // 1 hour
 )
@@ -44,10 +44,10 @@ indicate if the user is an admin or not (this is for future use, if admin functi
 is implemented).
 */
 type Session struct {
-	ID       string
-	Username string
-	Admin    bool
-	Expires  time.Time
+	SessionID string
+	UserID    int
+	Admin     bool
+	Expires   time.Time
 }
 
 /*
