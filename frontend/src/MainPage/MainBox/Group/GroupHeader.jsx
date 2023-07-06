@@ -1,8 +1,8 @@
 const GroupHeader = ({ group, handleRefresh }) => {
+
   const test = () => {
     console.log("test", group);
   };
-  group = dummyGroup;
 
   return (
     <div className="group-header">
@@ -16,7 +16,7 @@ const GroupHeader = ({ group, handleRefresh }) => {
       </div>
       <div className="group-header-followers">
         <label htmlFor="group-followers">Member:</label>
-        <span id="group-followers">{group.followers}</span>
+        <span id="group-followers">{group.noMembers}</span>
       </div>
       <div className="group-header-creater">
         <label htmlFor="group-creater">Creater:</label>
@@ -44,19 +44,3 @@ const GroupHeader = ({ group, handleRefresh }) => {
 };
 
 export default GroupHeader;
-
-//group dummy data
-/* dummy avatar image for test
- */
-const testAvatar = "https://i.imgur.com/3tC5ZnA.png";
-const dummyGroup = {
-  title: "test",
-  description: "test",
-  followers: 10,
-  creatorProfile: {
-    firstName: "test",
-    lastName: "test",
-    avatar: testAvatar,
-  },
-  date: "test",
-};

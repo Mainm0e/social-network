@@ -11,7 +11,9 @@ import { fetchData } from "../../tools/fetchData";
 
 
 
-const MainBox = ({ profileId, type ,state}) => {
+const MainBox = ({ profileId,groupId, type ,state}) => {
+  console.log("mainbox",profileId, type ,state)
+
   const [refreshKey, setRefreshKey] = useState(0);
   // refreshKey is used to refresh component
   const refreshComponent = () => {
@@ -39,7 +41,7 @@ const MainBox = ({ profileId, type ,state}) => {
         )
       } else if (type === "group"){
         return (
-          <Group key={refreshKey} groupId={profileId} refreshComponent={refreshComponent} />
+          <Group key={refreshKey} groupId={groupId} refreshComponent={refreshComponent} />
         )
       }
 } else if (state === "create_group"){
@@ -97,7 +99,7 @@ const CreateGroup = () => {
 
 const Group = ({ groupId, refreshComponent }) => {
   const [data, setData] = useState(null);
-  useEffect(() => {
+ /*  useEffect(() => {
     const method = "POST"
     const type = "group"
     const payload = { 
@@ -105,7 +107,15 @@ const Group = ({ groupId, refreshComponent }) => {
       userId: getUserId("userId"), 
       groupId: groupId }
     fetchData(method,type, payload).then((data) => setData(data) );
-  }, [groupId]);
+  }, [groupId]); */
+  useEffect(() => {
+    const method = "POST"
+   const type = "exploreGroups"
+    const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId")}
+    fetchData(method,type,payload).then((data)=>{
+        setData(data)
+    })
+    }, []);
   const handleRefresh = () => {
     refreshComponent(); // Call the refresh function from the parent component
   };
@@ -113,9 +123,16 @@ const Group = ({ groupId, refreshComponent }) => {
     return <div className="loading"><div>Loading...</div></div>;
   }
   else {
+    let group = null
+    for (let i = 0; i < data.length; i++) {
+      if (parseInt(data[i].groupId) === parseInt(groupId)) {
+        group = data[i]
+      }
+    }
+    console.log("group",group)
     return (
       <div className="main-box">
-        <GroupHeader group={data} handleRefresh={handleRefresh} />
+        <GroupHeader group={group} handleRefresh={handleRefresh} />
         <GroupBody id={groupId}/>
       </div>
     );

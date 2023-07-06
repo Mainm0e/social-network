@@ -62,6 +62,7 @@
     margin-bottom: 10px;
     font-family: myFancyFont;
     background: #FFEA00;
+    flex-direction: column;
 }
 
 .explore_list_item:hover {
@@ -84,6 +85,20 @@
 }
 
 .explore_list_item_left img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+    -webkit-box-shadow: 2px 5px 16px 0px #0B325E, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+    box-shadow: 2px 5px 16px 0px #0B325E, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+    background: #FFFFFF;
+}
+
+.explore_list_item_create_info_left {
+    margin-right: 10px;
+}
+
+.explore_list_item_create_info_left img {
     width: 45px;
     height: 45px;
     border-radius: 50%;

@@ -5,20 +5,24 @@ import "./explore.css"
 ;
 
 const Explore = ({type}) => {
-    const sessionId = getCookie("sessionId");
-    const id = getUserId("userId")
-    const uId =  parseInt(id);
     const [data, setData] = useState(null);
-  
     useEffect(() => {
         const method = "POST"
-        const payload = { sessionId: sessionId, userId: uId}
+        const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId")}
         fetchData(method,type,payload).then((data)=>{
             setData(data)
         })
-        }, [sessionId,type,uId]);
+        }, []);  
+        const followRequest = async (id) => {
+        const method = "POST"
+        const type = "followRequest"
+        const payload ={ sessionId: getCookie("sessionId"), senderId: getUserId("userId"), groupId:id}
+        fetchData(method,type,payload).then((data) => {console.log(data)})
+       /*  navigateToProfile(type,id) */
+      };
         
         const generateExploreList = () => {
+            if (type === "exploreUsers"){
             return data.map((user) => {
                 return (
                     <div className="explore_list_item" key={user.userId}  userid={user.userId}   onClick={() => navigateToProfile(type,user.userId)}>
@@ -33,7 +37,33 @@ const Explore = ({type}) => {
                     </div>
                 )
             })
+        } else if (type === "exploreGroups"){
+            return data.map((group) => {
+                return (
+                    <div className="explore_list_item" key={group.groupId}  userid={group.groupId}   /* onClick={() => navigateToProfile(type,group.groupId)} */>
+                        <div className="explore_list_item_title">
+                            <h3>{group.title}</h3>
+                        </div>
+                        <div className="explore_list_item_create_info">
+                            <div className="explore_list_item_create_info_left">
+                                <img src={group.creatorProfile.avatar} alt="profile" />
+                            </div>
+                            <div className="explore_list_item_create_info_right">
+                                    <h3>{group.creatorProfile.firstName}</h3>
+                            </div>
+                        </div>
+                        <div className="explore_list_item_create_time">
+                            <p>{group.date}</p>
+                        </div>
+                        {/* follow btn */}
+                        <div className="explore_list_item_follow_btn">
+                            <button onClick={() => followRequest(group.groupId)}>Follow</button>
+                        </div>
+                    </div>
+                )
+            })
         }
+    }
    
     if (!data) {
         return <div>Loading...</div>;
