@@ -26,7 +26,7 @@ import (
 
 const (
 	// Cookie name for user session
-	COOKIE_NAME = "supercalafragalisticexpialadoshus"
+	COOKIE_NAME = "sessionId"
 	// Session duration in seconds
 	SESSION_DURATION = 3600 // 1 hour
 )
