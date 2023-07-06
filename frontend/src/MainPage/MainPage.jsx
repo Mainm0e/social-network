@@ -51,6 +51,7 @@ const BoxState = ({userData}) => {
     }
   } else if (url.pathname === "/group"){
     if (state !== null){
+      console.log("in group",state)
       return <Group userData={userData} groupId={state}/>
     } else if (state === null){
       return <Explore userData={userData} type={"group"}/>

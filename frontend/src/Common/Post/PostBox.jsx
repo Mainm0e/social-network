@@ -5,7 +5,7 @@ import { getCookie, getUserId } from "../../tools/cookie";
 import { checkPostData } from "../../tools/checkdata";
 import { fetchData } from "../../tools/fetchData";
 
-const PostList = ({ profileId }) => {
+const PostList = ({ profileId, groupId, from }) => {
   const [postData, setPostData] = useState(null);
   useEffect(() => {
     const userId = getUserId("userId");
@@ -15,9 +15,9 @@ const PostList = ({ profileId }) => {
     const payload = {
       sessionId: sessionId,
       userId: parseInt(userId),
-      from: "profile",
+      from: from,
       profileId: parseInt(profileId),
-      groupId: 0,
+      groupId: parseInt(groupId),
     };
     fetchData(method, type, payload).then((responseData) => {
       setPostData(responseData);
@@ -43,7 +43,7 @@ const PostList = ({ profileId }) => {
   };
 
   if (!postData) {
-    return null
+    return null;
   } else {
     return <div className="post_list">{createPost()}</div>;
   }
@@ -114,16 +114,19 @@ const CreatePost = ({ onSubmit }) => {
   const [showImage, setShowImage] = useState(null);
   const [followers, setFollowers] = useState([]);
 
-  const [follower, setFollower] = useState(null)
+  const [follower, setFollower] = useState(null);
   useEffect(() => {
-    const method = "POST"
-    const type = "profileList"
-    const payload = {sessionId:getCookie("sessionId"), userId: getUserId("userId"), request:"followers"}
-    fetchData(method,type,payload).then((data)=>{
-        setFollower(data)
-    })
-    }, []);
-  
+    const method = "POST";
+    const type = "profileList";
+    const payload = {
+      sessionId: getCookie("sessionId"),
+      userId: getUserId("userId"),
+      request: "followers",
+    };
+    fetchData(method, type, payload).then((data) => {
+      setFollower(data);
+    });
+  }, []);
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
@@ -246,7 +249,8 @@ const FollowerList = ({ users, followers, handleFollowerChange }) => {
 };
 
 // !! Main Component !!
-const PostBox = ({ id }) => {
+const PostBox = ({ id, from }) => {
+  console.log("PostBox", id, from);
   const [body, setBody] = useState("");
   const [data, setData] = useState(null);
   useEffect(() => {
@@ -289,7 +293,6 @@ const PostBox = ({ id }) => {
         followers: postData.followers,
       };
       fetchData(method, type, payload).then((data) => {
-      
         window.location.hash = "postlist";
       });
     } else {
@@ -307,7 +310,11 @@ const PostBox = ({ id }) => {
 
       {body === "postlist" && (
         <section id="postlist">
-          <PostList profileId={id} />
+          <PostList
+            profileId={from === "profile" ? id : 0}
+            groupId={from === "group" ? id : 0}
+            from={from}
+          />
         </section>
       )}
     </>
