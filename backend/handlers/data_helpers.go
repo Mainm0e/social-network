@@ -4,7 +4,6 @@ import (
 	"backend/db"
 	"backend/utils"
 	"errors"
-	"time"
 )
 
 /*
@@ -272,26 +271,6 @@ func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 	}
 
 	return nonMembers, nil
-}
-
-func InsertGroupRequest(senderId int, groupId int) error {
-	var group Group
-	err := group.ReadGroup(groupId)
-	if err != nil {
-		return errors.New("Error fetching group" + err.Error())
-	}
-	receiverId := group.CreatorProfile.UserId
-	if receiverId == 0 {
-		return errors.New("error fetching group creator")
-	}
-	id, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_request", "", time.Now())
-	if err != nil {
-		return errors.New("Error inserting group request" + err.Error())
-	}
-	if id == 0 {
-		return errors.New("error inserting group request")
-	}
-	return nil
 }
 
 /*
