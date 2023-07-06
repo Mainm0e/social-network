@@ -16,6 +16,7 @@ func HTTPEventRouter(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		var event events.Event
 		err := json.NewDecoder(r.Body).Decode(&event)
+		r.Body.Close() // Must close the body after decoding it to free up resources
 		log.Println("Event:", event.Type, "payload: ", string(event.Payload))
 		if err != nil {
 			log.Println("Error decoding event:", err)
