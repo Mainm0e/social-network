@@ -55,6 +55,10 @@ const Explore = ({type}) => {
                         <div className="explore_list_item_create_time">
                             <p>{group.date}</p>
                         </div>
+                        {/* go to page */}
+                        <div className="explore_list_item_go_to_page">
+                            <button onClick={() => navigateToProfile(type,group.groupId)}>Go to page</button>
+                        </div>
                         {/* follow btn */}
                         <div className="explore_list_item_follow_btn">
                             <button onClick={() => followRequest(group.groupId)}>Follow</button>
