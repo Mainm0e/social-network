@@ -273,14 +273,6 @@ func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 	return nonMembers, nil
 }
 
-func InsertGroupInvitation(senderId int, groupId int, receiverId int, content string) error {
-	_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", content, time.Now())
-	if err != nil {
-		return errors.New("Error inserting group invitation" + err.Error())
-	}
-	return nil
-	// TODO: send notification to receiver
-}
 func InsertGroupRequest(senderId int, groupId int) error {
 	var group Group
 	err := group.ReadGroup(groupId)

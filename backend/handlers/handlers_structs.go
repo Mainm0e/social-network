@@ -21,9 +21,10 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"requestNotif":   RequestNotifications,
 	"createGroup":    CreateGroup,
 	"exploreGroups":  ExploreGroups,
+	"sendInvetaion":  SendInvitation,
+
 	/*
 		TODO: im not saying that we should have these functions but we need the functionality of these functions:
-		"sendInvetaion":      SendInvitation,
 		"responseInvitation": AcceptInvitation,
 		"requestToJoin":      RequestToJoin,
 		"responseToJoin":     ResponseToJoin,
@@ -143,12 +144,13 @@ type Explore struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 }
-type Follow struct {
+type Request struct {
 	SessionId  string `json:"sessionId"`
-	FollowerId int    `json:"followerId"`
-	FolloweeId int    `json:"followeeId"`
+	SenderId   int    `json:"senderId"`
+	ReceiverId int    `json:"receiverId"`
+	GroupId    int    `json:"groupId"`
 	NotifId    int    `json:"notifId"`
-	Response   string `json:"response"`
+	Content    string `json:"content"`
 }
 type Group struct {
 	SessionId      string       `json:"sessionId"`

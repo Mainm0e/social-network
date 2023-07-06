@@ -87,7 +87,7 @@ It returns a response with success/failure status and an event containing sessio
 */
 func FollowRequest(payload json.RawMessage) (Response, error) {
 	var response Response
-	var follow Follow
+	var follow Request
 	err := json.Unmarshal(payload, &follow)
 	if err != nil {
 		// handle the error
@@ -98,15 +98,15 @@ func FollowRequest(payload json.RawMessage) (Response, error) {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.FollowerId == 0 {
+	if follow.SenderId == 0 {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.FolloweeId == 0 {
+	if follow.ReceiverId == 0 {
 		response = Response{"followId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	err = insertFollowRequest(follow.FollowerId, follow.FolloweeId, follow.NotifId)
+	err = insertFollowRequest(follow.SenderId, follow.ReceiverId, follow.NotifId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
@@ -161,7 +161,7 @@ It returns a response with success/failure status and an event containing sessio
 */
 func FollowResponse(payload json.RawMessage) (Response, error) {
 	var response Response
-	var follow Follow
+	var follow Request
 	err := json.Unmarshal(payload, &follow)
 	if err != nil {
 		// handle the error
@@ -172,15 +172,15 @@ func FollowResponse(payload json.RawMessage) (Response, error) {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.FolloweeId == 0 {
+	if follow.SenderId == 0 {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.FollowerId == 0 {
+	if follow.ReceiverId == 0 {
 		response = Response{"followId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	err = deleteRequest("follow", follow.FollowerId, follow.FolloweeId, follow.NotifId, follow.Response)
+	err = deleteRequest("follow", follow.SenderId, follow.ReceiverId, follow.NotifId, follow.Content)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
@@ -195,5 +195,45 @@ func FollowResponse(payload json.RawMessage) (Response, error) {
 		Payload: payload,
 	}
 	response = Response{"follow response sent successfully!", event, http.StatusOK}
+	return response, nil
+}
+
+/*
+group invitation && group request to join
+*/
+func insertGroupInvitation(senderId int, groupId int, receiverId int, content string) error {
+	_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", time.Now())
+	if err != nil {
+		return errors.New("Error inserting group invitation" + err.Error())
+	}
+	return nil
+}
+func SendInvitation(payload json.RawMessage) (Response, error) {
+	var response Response
+	var invitation Request
+	err := json.Unmarshal(payload, &invitation)
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	if invitation.SessionId == "" {
+		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	err = insertGroupInvitation(invitation.SenderId, invitation.GroupId, invitation.ReceiverId, invitation.Content)
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	payload, err = json.Marshal(map[string]string{"sessionId": invitation.SessionId})
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	event := events.Event{
+		Type:    "sendInvitation",
+		Payload: payload,
+	}
+	response = Response{"invitation sent successfully!", event, http.StatusOK}
 	return response, nil
 }
