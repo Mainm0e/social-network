@@ -25,8 +25,8 @@ func (group *Group) InsertGroup() error {
 /*
 InsertGroupMember inserts a new group member into "group_member" table. return error if any occurred otherwise returns nil.
 */
-func InsertGroupMember(groupId int, userId int) error {
-	_, err := db.InsertData("group_member", groupId, userId)
+func InsertGroupMember(groupId int, userId int, status string) error {
+	_, err := db.InsertData("group_member", groupId, userId, status)
 	if err != nil {
 		return errors.New("Error inserting group member" + err.Error())
 	}
@@ -59,7 +59,7 @@ func CreateGroup(payload json.RawMessage) (Response, error) {
 		return response, err
 	}
 	//insert creator of the group into database
-	err = InsertGroupMember(group.GroupId, group.CreatorProfile.UserId)
+	err = InsertGroupMember(group.GroupId, group.CreatorProfile.UserId, "creator")
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
