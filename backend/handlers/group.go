@@ -24,6 +24,7 @@ func InsertGroupMember(groupId int, userId int) error {
 	}
 	return nil
 }
+
 func ReadGroup(groupId int) (Group, error) {
 	dbGroups, err := db.FetchData("groups", "groupId", groupId)
 	if err != nil {

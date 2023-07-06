@@ -2,6 +2,7 @@ import { logout } from "./logout"
 export async function fetchData(method, type, payload) {
   const response = await fetch("http://localhost:8080/api", {
     method: method,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },

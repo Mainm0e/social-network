@@ -13,7 +13,7 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
 	"createPost":     CreatePost,
-	"GetPosts":       GetPosts,
+	"GetPosts":       GetPosts, // TODO: Change spelling / syntax
 	"createComment":  CreateComment,
 	"exploreUsers":   ExploreUsers,
 	"exploreGroups":  ExploreGroups,
@@ -64,6 +64,7 @@ type SmallProfile struct {
 	LastName  string  `json:"lastName"`
 	Avatar    *string `json:"avatar"`
 }
+
 type Profile struct {
 	SessionId    string         `json:"sessionId"`
 	UserId       int            `json:"userId"`
@@ -77,11 +78,13 @@ type Profile struct {
 	FollowingNum int            `json:"followingNum"`
 	PrivateData  PrivateProfile `json:"privateProfile"`
 }
+
 type PrivacyData struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 	Privacy   string `json:"privacy"`
 }
+
 type PrivateProfile struct {
 	BirthDate string `json:"birthdate"`
 	Email     string `json:"email"`
@@ -100,6 +103,7 @@ type Comment struct {
 	Image          string       `json:"image,omitempty"`
 	Date           string       `json:"Date"`
 }
+
 type Post struct {
 	SessionId      string       `json:"sessionId"`
 	PostId         int          `json:"postId"`
@@ -114,6 +118,7 @@ type Post struct {
 	Comments       []Comment    `json:"comments"`
 	Date           string       `json:"date"`
 }
+
 type RequestPost struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
@@ -141,6 +146,7 @@ type Explore struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 }
+
 type Follow struct {
 	SessionId  string `json:"sessionId"`
 	FollowerId int    `json:"followerId"`
@@ -148,11 +154,13 @@ type Follow struct {
 	NotifId    int    `json:"notifId"`
 	Response   string `json:"response"`
 }
+
 type GroupEvent struct {
 	SessionId    string                    `json:"sessionId"`
 	Event        db.Event                  `json:"event"`
 	Participants map[string][]SmallProfile `json:"participants"`
 }
+
 type Notification struct {
 	SessionId    string          `json:"sessionId"`
 	Profile      SmallProfile    `json:"profile"`

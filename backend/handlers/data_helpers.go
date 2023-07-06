@@ -265,6 +265,7 @@ func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
 	}
 	return users, nil
 }
+
 func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error) {
 	users, err := ReadAllUsers(userId, sessionId)
 	if err != nil {
@@ -344,4 +345,33 @@ func GroupInvitationCheck(accept string, notifId int, userId int, groupId int) e
 	}
 	return nil
 
+}
+
+/*
+GetAllGroupMemberIDs returns all the user ids of the members of a group.
+It takes a groupID integer as an argument and returns a slice of integers
+and an error value, which is non-nil if any of the database operations
+failed.
+*/
+func GetAllGroupMemberIDs(groupId int) ([]int, error) {
+	var userIds []int
+
+	// Fetch all group members from the database
+	dbGroupMembers, err := db.FetchData("group_member", "groupId", groupId)
+	if err != nil {
+		return userIds, errors.New("Error fetching group members" + err.Error())
+	}
+
+	// If no group members were found, return an error
+	if len(dbGroupMembers) == 0 {
+		return userIds, errors.New("no group member found")
+	}
+
+	// Iterate over all group members and append their user ids to the slice
+	for _, dbGroupMember := range dbGroupMembers {
+		dbGroupMember := dbGroupMember.(db.GroupMember)
+		userIds = append(userIds, dbGroupMember.UserId)
+	}
+
+	return userIds, nil
 }
