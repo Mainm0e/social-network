@@ -2,13 +2,17 @@ package server
 
 import (
 	"backend/db"
+	"backend/events"
 	"backend/handlers"
 	"backend/server/sessions"
 	"backend/sockets"
 	"backend/utils"
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -125,46 +129,66 @@ middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract the session cookie from the request header
-		// Copy the r into a new r
-		/* var event handlers.Event
+		// Check the request path
+		if r.URL.Path == "/ws" {
+			// For websocket requests, validate the session cookie
+			cookie, err := r.Cookie(sessions.COOKIE_NAME)
+			if err != nil {
+				// Handle error: No valid sessionID cookie found.
+				http.Error(w, "Authentication required", http.StatusUnauthorized)
+				return
+			}
 
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			// Handle the error
-			log.Println("Error reading request body", http.StatusBadRequest)
-			return
+			// Check if session cookie is valid
+			isValid, err := sessions.CookieCheck(cookie)
+			if !isValid || err != nil {
+				// Handle error: Invalid sessionID cookie.
+				http.Error(w, "Invalid session", http.StatusUnauthorized)
+				return
+			}
+
+			// If session cookie is valid, pass to the next middleware or handler
+			handler.ServeHTTP(w, r)
+		} else {
+			// For other requests, parse JSON event as before
+			// Copy the r into a new r
+			var event events.Event
+
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				// Handle the error
+				log.Println("Error reading request body", http.StatusBadRequest)
+				return
+			}
+			defer r.Body.Close()
+
+			newBody := io.NopCloser(bytes.NewReader(body))
+			newRequest := r.Clone(r.Context())
+			newRequest.Body = newBody
+
+			err = json.NewDecoder(newRequest.Body).Decode(&event)
+			if err != nil {
+				// Handle the error
+				log.Println("Error decoding JSON", http.StatusBadRequest)
+				return
+			}
+
+			// Use the new request in subsequent middleware or handlers
+			// Access the event structure from the newRequest.Body here
+
+			// Call the next middleware or handler
+			// Check if the event is a login or register event
+			if event.Type == "login" || event.Type == "register" {
+				// Skip authentication check
+				log.Println("Skipping authentication check for login or register event", event)
+
+				handler.ServeHTTP(w, newRequest)
+				return
+			}
+
+			// If authenticated, pass to the next middleware or handler
+			handler.ServeHTTP(w, r)
 		}
-		defer r.Body.Close()
-
-		newBody := ioutil.NopCloser(bytes.NewReader(body))
-		newRequest := r.Clone(r.Context())
-		newRequest.Body = newBody
-
-		err = json.NewDecoder(newRequest.Body).Decode(&event)
-		if err != nil {
-			// Handle the error
-			log.Println("Error decoding JSON", http.StatusBadRequest)
-			return
-		}
-
-		// Use the new request in subsequent middleware or handlers
-		// Access the event structure from the newRequest.Body here
-
-		// Call the next middleware or handler
-		// Check if the event is a login or register event
-		if event.Event_type == "login" || event.Event_type == "register" {
-			// skip authentication check
-			log.Println("Skipping authentication check for login or register event", event)
-
-			handler.ServeHTTP(w, newRequest)
-			return
-		}
-
-		// ... rest of your authentication logic ...
-
-		// If authenticated, pass to the next middleware or handler */
-		handler.ServeHTTP(w, r)
 	})
 }
 
