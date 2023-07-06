@@ -10,9 +10,9 @@ import (
 )
 
 /*
-login is a function that attempts to log in a user based on the provided data.
-It takes in a byte slice `data` containing the login information.
-It returns a boolean value indicating whether the login was successful, and an error if any occurred.
+login is a function defined on the LoginData struct. It checks if user exists in the database base on the provided email,
+and if the password matches the one stored in the database. If both are true,
+it returns the user id and nil otherwise it returns 0 and an error.
 */
 func (lg *LoginData) login() (int, error) {
 	// Fetch user data from the database based on the provided email.
@@ -29,7 +29,7 @@ func (lg *LoginData) login() (int, error) {
 }
 
 /*
-LoginPage is a function receiving a byte slice `payload` containing the login information.
+LoginPage is a function receiving a json file, payload, containing the login information.
 It checks if the login information is valid, using the login() function. if it is,
 it calls the sessions.Login() function to create a session for the user.
 It then returns a Response struct containing the appropriate message and status code and an error if any occurred.
