@@ -7,8 +7,9 @@ import (
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":          LoginPage,
-	"register":       RegisterPage,
+	"login":    LoginPage,
+	"register": RegisterPage,
+	//TODO: "logout":         LogoutPage,
 	"profile":        ProfilePage,
 	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
@@ -158,13 +159,17 @@ type Request struct {
 	Content    string `json:"content"`
 }
 type Group struct {
-	SessionId      string       `json:"sessionId"`
-	CreatorProfile SmallProfile `json:"creatorProfile"`
-	GroupId        int          `json:"groupId"`
-	Title          string       `json:"title"`
-	Description    string       `json:"description"`
-	Date           string       `json:"date"`
+	SessionId      string         `json:"sessionId"`
+	CreatorProfile SmallProfile   `json:"creatorProfile"`
+	GroupId        int            `json:"groupId"`
+	Title          string         `json:"title"`
+	Description    string         `json:"description"`
+	Status         string         `json:"status"`
+	NoMembers      int            `json:"noMembers"`
+	Members        []SmallProfile `json:"members"`
+	Date           string         `json:"date"`
 }
+
 type GroupEvent struct {
 	SessionId    string                    `json:"sessionId"`
 	Event        db.Event                  `json:"event"`
