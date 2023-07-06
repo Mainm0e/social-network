@@ -32,7 +32,8 @@ VALUES (1, 2, 'following'),
 INSERT INTO group_member (userId, groupId, status)
 VALUES (1, 1, 'member'),
        (2, 1, 'member'),
-       (1, 2, 'member');
+       (2, 2, 'member'),
+       (1, 3, 'member');
 
 INSERT INTO semiPrivate (postId, userId)
 VALUES (1, 2),
@@ -56,7 +57,7 @@ DELETE FROM messages;
 
 -- Remove the previously inserted rows from other tables (follow, group_member, semiPrivate, notifications, events)
 DELETE FROM follow WHERE followerId IN (1, 2) AND followeeId IN (2, 1,3) AND status = 'following';
-DELETE FROM group_member WHERE userId IN (1, 2) AND groupId IN (1, 2) AND status = 'member';
+DELETE FROM group_member WHERE userId IN (1, 2) AND groupId IN (1, 2, 3) AND status = 'member';
 DELETE FROM semiPrivate WHERE postId IN (1, 3) AND userId IN (1, 2);
 DELETE FROM notifications WHERE receiverId IN (1, 2) AND senderId IN (2, 1);
 DELETE FROM events WHERE creatorId IN (1, 2) AND receiverId IN (1, 2) AND groupId IN (1, 2);
