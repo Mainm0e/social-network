@@ -55,13 +55,13 @@ to an http.Cookie and an error. It is used to extract the session cookie from th
 header. It returns an error which is non-nil if a cookie with the sessions.COOKIE_NAME is
 not present in the request header.
 */
-func extractCookie(r *http.Request) (*http.Cookie, error) {
-	cookie, err := r.Cookie(sessions.COOKIE_NAME)
-	if err != nil {
-		return nil, errors.New("error in server.extractCookie(): " + err.Error())
-	}
-	return cookie, nil
-}
+// func extractCookie(r *http.Request) (*http.Cookie, error) {
+// 	cookie, err := r.Cookie(sessions.COOKIE_NAME)
+// 	if err != nil {
+// 		return nil, errors.New("error in server.extractCookie(): " + err.Error())
+// 	}
+// 	return cookie, nil
+// }
 
 /*
 loggerMiddleware is a middleware function which logs the URL path of each request to the
@@ -129,66 +129,55 @@ middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Check the request path
-		if r.URL.Path == "/ws" {
-			// For websocket requests, validate the session cookie
-			cookie, err := r.Cookie(sessions.COOKIE_NAME)
-			if err != nil {
-				// Handle error: No valid sessionID cookie found.
-				http.Error(w, "Authentication required", http.StatusUnauthorized)
-				return
-			}
-
-			// Check if session cookie is valid
-			isValid, err := sessions.CookieCheck(cookie)
-			if !isValid || err != nil {
-				// Handle error: Invalid sessionID cookie.
-				http.Error(w, "Invalid session", http.StatusUnauthorized)
-				return
-			}
-
-			// If session cookie is valid, pass to the next middleware or handler
-			handler.ServeHTTP(w, r)
-		} else {
-			// For other requests, parse JSON event as before
-			// Copy the r into a new r
-			var event events.Event
-
-			body, err := io.ReadAll(r.Body)
-			if err != nil {
-				// Handle the error
-				log.Println("Error reading request body", http.StatusBadRequest)
-				return
-			}
-			defer r.Body.Close()
-
-			newBody := io.NopCloser(bytes.NewReader(body))
-			newRequest := r.Clone(r.Context())
-			newRequest.Body = newBody
-
-			err = json.NewDecoder(newRequest.Body).Decode(&event)
-			if err != nil {
-				// Handle the error
-				log.Println("Error decoding JSON", http.StatusBadRequest)
-				return
-			}
-
-			// Use the new request in subsequent middleware or handlers
-			// Access the event structure from the newRequest.Body here
-
-			// Call the next middleware or handler
-			// Check if the event is a login or register event
-			if event.Type == "login" || event.Type == "register" {
-				// Skip authentication check
-				log.Println("Skipping authentication check for login or register event", event)
-
-				handler.ServeHTTP(w, newRequest)
-				return
-			}
-
-			// If authenticated, pass to the next middleware or handler
-			handler.ServeHTTP(w, r)
+		// Read the request body
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Println("Error reading request body", http.StatusBadRequest)
+			http.Error(w, "Invalid request", http.StatusBadRequest)
+			return
 		}
+		// Always close the request body after reading it to free up resources
+		defer r.Body.Close()
+
+		// Create a new reader with the body for JSON decoding
+		reader1 := io.NopCloser(bytes.NewReader(body))
+		// Initialise  event struct
+		var event events.Event
+
+		err = json.NewDecoder(reader1).Decode(&event)
+		if err != nil {
+			log.Println("Error decoding JSON", http.StatusBadRequest)
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
+		}
+
+		// Refer to events catalogue in handlers package (handlers_structs.go)
+		if _, ok := handlers.Events[event.Type]; ok {
+			// Check that event type is not login or register (these events do not require authentication)
+			if event.Type != "login" && event.Type != "register" {
+				// Check if the request contains a sessionID cookie
+				cookie, err := r.Cookie(sessions.COOKIE_NAME)
+				if err != nil {
+					// Handle error: No sessionID cookie found.
+					log.Printf("No sessionID cookie found: %v", err)
+					http.Error(w, "Invalid session", http.StatusUnauthorized)
+					return
+				}
+
+				// Validate the sessionID cookie
+				isValid, err := sessions.CookieCheck(cookie)
+				if !isValid || err != nil {
+					// Handle error: Invalid sessionID cookie.
+					log.Printf("Invalid sessionID cookie: %v", err)
+					http.Error(w, "Invalid session", http.StatusUnauthorized)
+					return
+				}
+			}
+		}
+
+		// Create a new reader with the body for the next handler
+		r.Body = io.NopCloser(bytes.NewReader(body))
+		handler.ServeHTTP(w, r)
 	})
 }
 
@@ -208,7 +197,6 @@ func initialiseRoutes() http.Handler {
 	// Register handler functions for various routes
 	mux.HandleFunc("/api", handlers.HTTPEventRouter)
 	mux.HandleFunc("/ws", wsManager.ServeWS)
-	log.Println("Websocket initialisation complete")
 
 	// Wrap the mux with the CORS middleware and return it
 	// Although the return type is an http.Handler, it is actually a wrapped *mux.Router which
