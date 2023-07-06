@@ -114,8 +114,8 @@ var UpdateRules = map[string]string{
 	"posts":         "UPDATE posts SET image=? WHERE postId=?",
 	"comments":      "UPDATE comments SET image=? WHERE commentId=?",
 	"groups":        "UPDATE groups SET creatorId=?, title=?, description=? WHERE groupId=?",
-	"follow":        "UPDATE follow SET status=? WHERE followerId = ? AND followeeId = ?", // TODO check this works correctly
-	"group_member":  "UPDATE group_member SET status=? WHERE userId=?",                    // Assuming userId uniquely identifies a group member record
+	"follow":        "UPDATE follow SET status=? WHERE followerId = ? AND followeeId = ?",
+	"group_member":  "UPDATE group_member SET status=? WHERE userId=? AND groupId=?",
 	"messages":      "UPDATE messages SET senderId=?, receiverId=?, messageContent=?, sendTime=?, seen=? WHERE messageId=?",
 	"semiPrivate":   "UPDATE semiPrivate SET postId=?, userId=? WHERE postId=?", // Assuming postId uniquely identifies a semiPrivate record
 	"notifications": "UPDATE notifications SET  type=? WHERE notificationId=?",

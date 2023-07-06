@@ -139,15 +139,6 @@ type ReqAllPosts struct {
 	GroupId   int    `json:"groupId"`
 }
 
-type Group struct {
-	SessionId      string       `json:"sessionId"`
-	CreatorProfile SmallProfile `json:"creatorProfile"`
-	GroupId        int          `json:"groupId"`
-	Title          string       `json:"title"`
-	Description    string       `json:"description"`
-	Date           string       `json:"date"`
-}
-
 type Explore struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
@@ -158,6 +149,14 @@ type Follow struct {
 	FolloweeId int    `json:"followeeId"`
 	NotifId    int    `json:"notifId"`
 	Response   string `json:"response"`
+}
+type Group struct {
+	SessionId      string       `json:"sessionId"`
+	CreatorProfile SmallProfile `json:"creatorProfile"`
+	GroupId        int          `json:"groupId"`
+	Title          string       `json:"title"`
+	Description    string       `json:"description"`
+	Date           string       `json:"date"`
 }
 type GroupEvent struct {
 	SessionId    string                    `json:"sessionId"`

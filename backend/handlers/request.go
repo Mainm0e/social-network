@@ -125,24 +125,30 @@ func FollowRequest(payload json.RawMessage) (Response, error) {
 }
 
 /*
-DeleteFollowRequest function delete the follow request from notification table and update the follow table base on user decision
+DeleteRequest function delete the follow/join-group request from notification table and update the follow/group_member table base on user decision
 if error occur then it return error
 */
 
-func deleteFollowRequest(followerId int, followeeId int, notifId int, response string) error {
+func deleteRequest(tableName string, senderId int, receiverId int, notifId int, response string) error {
 	err := db.DeleteData("notifications", notifId)
 	if err != nil {
-		return errors.New("Error deleting follow request" + err.Error())
+		return errors.New("Error deleting request" + err.Error())
 	}
+	var status string
 	if response == "accept" {
-		err = db.UpdateData("follow", "following", followerId, followeeId)
+		if tableName == "follow" {
+			status = "following"
+		} else {
+			status = "member"
+		}
+		err = db.UpdateData(tableName, status, senderId, receiverId)
 		if err != nil {
-			return errors.New("Error updating follow request" + err.Error())
+			return errors.New("Error updating request" + err.Error())
 		}
 	} else if response == "reject" {
-		err = db.DeleteData("follow", followeeId, followerId)
+		err = db.DeleteData(tableName, senderId, receiverId)
 		if err != nil {
-			return errors.New("Error deleting follow request" + err.Error())
+			return errors.New("Error deleting  request" + err.Error())
 		}
 	}
 	return nil
@@ -174,7 +180,7 @@ func FollowResponse(payload json.RawMessage) (Response, error) {
 		response = Response{"followId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	err = deleteFollowRequest(follow.FollowerId, follow.FolloweeId, follow.NotifId, follow.Response)
+	err = deleteRequest("follow", follow.FollowerId, follow.FolloweeId, follow.NotifId, follow.Response)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
