@@ -209,9 +209,14 @@ and broadcasts it to all clients in the chat. It returns an error value, which
 is non-nil if any of the operations failed.
 */
 func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) error {
+	// Unmarshal the event into a ChatMsg interface
+	msg, err := UnmarshalEventToChatMsg(chatEvent)
+	if err != nil {
+		return fmt.Errorf("HandleChatMessage() error - %v", err)
+	}
 
 	// Store message in database
-	err := RecordMsgToDB(msg)
+	err = RecordMsgToDB(msg)
 	if err != nil {
 		return fmt.Errorf("HandleChatMessage() error - %v", err)
 	}
