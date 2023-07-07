@@ -74,7 +74,7 @@ func (c *Client) ReadData() {
 		_, message, err := c.Connection.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("Unexpected close error: %v", err)
+				log.Printf("sockets.ReadData() - Unexpected close error: %v", err)
 			}
 			break
 		}
@@ -82,7 +82,7 @@ func (c *Client) ReadData() {
 		// Unmarshal the received message into an event.
 		var event events.Event
 		if err := json.Unmarshal(message, &event); err != nil {
-			log.Printf("Error unmarshalling event: %v", err)
+			log.Printf("sockets.ReadData() - Error unmarshalling event: %v", err)
 
 			// In case of an error unmarshalling, it sends back an error event to the client.
 			errorEvent := events.Event{
@@ -100,13 +100,13 @@ func (c *Client) ReadData() {
 		// If the event type exists in the map of handlers, execute the handler.
 		handler, ok := c.Manager.Handlers[event.Type]
 		if !ok {
-			log.Printf("No handler for event type %v", event.Type)
+			log.Printf("sockets.ReadData() - No handler for event type %v", event.Type)
 			break
 		}
 
 		err = handler(event, c)
 		if err != nil {
-			log.Printf("Error handling event: %v", err)
+			log.Printf("sockets.ReadData() - Error handling event: %v", err)
 			break
 		}
 	}
