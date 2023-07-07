@@ -21,13 +21,19 @@ This function is typically called when the WebSocket server starts up and
 needs to create a Manager to manage clients and messages.
 */
 func NewManager() *Manager {
-	return &Manager{
+	m := &Manager{
 		Broadcast:  make(chan []byte),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    ClientList{},
 		Handlers:   make(map[string]EventHandler),
 	}
+
+	// Add the chat handler to the Handlers map
+	m.Handlers["privateMsg"] = m.HandleChatEvent
+	m.Handlers["groupMsg"] = m.HandleChatEvent
+
+	return m
 }
 
 /*
@@ -86,8 +92,8 @@ func (c *Client) ReadData() {
 
 			// In case of an error unmarshalling, it sends back an error event to the client.
 			errorEvent := events.Event{
-				Type:    "", // TODO: Add error event type
-				Payload: json.RawMessage(fmt.Sprintf(`{"error": "Failed to parse event: %v"}`, err)),
+				Type:    "error",
+				Payload: json.RawMessage(fmt.Sprintf(`{"sockets.ReadData() error": "Failed to parse event: %v"}`, err)),
 			}
 
 			eventBytes, _ := json.Marshal(errorEvent)
