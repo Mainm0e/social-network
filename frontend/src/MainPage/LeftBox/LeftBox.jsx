@@ -95,7 +95,6 @@ const LinkBox = ({type,show}) => {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
         if (url.pathname ==="/user"){
-            console.log(id + " " + getUserId("userId") )
             if (parseInt(id) === getUserId("userId")){
                 setLink(your_link)
             } else {

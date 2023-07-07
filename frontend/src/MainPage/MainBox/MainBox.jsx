@@ -12,8 +12,6 @@ import { fetchData } from "../../tools/fetchData";
 
 
 const MainBox = ({ profileId,groupId, type ,state}) => {
-  console.log("mainbox",profileId, type ,state)
-
   const [refreshKey, setRefreshKey] = useState(0);
   // refreshKey is used to refresh component
   const refreshComponent = () => {
@@ -129,7 +127,6 @@ const Group = ({ groupId, refreshComponent }) => {
         group = data[i]
       }
     }
-    console.log("group",group)
     return (
       <div className="main-box">
         <GroupHeader group={group} handleRefresh={handleRefresh} />

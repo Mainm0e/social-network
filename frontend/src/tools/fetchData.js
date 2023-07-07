@@ -26,10 +26,8 @@ if (!response.ok) {
   }
 } else {
   const responseData = await response.json();
-  console.log("response", response);
   if (type === "login") {
     if (responseData.statusCode === 200) {
-      console.log("set cookie", responseData);
       document.cookie = "sessionId=" + responseData.event.payload.sessionId;
       localStorage.setItem("userId", responseData.event.payload.userId);
       window.location.href = "/";
@@ -40,7 +38,6 @@ if (!response.ok) {
   }
   if (type === "register") {
     if (responseData.statusCode === 200) {
-      console.log("set cookie", responseData);
       window.location.href = "/login";
       return responseData.event.payload;
     } else {
@@ -48,7 +45,6 @@ if (!response.ok) {
     }
   }
   if (responseData.statusCode === 200) {
-    console.log("responseData", responseData)
     return responseData.event.payload;
   }
   if (responseData.statusCode !== 200) {

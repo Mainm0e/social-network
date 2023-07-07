@@ -39,7 +39,6 @@ const Notification = ({ clearBox }) => {
     ));
   };
   if (notificationData.length  > 0) {
-    console.log(notificationData, "notificationData", notificationData.length, "notificationData.length")
   return (
     <div className="notification-container">
       {showNotification && renderNotifications()}{" "}
@@ -80,7 +79,7 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
         senderId: notifications.senderId,
         groupId: notifications.groupId,
         notifId: notifications.notificationId,
-        response: value, // Use the value parameter here
+        content: value, // Use the value parameter here
       };
       fetchData(method, type, payload).then((data) => {
         window.location.reload();
@@ -97,7 +96,7 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
           </span>
         </div>
         <div className="notification-content">
-          <span>sent you a follow request</span>
+          <span>sent you a {notifications.type}</span>
         </div>
         <div className="notification-btn">
           <button value="accept" onClick={() => handleAccept("accept")}>
