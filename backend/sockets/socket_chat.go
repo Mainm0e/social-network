@@ -19,7 +19,7 @@ byte array to the the client with the given receiver ID. It returns an error
 value, which is non-nil if any of the broadcasting operations failed or if
 the receiver was not found.
 */
-func (m *Manager) BroadcastPrivateMsg(receiverID int, payloadJSON []byte) error {
+func (m *Manager) BroadcastPrivateMsg(receiverID int, msgEventJSON []byte) error {
 	var sent bool
 	// The range function on a sync.map accepts a function of the form
 	// func(key, value interface{}) bool, which it calls once for each
@@ -27,7 +27,7 @@ func (m *Manager) BroadcastPrivateMsg(receiverID int, payloadJSON []byte) error 
 	m.Clients.Range(func(key, client interface{}) bool {
 		if client.(*Client).ID == receiverID {
 			select {
-			case client.(*Client).Egress <- payloadJSON:
+			case client.(*Client).Egress <- msgEventJSON:
 				sent = true
 			default:
 				close(client.(*Client).Egress)
@@ -122,6 +122,19 @@ func UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent events.Event) (*
 }
 
 /*
+UnmarshalEventToChatHistory() takes an events.Event as input and unmarshals it
+into a ChatHistory struct. It returns a pointer to the ChatHistory struct and
+an error value, which is non-nil if the unmarshalling operation failed.
+*/
+func UnmarshalEventToChatHistory(chatHistoryEvent events.Event) (*ChatHistory, error) {
+	var chatHistory ChatHistory
+	if err := json.Unmarshal(chatHistoryEvent.Payload, &chatHistory); err != nil {
+		return nil, fmt.Errorf("UnmarshalEventToChatHistory() error: %v", err)
+	}
+	return &chatHistory, nil
+}
+
+/*
 FetchChatHistory() takes a ChatHistoryRequest struct as input and fetches the
 chat history from the database. It returns a pointer to a ChatHistory struct
 and an error value, which is non-nil if the database query failed. It works by
@@ -169,7 +182,9 @@ func FetchChatHistory(chatHistoryRequest ChatHistoryRequest) (*ChatHistory, erro
 	}, nil
 }
 
-// TODO: BroadcastChatHistory() - sockets operation
+// func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
+// 	// Marshal the chat history into a JSON byte array
+// }
 
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
 
