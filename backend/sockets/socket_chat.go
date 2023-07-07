@@ -13,20 +13,6 @@ import (
 /********************** PRIVATE MESSAGE LOGIC *******************************/
 
 /*
-UnmarshalEventToPrivateMsg() takes an Event struct, which is usually received
-from the frontend in the form of a websocket message, and unmarshals it into
-a PrivateMsg struct. It then returns a pointer to this PrivateMsg struct, along
-with an error value, which is non-nil if the unmarshalling process failed.
-*/
-func UnmarshalEventToPrivateMsg(msgEvent events.Event) (*PrivateMsg, error) {
-	var privateMsg PrivateMsg
-	if err := json.Unmarshal(msgEvent.Payload, &privateMsg); err != nil {
-		return nil, fmt.Errorf("UnmarshalEventToPrivateMsg() error: %v", err)
-	}
-	return &privateMsg, nil
-}
-
-/*
 BroadcastProvateMessage() is a method of the Manager struct, which takes a
 receiver ID int and a json byte array as parameters. It then broadcasts the json
 byte array to the the client with the given receiver ID. It returns an error
@@ -61,20 +47,6 @@ func (m *Manager) BroadcastPrivateMsg(receiverID int, payloadJSON []byte) error 
 }
 
 /********************** GROUP MESSAGE LOGIC **********************************/
-
-/*
-UmarshalEventToGroupMsg() takes an Event struct, which is usually received
-from the frontend in the form of a websocket message, and unmarshals it into
-a GroupMsg struct. It then returns a pointer to this GroupMsg struct, along
-with an error value, which is non-nil if the unmarshalling process failed.
-*/
-func UnmarshalEventToGroupMsg(msgEvent events.Event) (*GroupMsg, error) {
-	var groupMsg GroupMsg
-	if err := json.Unmarshal(msgEvent.Payload, &groupMsg); err != nil {
-		return nil, fmt.Errorf("UnmarshalEventToGroupMsg() error: %v", err)
-	}
-	return &groupMsg, nil
-}
 
 /*
 BroadcastGroupMessage() is a method of the Manager struct, which takes a
@@ -150,6 +122,27 @@ func UnmarshalJSONToChatHistoryRequest(jsonMsg []byte) (*ChatHistoryRequest, err
 }
 
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
+
+func UnmarshalEventToChatMsg(msgEvent events.Event) (ChatMsg, error) {
+	// Check the message type and unmarshal accordingly
+
+	// Private message
+	if msgEvent.Type == "privateMsg" {
+		var pMsg PrivateMsg
+		if err := json.Unmarshal(msgEvent.Payload, &pMsg); err != nil {
+			return nil, fmt.Errorf("UnmarshalEventToChatMsg() error: %v", err)
+		}
+		return &pMsg, nil
+	} else if msgEvent.Type == "groupMsg" {
+		var gMsg GroupMsg
+		if err := json.Unmarshal(msgEvent.Payload, &gMsg); err != nil {
+			return nil, fmt.Errorf("UnmarshalEventToChatMsg() error: %v", err)
+		}
+		return &gMsg, nil
+	}
+	// Else, return an error
+	return nil, fmt.Errorf("UnmarshalEventToChatMsg() error: invalid message type")
+}
 
 /*
 RecordMsgToDB() takes a ChatMsg interface, which is either a PrivateMsg or a
