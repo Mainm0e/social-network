@@ -34,10 +34,10 @@ type ChatHistoryRequest struct {
 /*********************** ONLY FROM BACKEND EVENT STRUCT ******************/
 
 type ChatHistory struct {
-	ChatType    string   `json:"chatType"`
-	ClientID    int      `json:"clientID"`
-	TargetID    int      `json:"targetID"` // UserID or GroupID
-	ChatHistory []string `json:"chatHistory"`
+	ChatType    string     `json:"chatType"`
+	ClientID    int        `json:"clientID"`
+	TargetID    int        `json:"targetID"` // UserID or GroupID
+	ChatHistory [][]string `json:"chatHistory"`
 }
 
 /*********************** INTERFACES & METHODS ****************************/
