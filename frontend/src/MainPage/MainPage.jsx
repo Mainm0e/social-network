@@ -19,8 +19,6 @@ function MainPage() {
     fetchData(method,type, payload).then((data) => setData(data));
   }, []);
 
- 
-
   if (!data) {
     return <div className="loading"><div>Loading...</div></div>;
   } else {
@@ -33,7 +31,6 @@ function MainPage() {
   );
 }
 }
-
 export default MainPage;
 
 // BoxState is component that read url and send user to correct place
@@ -54,15 +51,16 @@ const BoxState = ({userData}) => {
     }
   } else if (url.pathname === "/group"){
     if (state !== null){
+      return <Group userData={userData} groupId={state}/>
     } else if (state === null){
       return <Explore userData={userData} type={"group"}/>
     }
-  } else if (url.pathname === "/"){
+  } else if (url.pathname === "/create_group") {
+    return <CreateGroup userData={userData} />
+  }else if  (url.pathname === "/"){
     home();
   }
 }
-
-
 
 const Profile = ({userData, profileId ,type}) => {
   return (
@@ -74,12 +72,33 @@ const Profile = ({userData, profileId ,type}) => {
   </> 
   )
 }
+const Group = ({userData, groupId}) => {
+  return (
+    <>
+      <LeftBox user={userData}/>
+      <MainBox groupId={groupId} type={"group"} state={"profile"}/>
+      <RightBox/>
+      <ChatBox/>
+    </>
+  )
+}
 
 const Explore = ({userData, type}) => {
   return (
     <>
       <LeftBox user={userData}/>
       <MainBox userId={null} type={type} state={"explore"}/>
+      <RightBox/>
+      <ChatBox/>
+    </>
+  )
+}
+
+const CreateGroup = ({userData}) => {
+  return (
+    <>
+      <LeftBox user={userData}/>
+      <MainBox userId={null} type={"group"} state={"create_group"}/>
       <RightBox/>
       <ChatBox/>
     </>

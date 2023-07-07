@@ -114,11 +114,11 @@ var UpdateRules = map[string]string{
 	"posts":         "UPDATE posts SET image=? WHERE postId=?",
 	"comments":      "UPDATE comments SET image=? WHERE commentId=?",
 	"groups":        "UPDATE groups SET creatorId=?, title=?, description=? WHERE groupId=?",
-	"follow":        "UPDATE follow SET status=? WHERE followerId = ? AND followeeId = ?", // TODO check this works correctly
-	"group_member":  "UPDATE group_member SET status=? WHERE userId=?",                    // Assuming userId uniquely identifies a group member record
+	"follow":        "UPDATE follow SET status=? WHERE followerId = ? AND followeeId = ?",
+	"group_member":  "UPDATE group_member SET status=? WHERE userId=? AND groupId=?",
 	"messages":      "UPDATE messages SET senderId=?, receiverId=?, messageContent=?, sendTime=?, seen=? WHERE messageId=?",
 	"semiPrivate":   "UPDATE semiPrivate SET postId=?, userId=? WHERE postId=?", // Assuming postId uniquely identifies a semiPrivate record
-	"notifications": "UPDATE notifications SET receiverId=?, senderId=?, type=?, creationTime=? WHERE notificationId=?",
+	"notifications": "UPDATE notifications SET  type=? WHERE notificationId=?",
 	"events":        "UPDATE events SET creatorId=?, groupId=?, title=?, content=?, creationTime=? date=? WHERE eventId=?",
 	"event_member":  "UPDATE event_member SET option=? WHERE eventId=? AND memberId=? ", // Assuming eventId uniquely identifies an event member record //TODO: check if this is correct
 }

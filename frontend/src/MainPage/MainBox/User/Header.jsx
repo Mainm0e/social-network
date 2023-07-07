@@ -26,7 +26,7 @@ const Header = ({profile,handleRefresh}) => {
     const followRequest = async () => {
       const method = "POST"
       const type = "followRequest"
-      const payload ={ sessionId: getCookie("sessionId"), followerId: getUserId("userId"), followeeId:user.userId,response:""}
+      const payload ={ sessionId: getCookie("sessionId"), senderId: getUserId("userId"), receiverId:user.userId}
       fetchData(method,type,payload).then((data) => {console.log(data)})
       handleRefresh();
     };
