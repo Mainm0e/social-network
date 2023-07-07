@@ -5,7 +5,7 @@ import "./LeftBox.css";
 import {home,link_notifications} from "../../tools/link";
 import {getUserId, getCookie} from "../../tools/cookie";
 import {fetchData} from "../../tools/fetchData";
-import { profile_link, your_link , default_link} from "../../tools/link_links";
+import { profile_link, your_link , default_link ,group_link} from "../../tools/link_links";
 
 const LeftBox = ({user,link}) => {
 
@@ -101,7 +101,7 @@ const LinkBox = ({type,show}) => {
                 setLink(profile_link)
             }
         } else if (url.pathname === "/group"){
-            console.log("group")
+           setLink(group_link)
         }
     }, [])
     if (show === true) {
