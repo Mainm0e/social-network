@@ -20,7 +20,7 @@ with an error value, which is non-nil if the unmarshalling process failed.
 func UnmarshalJSONToPrivateMsg(jsonMsg []byte) (*PrivateMsg, error) {
 	var privateMsg PrivateMsg
 	if err := json.Unmarshal(jsonMsg, &privateMsg); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("UnmarshalJSONToPrivateMsg() error: %v", err)
 	}
 	return &privateMsg, nil
 }
@@ -70,7 +70,7 @@ with an error value, which is non-nil if the unmarshalling process failed.
 func UnmarshalJSONToGroupMsg(jsonMsg []byte) (*GroupMsg, error) {
 	var groupMsg GroupMsg
 	if err := json.Unmarshal(jsonMsg, &groupMsg); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("UnmarshalJSONToGroupMsg() error: %v", err)
 	}
 	return &groupMsg, nil
 }
@@ -130,6 +130,22 @@ func (m *Manager) BroadcastGroupMsg(groupID int, payloadJSON []byte) error {
 
 	// Return nil if there were no errors
 	return nil
+}
+
+/********************** CHAT HISTORY LOGIC ***********************************/
+
+/*
+UnmarshalJSONToChatHistoryRequest() takes a json byte array, which is usually
+received from the frontend in the form of a websocket message, and unmarshals
+it into a ChatHistoryRequest struct. It then returns a pointer to this struct,
+along with an error value, which is non-nil if the unmarshalling process failed.
+*/
+func UnmarshalJSONToChatHistoryRequest(jsonMsg []byte) (*ChatHistoryRequest, error) {
+	var chatHistoryRequest ChatHistoryRequest
+	if err := json.Unmarshal(jsonMsg, &chatHistoryRequest); err != nil {
+		return nil, fmt.Errorf("UnmarshalJSONToChatHistoryRequest() error: %v", err)
+	}
+	return &chatHistoryRequest, nil
 }
 
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
