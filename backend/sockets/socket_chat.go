@@ -121,34 +121,55 @@ func UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent events.Event) (*
 	return &chatHistoryRequest, nil
 }
 
-// TODO: GetPrivateChatHistory() - database operation
+/*
+FetchChatHistory() takes a ChatHistoryRequest struct as input and fetches the
+chat history from the database. It returns a pointer to a ChatHistory struct
+and an error value, which is non-nil if the database query failed. It works by
+first preparing the condition and arguments for the SQL query based on the
+ChatHistoryRequest struct (differentiating by "private" or "group" chat), then
+fetching the chat history from the database, and finally casting the data into
+a slice of db.Message structs.
+*/
+func FetchChatHistory(chatHistoryRequest ChatHistoryRequest) (*ChatHistory, error) {
+	// Prepare the condition and arguments for the SQL query
+	var condition string
+	var args []any
+	if chatHistoryRequest.ChatType == "private" {
+		condition = "(senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)"
+		args = []any{chatHistoryRequest.ClientID, chatHistoryRequest.TargetID, chatHistoryRequest.TargetID, chatHistoryRequest.ClientID}
+	} else if chatHistoryRequest.ChatType == "group" {
+		condition = "receiverId = ?"
+		args = []any{chatHistoryRequest.TargetID}
+	} else {
+		return nil, fmt.Errorf("sockets.FetchChatHistory() error - unknown chat type: %s", chatHistoryRequest.ChatType)
+	}
 
-// TODO: GetGroupChatHistory() - database operation
+	// Fetch the chat history from the database
+	data, err := db.FetchData("messages", condition, args...)
+	if err != nil {
+		return nil, fmt.Errorf("sockets.FetchChatHistory() error - %v", err)
+	}
 
-// TODO: Fix FetchChatHistory() below
+	// Cast the data into a slice of db.Message
+	chatHistory := make([]db.Message, len(data))
+	for i, item := range data {
+		msg, ok := item.(db.Message)
+		if !ok {
+			return nil, fmt.Errorf("sockets.FetchChatHistory() error - Failed to cast item to Message")
+		}
+		chatHistory[i] = msg
+	}
+
+	// Compile the chat history into a ChatHistory struct and return it
+	return &ChatHistory{
+		ChatType:    chatHistoryRequest.ChatType,
+		ClientID:    chatHistoryRequest.ClientID,
+		TargetID:    chatHistoryRequest.TargetID,
+		ChatHistory: chatHistory,
+	}, nil
+}
 
 // TODO: BroadcastChatHistory() - sockets operation
-
-// func FetchChatHistory(chatHistoryRequest ChatHistoryRequest) (*ChatHistory, error) {
-// 	// Check if the chat history is being requested for a private chat
-// 	if chatHistoryRequest.ChatType == "private" {
-// 		// Retrieve the chat history from the database
-// 		chatHistory, err := GetPrivateChatHistory(chatHistoryRequest.ChatID)
-// 		if err != nil {
-// 			return nil, fmt.Errorf("FetchChatHistory() error: %v", err)
-// 		}
-// 		return chatHistory, nil
-// 	}
-// 	if chatHistoryRequest.ChatType == "group" {
-// 		// Retrieve the chat history from the database
-// 		chatHistory, err := GetGroupChatHistory(chatHistoryRequest.ChatID)
-// 		if err != nil {
-// 			return nil, fmt.Errorf("FetchChatHistory() error: %v", err)
-// 		}
-// 		return chatHistory, nil
-// 	}
-// 	return nil, fmt.Errorf("FetchChatHistory() error: invalid chat type")
-// }
 
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
 
