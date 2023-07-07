@@ -41,8 +41,8 @@ VALUES (1, 2),
 
 -- +migrate Up
 INSERT INTO notifications (receiverId, senderId, type, content, creationTime)
-VALUES (1, 2, 'following request', 'You have a new follower request', '2023-05-31 18:00:00'),
-       (2, 1, 'group invitation', 'You have been invited to join Group 2', '2023-05-31 19:00:00');
+VALUES (1, 2, 'follow_request', 'You have a new follower request', '2023-05-31 18:00:00'),
+       (2, 1, 'group_invitation', 'You have been invited to join Group 2', '2023-05-31 19:00:00');
 
 INSERT INTO events (creatorId, receiverId, groupId, title, content, creationTime)
 VALUES (1, 2, 1, 'Event 1', 'Content of Event 1', '2023-05-31 20:00:00'),

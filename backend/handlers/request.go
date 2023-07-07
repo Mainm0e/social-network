@@ -5,6 +5,7 @@ import (
 	"backend/events"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -81,6 +82,72 @@ func insertFollowRequest(senderId int, receiverId int, notifId int) error {
 }
 
 /*
+ */
+func insertGroupRequest(senderId int, groupId int) error {
+	dbGroups, err := db.FetchData("groups", "groupId", groupId)
+	if err != nil {
+		return errors.New("Error fetching groups" + err.Error())
+	}
+	// getting group creator id
+	receiverId := dbGroups[0].(db.Group).CreatorId
+	if receiverId == 0 {
+		return errors.New("error fetching group creator")
+	}
+	//getting relation between sender and group ("member", "pending", "waiting", "default")
+	relation, err := groupUserRelation(senderId, groupId)
+	if err != nil {
+		return errors.New("Error checking users relation" + err.Error())
+	}
+	// dealing with request based on the relation type
+	fmt.Println("senderId", senderId, "receiverId", receiverId, "groupId", groupId, "relation", relation)
+	switch relation {
+
+	case "default":
+		//inserting group request in notifications table
+		_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_request", time.Now())
+		if err != nil {
+			return errors.New("Error inserting group request in notifications: " + err.Error())
+		}
+		//inserting group request in group_members table
+		_, err = db.InsertData("group_member", senderId, groupId, "pending")
+		if err != nil {
+			return errors.New("Error inserting group request in group_member:" + err.Error())
+		}
+	case "member":
+		//delete group member from group_members table
+		err = db.DeleteData("group_member", groupId, senderId)
+		if err != nil {
+			return errors.New("Error deleting group member" + err.Error())
+		}
+	case "pending":
+		//delete group request from notifications table
+		Notifications, err := db.FetchData("notifications", "groupId", groupId)
+		if err != nil {
+			return errors.New("Error fetching notifications" + err.Error())
+		}
+		for _, n := range Notifications {
+			if notification, ok := n.(db.Notification); ok {
+				if notification.SenderId == senderId && notification.Type == "group_request" {
+					err = db.DeleteData("notifications", notification.NotificationId)
+					if err != nil {
+						return errors.New("Error deleting notification" + err.Error())
+					}
+					err = db.DeleteData("group_member", groupId, senderId)
+					if err != nil {
+						return errors.New("Error deleting group member" + err.Error())
+					}
+					break
+				}
+			}
+		}
+	case "waiting":
+		fmt.Println("waiting")
+		//TODO: IDK what to do here yet
+	}
+	return nil
+}
+
+/*
 FollowRequest is a function that processes a follow request by unmarshaling the payload,
 validating the required fields, and calling insertFollowRequest function to handle followRequest.
 It returns a response with success/failure status and an event containing sessionId.
@@ -98,19 +165,20 @@ func FollowRequest(payload json.RawMessage) (Response, error) {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.SenderId == 0 {
-		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
-		return response, err
+	if follow.GroupId == 0 {
+		err = insertFollowRequest(follow.SenderId, follow.ReceiverId, follow.NotifId)
+		if err != nil {
+			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return response, err
+		}
+	} else if follow.GroupId != 0 {
+		err = insertGroupRequest(follow.SenderId, follow.GroupId)
+		if err != nil {
+			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return response, err
+		}
 	}
-	if follow.ReceiverId == 0 {
-		response = Response{"followId is required", events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	err = insertFollowRequest(follow.SenderId, follow.ReceiverId, follow.NotifId)
-	if err != nil {
-		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
+
 	payload, err = json.Marshal(map[string]string{"sessionId": follow.SessionId})
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
@@ -236,4 +304,33 @@ func SendInvitation(payload json.RawMessage) (Response, error) {
 	}
 	response = Response{"invitation sent successfully!", event, http.StatusOK}
 	return response, nil
+}
+
+/*
+GroupInvitationCheck function check if user accept or reject or ignore the group invitation,
+then insert or delete the user from group_member table base on user decision.
+if error occur then it return error
+*/
+func GroupInvitationCheck(accept string, notifId int, userId int, groupId int) error {
+	if accept == "" {
+		return nil
+	}
+	err := db.DeleteData("notifications", notifId)
+	if err != nil {
+		return errors.New("Error deleting group invitation" + err.Error())
+	}
+	if accept == "accept" {
+		err := db.UpdateData("group_member", "member", userId)
+		if err != nil {
+			return errors.New("Error inserting group member" + err.Error())
+
+		} else if accept == "reject" {
+			err = db.DeleteData("group_member", userId)
+			if err != nil {
+				return errors.New("Error deleting group member" + err.Error())
+			}
+		}
+	}
+	return nil
+
 }

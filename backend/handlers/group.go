@@ -123,7 +123,13 @@ func (group *Group) ReadGroup(dbGroup db.Group, userId int) error {
 		if err != nil {
 			return errors.New("Error fetching group member" + err.Error())
 		}
-		membersProfiles = append(membersProfiles, member)
+		status, err := groupUserRelation(memberId, group.GroupId)
+		if err != nil {
+			return errors.New("Error fetching group member" + err.Error())
+		}
+		if status == "member" {
+			membersProfiles = append(membersProfiles, member)
+		}
 	}
 	group.Members = membersProfiles
 	group.NoMembers = len(membersProfiles)
@@ -205,28 +211,4 @@ func ExploreGroups(payload json.RawMessage) (Response, error) {
 		Payload: payload,
 	}
 	return Response{"groups retrieved successfully!", event, http.StatusOK}, nil
-}
-func InsertGroupRequest(senderId int, groupId int) error {
-	dbGroups, err := db.FetchData("groups", "groupId", groupId)
-	if err != nil {
-		return errors.New("Error fetching groups" + err.Error())
-	}
-	var group Group
-
-	err = group.ReadGroup(dbGroups[0].(db.Group), senderId)
-	if err != nil {
-		return errors.New("Error fetching group" + err.Error())
-	}
-	receiverId := group.CreatorProfile.UserId
-	if receiverId == 0 {
-		return errors.New("error fetching group creator")
-	}
-	id, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_request", "", time.Now())
-	if err != nil {
-		return errors.New("Error inserting group request" + err.Error())
-	}
-	if id == 0 {
-		return errors.New("error inserting group request")
-	}
-	return nil
 }
