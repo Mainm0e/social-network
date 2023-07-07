@@ -98,7 +98,7 @@ func insertGroupRequest(senderId int, groupId int) error {
 	if receiverId == 0 {
 		return errors.New("error fetching group creator")
 	}
-	//getting relation between sender and group ("member", "pending", "waiting", "default")
+	//getting relation between sender and group ("member", "pending", "waiting", "join")
 	relation, err := groupUserRelation(senderId, groupId)
 	if err != nil {
 		return errors.New("Error checking users relation" + err.Error())
@@ -106,7 +106,7 @@ func insertGroupRequest(senderId int, groupId int) error {
 	// dealing with request based on the relation type
 	switch relation {
 
-	case "default":
+	case "join":
 		//inserting group request in notifications table
 		_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_request", time.Now())
 		if err != nil {
