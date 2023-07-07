@@ -87,6 +87,7 @@ const LeftBox = ({user,link}) => {
 
 export default LeftBox;
 
+
 const LinkBox = ({type,show}) => {
     // read url fine value
     const url = new URL(window.location.href);
