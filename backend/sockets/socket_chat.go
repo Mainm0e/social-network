@@ -108,17 +108,30 @@ func (m *Manager) BroadcastGroupMsg(groupID int, payloadJSON []byte) error {
 /********************** CHAT HISTORY LOGIC ***********************************/
 
 /*
-UnmarshalJSONToChatHistoryRequest() takes a json byte array, which is usually
-received from the frontend in the form of a websocket message, and unmarshals
-it into a ChatHistoryRequest struct. It then returns a pointer to this struct,
-along with an error value, which is non-nil if the unmarshalling process failed.
+UnmarshalEventToChatHistoryRequest() takes an events.Event as input and
+unmarshals it into a ChatHistoryRequest struct. It returns a pointer to the
+ChatHistoryRequest struct and an error value, which is non-nil if the
+unmarshalling operation failed.
 */
-func UnmarshalJSONToChatHistoryRequest(jsonMsg []byte) (*ChatHistoryRequest, error) {
+func UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent events.Event) (*ChatHistoryRequest, error) {
 	var chatHistoryRequest ChatHistoryRequest
-	if err := json.Unmarshal(jsonMsg, &chatHistoryRequest); err != nil {
-		return nil, fmt.Errorf("UnmarshalJSONToChatHistoryRequest() error: %v", err)
+	if err := json.Unmarshal(chatHistoryRequestEvent.Payload, &chatHistoryRequest); err != nil {
+		return nil, fmt.Errorf("UnmarshalEventToChatHistoryRequest() error: %v", err)
 	}
 	return &chatHistoryRequest, nil
+}
+
+/*
+UnmarshalEventToChatHistory() takes an events.Event as input and unmarshals it
+into a ChatHistory struct. It returns a pointer to the ChatHistory struct and
+an error value, which is non-nil if the unmarshalling operation failed.
+*/
+func UnmarshalEventToChatHistory(chatHistoryEvent events.Event) (*ChatHistory, error) {
+	var chatHistory ChatHistory
+	if err := json.Unmarshal(chatHistoryEvent.Payload, &chatHistory); err != nil {
+		return nil, fmt.Errorf("UnmarshalEventToChatHistory() error: %v", err)
+	}
+	return &chatHistory, nil
 }
 
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
