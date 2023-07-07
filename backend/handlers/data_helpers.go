@@ -274,35 +274,6 @@ func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 }
 
 /*
-GroupInvitationCheck function check if user accept or reject or ignore the group invitation,
-then insert or delete the user from group_member table base on user decision.
-if error occur then it return error
-*/
-func GroupInvitationCheck(accept string, notifId int, userId int, groupId int) error {
-	if accept == "" {
-		return nil
-	}
-	err := db.DeleteData("notifications", notifId)
-	if err != nil {
-		return errors.New("Error deleting group invitation" + err.Error())
-	}
-	if accept == "accept" {
-		err := db.UpdateData("group_member", "member", userId)
-		if err != nil {
-			return errors.New("Error inserting group member" + err.Error())
-
-		} else if accept == "reject" {
-			err = db.DeleteData("group_member", userId)
-			if err != nil {
-				return errors.New("Error deleting group member" + err.Error())
-			}
-		}
-	}
-	return nil
-
-}
-
-/*
 GetAllGroupMemberIDs returns all the user ids of the members of a group.
 It takes a groupID integer as an argument and returns a slice of integers
 and an error value, which is non-nil if any of the database operations

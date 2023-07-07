@@ -6,7 +6,6 @@ import Notification from "../../Common/Notification/Notification";
 const RightBox = () => {
   const [box, setBox] = useState(null);
   useEffect(() => {
-    console.log("what is box",box)
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1); // Remove the '#' character
       // Get the URL
@@ -15,10 +14,6 @@ const RightBox = () => {
 
     // Get the value of the 'id' parameter
     const id = searchParams.get('id');
-
-      // Use the id value as needed
-      console.log(id);
-
       // Clear the box and create a new UserList component after a slight delay
       clearBox();
       setTimeout(() => {

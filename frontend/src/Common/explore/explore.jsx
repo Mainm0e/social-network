@@ -11,6 +11,7 @@ const Explore = ({type}) => {
         const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId")}
         fetchData(method,type,payload).then((data)=>{
             setData(data)
+            console.log("is data ins explore",data)
         })
         }, []);  
         const followRequest = async (id) => {
@@ -55,14 +56,13 @@ const Explore = ({type}) => {
                         <div className="explore_list_item_create_time">
                             <p>{group.date}</p>
                         </div>
-                        {/* go to page */}
-                        <div className="explore_list_item_go_to_page">
-                            <button onClick={() => navigateToProfile(type,group.groupId)}>Go to page</button>
-                        </div>
-                        {/* follow btn */}
+                        // TODO: add a button to follow the group
+                        {group.status !== "member" ? 
                         <div className="explore_list_item_follow_btn">
-                            <button onClick={() => followRequest(group.groupId)}>Follow</button>
-                        </div>
+                        <button onClick={() => followRequest(group.groupId)}>{group.status}</button>
+                    </div>: <div className="explore_list_item_go_to_page">
+                            <button onClick={() => navigateToProfile(type,group.groupId)}>Go to page</button>
+                        </div>  }
                     </div>
                 )
             })

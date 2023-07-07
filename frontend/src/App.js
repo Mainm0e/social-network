@@ -6,6 +6,7 @@ import { WebSocketProvider } from './WebSocketContext/websocketcontext'; // impo
 import './App.css';
 import {getCookie} from "./tools/cookie";
 
+
 function App() {
   // function handle that check url and return the page
   // check cookies and return the page
@@ -26,7 +27,6 @@ function App() {
     }
 
   };
-
   return (
     <div className="App">
       <WebSocketProvider> {/* Wrap your app with WebSocketProvider */}

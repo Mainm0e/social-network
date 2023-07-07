@@ -5,7 +5,7 @@ import "./LeftBox.css";
 import {home,link_notifications} from "../../tools/link";
 import {getUserId, getCookie} from "../../tools/cookie";
 import {fetchData} from "../../tools/fetchData";
-import { profile_link, your_link , default_link} from "../../tools/link_links";
+import { profile_link, your_link , default_link ,group_link} from "../../tools/link_links";
 
 const LeftBox = ({user,link}) => {
 
@@ -87,6 +87,7 @@ const LeftBox = ({user,link}) => {
 
 export default LeftBox;
 
+
 const LinkBox = ({type,show}) => {
     // read url fine value
     const url = new URL(window.location.href);
@@ -95,14 +96,13 @@ const LinkBox = ({type,show}) => {
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
         if (url.pathname ==="/user"){
-            console.log(id + " " + getUserId("userId") )
             if (parseInt(id) === getUserId("userId")){
                 setLink(your_link)
             } else {
                 setLink(profile_link)
             }
         } else if (url.pathname === "/group"){
-            console.log("group")
+           setLink(group_link)
         }
     }, [])
     if (show === true) {

@@ -68,16 +68,18 @@ else {
 export default Notification;
 
 const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
-  if (notifications.type === "follow_request") {
+  if (notifications.type === "follow_request" || notifications.type === "group_request" ) {
     const handleAccept = (value) => {
+      console.log(notifications, "notifications in handleAccept")
       const method = "POST";
       const type = "followResponse";
       const payload = {
         sessionId: getCookie("sessionId"),
-        followeeId: getUserId("userId"),
-        followerId: notifications.senderId,
+        receiverId: getUserId("userId"),
+        senderId: notifications.senderId,
+        groupId: notifications.groupId,
         notifId: notifications.notificationId,
-        response: value, // Use the value parameter here
+        content: value, // Use the value parameter here
       };
       fetchData(method, type, payload).then((data) => {
         window.location.reload();
@@ -94,7 +96,7 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
           </span>
         </div>
         <div className="notification-content">
-          <span>sent you a follow request</span>
+          <span>sent you a {notifications.type}</span>
         </div>
         <div className="notification-btn">
           <button value="accept" onClick={() => handleAccept("accept")}>
@@ -113,8 +115,8 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
       const type = "followResponse";
       const payload = {
         sessionId: getCookie("sessionId"),
-        followeeId: getUserId("userId"),
-        followerId: notifications.senderId,
+        receiverId: getUserId("userId"),
+        senderId: notifications.senderId,
         notifId: notifications.notificationId,
         response: "", // Use the value parameter here
       };
