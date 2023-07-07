@@ -33,6 +33,9 @@ func NewManager() *Manager {
 	m.Handlers["privateMsg"] = m.HandleChatEvent
 	m.Handlers["groupMsg"] = m.HandleChatEvent
 
+	// Add the chat history handler to the Handlers map
+	m.Handlers["chatHistoryRequest"] = m.HandleChatHistoryRequestEvent
+
 	return m
 }
 
