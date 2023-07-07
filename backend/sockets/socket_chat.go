@@ -2,28 +2,16 @@ package sockets
 
 import (
 	"backend/db"
+	"backend/events"
 	"backend/handlers"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 )
 
 /********************** PRIVATE MESSAGE LOGIC *******************************/
-
-/*
-UnmarshalJSONToPrivateMsg() takes a json byte array, which is usually received
-from the frontend in the form of a websocket message, and unmarshals it into
-a PrivateMsg struct. It then returns a pointer to this PrivateMsg struct, along
-with an error value, which is non-nil if the unmarshalling process failed.
-*/
-func UnmarshalJSONToPrivateMsg(jsonMsg []byte) (*PrivateMsg, error) {
-	var privateMsg PrivateMsg
-	if err := json.Unmarshal(jsonMsg, &privateMsg); err != nil {
-		return nil, err
-	}
-	return &privateMsg, nil
-}
 
 /*
 BroadcastProvateMessage() is a method of the Manager struct, which takes a
@@ -32,7 +20,7 @@ byte array to the the client with the given receiver ID. It returns an error
 value, which is non-nil if any of the broadcasting operations failed or if
 the receiver was not found.
 */
-func (m *Manager) BroadcastPrivateMsg(receiverID int, payloadJSON []byte) error {
+func (m *Manager) BroadcastPrivateMsg(receiverID int, msgEventJSON []byte) error {
 	var sent bool
 	// The range function on a sync.map accepts a function of the form
 	// func(key, value interface{}) bool, which it calls once for each
@@ -40,7 +28,7 @@ func (m *Manager) BroadcastPrivateMsg(receiverID int, payloadJSON []byte) error 
 	m.Clients.Range(func(key, client interface{}) bool {
 		if client.(*Client).ID == receiverID {
 			select {
-			case client.(*Client).Egress <- payloadJSON:
+			case client.(*Client).Egress <- msgEventJSON:
 				sent = true
 			default:
 				close(client.(*Client).Egress)
@@ -60,20 +48,6 @@ func (m *Manager) BroadcastPrivateMsg(receiverID int, payloadJSON []byte) error 
 }
 
 /********************** GROUP MESSAGE LOGIC **********************************/
-
-/*
-UmarshalJSONToGroupMsg() takes a json byte array, which is usually received
-from the frontend in the form of a websocket message, and unmarshals it into
-a GroupMsg struct. It then returns a pointer to this GroupMsg struct, along
-with an error value, which is non-nil if the unmarshalling process failed.
-*/
-func UnmarshalJSONToGroupMsg(jsonMsg []byte) (*GroupMsg, error) {
-	var groupMsg GroupMsg
-	if err := json.Unmarshal(jsonMsg, &groupMsg); err != nil {
-		return nil, err
-	}
-	return &groupMsg, nil
-}
 
 /*
 BroadcastGroupMessage() is a method of the Manager struct, which takes a
@@ -132,7 +106,147 @@ func (m *Manager) BroadcastGroupMsg(groupID int, payloadJSON []byte) error {
 	return nil
 }
 
+/********************** CHAT HISTORY / REQUEST LOGIC *************************/
+
+/*
+UnmarshalEventToChatHistoryRequest() takes an events.Event as input and
+unmarshals it into a ChatHistoryRequest struct. It returns a pointer to the
+ChatHistoryRequest struct and an error value, which is non-nil if the
+unmarshalling operation failed.
+*/
+func UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent events.Event) (ChatHistoryRequest, error) {
+	var chatHistoryRequest ChatHistoryRequest
+	if err := json.Unmarshal(chatHistoryRequestEvent.Payload, &chatHistoryRequest); err != nil {
+		return chatHistoryRequest, fmt.Errorf("UnmarshalEventToChatHistoryRequest() error: %v", err)
+	}
+	return chatHistoryRequest, nil
+}
+
+/*
+UnmarshalEventToChatHistory() takes an events.Event as input and unmarshals it
+into a ChatHistory struct. It returns a pointer to the ChatHistory struct and
+an error value, which is non-nil if the unmarshalling operation failed.
+
+**NOTE** This function is currently not used anywhere, but it is kept here
+for future use.
+*/
+func UnmarshalEventToChatHistory(chatHistoryEvent events.Event) (ChatHistory, error) {
+	var chatHistory ChatHistory
+	if err := json.Unmarshal(chatHistoryEvent.Payload, &chatHistory); err != nil {
+		return chatHistory, fmt.Errorf("UnmarshalEventToChatHistory() error: %v", err)
+	}
+	return chatHistory, nil
+}
+
+/*
+FetchChatHistory() takes a ChatHistoryRequest struct as input and fetches the
+chat history from the database. It returns a pointer to a ChatHistory struct
+and an error value, which is non-nil if the database query failed. It works by
+first preparing the condition and arguments for the SQL query based on the
+ChatHistoryRequest struct (differentiating by "private" or "group" chat), then
+fetching the chat history from the database, and finally casting the data into
+a slice of db.Message structs.
+*/
+func FetchChatHistory(chatHistoryRequest ChatHistoryRequest) (*ChatHistory, error) {
+	// Prepare the condition and arguments for the SQL query
+	var condition string
+	var args []any
+	if chatHistoryRequest.ChatType == "private" {
+		condition = "(senderId = ? AND receiverId = ?) OR (senderId = ? AND receiverId = ?)"
+		args = []any{chatHistoryRequest.ClientID, chatHistoryRequest.TargetID, chatHistoryRequest.TargetID, chatHistoryRequest.ClientID}
+	} else if chatHistoryRequest.ChatType == "group" {
+		condition = "receiverId = ?"
+		args = []any{chatHistoryRequest.TargetID}
+	} else {
+		return nil, fmt.Errorf("sockets.FetchChatHistory() error - unknown chat type: %s", chatHistoryRequest.ChatType)
+	}
+
+	// Fetch the chat history from the database
+	data, err := db.FetchData("messages", condition, args...)
+	if err != nil {
+		return nil, fmt.Errorf("sockets.FetchChatHistory() error - %v", err)
+	}
+
+	// Cast the data into a slice of db.Message
+	chatHistory := make([]db.Message, len(data))
+	for i, item := range data {
+		msg, ok := item.(db.Message)
+		if !ok {
+			return nil, fmt.Errorf("sockets.FetchChatHistory() error - Failed to cast item to Message")
+		}
+		chatHistory[i] = msg
+	}
+
+	// Compile the chat history into a ChatHistory struct and return it
+	return &ChatHistory{
+		ChatType:    chatHistoryRequest.ChatType,
+		ClientID:    chatHistoryRequest.ClientID,
+		TargetID:    chatHistoryRequest.TargetID,
+		ChatHistory: chatHistory,
+	}, nil
+}
+
+/*
+SendChatHistory() is a method of the Manager struct that takes a pointer to a
+ChatHistory struct as input and sends the chat history to the client with the
+matching ID. It returns an error value, which is non-nil if the operation failed,
+either in the wrapping of the ChatHistory struct into an events.Event struct,
+the marshalling of the event into JSON, or the sending of the event to the client.
+*/
+func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
+	// Wrap the ChatHistory struct in an events.Event struct
+	chatHistoryEvent, err := chatHistory.WrapEvent()
+	if err != nil {
+		return fmt.Errorf("sockets.SendChatHistory() error - %v", err)
+	}
+
+	// Marhsal the event into JSON
+	eventJSON, err := json.Marshal(chatHistoryEvent)
+	if err != nil {
+		return fmt.Errorf("sockets.SendChatHistory() error - %v", err)
+	}
+
+	// Find the client with the matching ID and send the event
+	m.Clients.Range(func(key interface{}, value interface{}) bool {
+		client := value.(*Client)
+		if client.ID == chatHistory.ClientID {
+			select {
+			case client.Egress <- eventJSON:
+			default:
+				// The Egress channel could be full or closed, or the client could be disconnected
+				log.Printf("SendChatHistory() error - Could not send message to client %d\n", chatHistory.ClientID)
+			}
+			return false // Stop ranging as we found the client
+		}
+		return true // Continue ranging
+	})
+
+	return nil
+
+}
+
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
+
+func UnmarshalEventToChatMsg(msgEvent events.Event) (ChatMsg, error) {
+	// Check the message type and unmarshal accordingly
+
+	// Private message
+	if msgEvent.Type == "privateMsg" {
+		var pMsg PrivateMsg
+		if err := json.Unmarshal(msgEvent.Payload, &pMsg); err != nil {
+			return nil, fmt.Errorf("UnmarshalEventToChatMsg() error: %v", err)
+		}
+		return &pMsg, nil
+	} else if msgEvent.Type == "groupMsg" {
+		var gMsg GroupMsg
+		if err := json.Unmarshal(msgEvent.Payload, &gMsg); err != nil {
+			return nil, fmt.Errorf("UnmarshalEventToChatMsg() error: %v", err)
+		}
+		return &gMsg, nil
+	}
+	// Else, return an error
+	return nil, fmt.Errorf("UnmarshalEventToChatMsg() error: invalid message type")
+}
 
 /*
 RecordMsgToDB() takes a ChatMsg interface, which is either a PrivateMsg or a
@@ -198,18 +312,55 @@ GroupMsg, and handles it. This means that it records the message to the database
 and broadcasts it to all clients in the chat. It returns an error value, which
 is non-nil if any of the operations failed.
 */
-func (m *Manager) HandleChatMessage(msg ChatMsg) error {
-	// Store message in database
-	err := RecordMsgToDB(msg)
+func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) error {
+	// Unmarshal the event into a ChatMsg interface
+	msg, err := UnmarshalEventToChatMsg(chatEvent)
 	if err != nil {
-		return fmt.Errorf("HandleMessage() error - %v", err)
+		return fmt.Errorf("HandleChatMessage() error - %v", err)
+	}
+
+	// Store message in database
+	err = RecordMsgToDB(msg)
+	if err != nil {
+		return fmt.Errorf("HandleChatMessage() error - %v", err)
 	}
 
 	// Broadcast message to clients
 	err = m.BroadcastMessage(msg)
 	if err != nil {
-		return fmt.Errorf("HandleMessage() error - %v", err)
+		return fmt.Errorf("HandleChatMessage() error - %v", err)
 	}
 
 	return nil
 }
+
+/*
+HandleChatHistoryRequestEvent() takes a ChatHistoryRequest event as input, along
+with a pointer to the client that sent the request, and handles it. This means that
+it first unmashals the event into a ChatHistoryRequest struct, then fetches the
+chat history from the database, and finally sends the chat history to the client.
+It returns an error value, which is non-nil if any of the operations failed.
+*/
+func (m *Manager) HandleChatHistoryRequestEvent(chatHistoryRequestEvent events.Event, client *Client) error {
+	// Unmarshal the event into a ChatHistoryRequest struct
+	chatHistoryRequest, err := UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent)
+	if err != nil {
+		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+	}
+
+	// Get chat history from database, returned as a pointer to a ChatHistory struct
+	chatHistory, err := FetchChatHistory(chatHistoryRequest)
+	if err != nil {
+		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+	}
+
+	// Send chat history to client
+	err = m.SendChatHistory(chatHistory)
+	if err != nil {
+		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+	}
+
+	return nil
+}
+
+// TODO: HandleIsTypingEvent(): Receive isTyping event and broadcast to all clients in chat

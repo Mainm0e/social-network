@@ -12,6 +12,11 @@ import (
 	"time"
 )
 
+/*
+InsertComment inserts a comment into the database base on the Comment struct
+if comment has an image it will be processed and saved to the local storage then the url will be saved to the database
+if error occur it return error.
+*/
 func InsertComment(comment Comment) error {
 	id, err := db.InsertData("comments", comment.UserId, comment.PostId, comment.Content, "", time.Now())
 	if err != nil {
@@ -40,17 +45,16 @@ func InsertComment(comment Comment) error {
 	}
 	return nil
 }
+
 func CreateComment(payload json.RawMessage) (Response, error) {
 	var response Response
 	var comment Comment
 	err := json.Unmarshal(payload, &comment)
-	log.Println("comment: ", comment)
 	if err != nil {
 		// handle the error
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-
 	//insert new post into database
 	err = InsertComment(comment)
 	if err != nil {

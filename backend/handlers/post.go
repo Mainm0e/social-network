@@ -188,7 +188,7 @@ func readPosts(currentUserId int, key string, value int, groupFlag bool) ([]Post
 		return []Post{}, errors.New("Error fetching posts" + err.Error())
 	}
 	if len(dbPosts) == 0 {
-		return []Post{}, errors.New("posts not found")
+		return []Post{}, nil
 	}
 	for _, dbPost := range dbPosts {
 		if groupFlag && dbPost.(db.Post).GroupId == 0 || !groupFlag && dbPost.(db.Post).GroupId != 0 {
@@ -246,7 +246,11 @@ func GetPosts(payload json.RawMessage) (Response, error) {
 		response = Response{"from is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
+	if len(posts) == 0 {
 
+		response = Response{"no posts found", events.Event{}, http.StatusOK}
+		return response, nil
+	}
 	payload, err = json.Marshal(posts)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}

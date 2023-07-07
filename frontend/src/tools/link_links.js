@@ -2,13 +2,12 @@ export const your_link ={
     "Home": '/',
     "Create Post": '#createpost',
     "Postlists": '#postlist',
-    "create group": '#creategroup',
+    "create group": '/create_group',
     "Explore users": "/user",
     "Explore groups": "/group",
 }
 export const profile_link ={
     "Home": '/',
-    "Postlists": '#postlist',
     "Explore user": "/user",
     "Explore groups": "/group",
 }

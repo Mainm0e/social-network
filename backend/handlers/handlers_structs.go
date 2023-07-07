@@ -7,8 +7,9 @@ import (
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":          LoginPage,
-	"register":       RegisterPage,
+	"login":    LoginPage,
+	"register": RegisterPage,
+	//TODO: "logout":         LogoutPage,
 	"profile":        ProfilePage,
 	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
@@ -16,10 +17,22 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"GetPosts":       GetPosts, // TODO: Change spelling / syntax
 	"createComment":  CreateComment,
 	"exploreUsers":   ExploreUsers,
-	"exploreGroups":  ExploreGroups,
 	"followRequest":  FollowRequest,
 	"followResponse": FollowResponse,
 	"requestNotif":   RequestNotifications,
+	"createGroup":    CreateGroup,
+	"exploreGroups":  ExploreGroups,
+	"sendInvetaion":  SendInvitation,
+
+	/*
+		TODO: im not saying that we should have these functions but we need the functionality of these functions:
+		"responseInvitation": AcceptInvitation,
+		"requestToJoin":      RequestToJoin,
+		"responseToJoin":     ResponseToJoin,
+		"getGroupEvents":     GetGroupEvents,
+		"responseEvent":      ResponseEvent,
+	*/
+
 }
 
 type Response struct {
@@ -133,26 +146,28 @@ type ReqAllPosts struct {
 	GroupId   int    `json:"groupId"`
 }
 
-type Group struct {
-	SessionId      string       `json:"sessionId"`
-	CreatorProfile SmallProfile `json:"creatorProfile"`
-	GroupId        int          `json:"groupId"`
-	Title          string       `json:"title"`
-	Description    string       `json:"description"`
-	Date           string       `json:"date"`
-}
-
 type Explore struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 }
-
-type Follow struct {
+type Request struct {
 	SessionId  string `json:"sessionId"`
-	FollowerId int    `json:"followerId"`
-	FolloweeId int    `json:"followeeId"`
+	SenderId   int    `json:"senderId"`
+	ReceiverId int    `json:"receiverId"`
+	GroupId    int    `json:"groupId"`
 	NotifId    int    `json:"notifId"`
-	Response   string `json:"response"`
+	Content    string `json:"content"`
+}
+type Group struct {
+	SessionId      string         `json:"sessionId"`
+	CreatorProfile SmallProfile   `json:"creatorProfile"`
+	GroupId        int            `json:"groupId"`
+	Title          string         `json:"title"`
+	Description    string         `json:"description"`
+	Status         string         `json:"status"` // default, pending, waiting, member
+	NoMembers      int            `json:"noMembers"`
+	Members        []SmallProfile `json:"members"`
+	Date           string         `json:"date"`
 }
 
 type GroupEvent struct {

@@ -21,13 +21,22 @@ This function is typically called when the WebSocket server starts up and
 needs to create a Manager to manage clients and messages.
 */
 func NewManager() *Manager {
-	return &Manager{
+	m := &Manager{
 		Broadcast:  make(chan []byte),
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
 		Clients:    ClientList{},
 		Handlers:   make(map[string]EventHandler),
 	}
+
+	// Add the chat handler to the Handlers map
+	m.Handlers["privateMsg"] = m.HandleChatEvent
+	m.Handlers["groupMsg"] = m.HandleChatEvent
+
+	// Add the chat history handler to the Handlers map
+	m.Handlers["chatHistoryRequest"] = m.HandleChatHistoryRequestEvent
+
+	return m
 }
 
 /*
@@ -74,7 +83,7 @@ func (c *Client) ReadData() {
 		_, message, err := c.Connection.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("Unexpected close error: %v", err)
+				log.Printf("sockets.ReadData() - Unexpected close error: %v", err)
 			}
 			break
 		}
@@ -82,12 +91,12 @@ func (c *Client) ReadData() {
 		// Unmarshal the received message into an event.
 		var event events.Event
 		if err := json.Unmarshal(message, &event); err != nil {
-			log.Printf("Error unmarshalling event: %v", err)
+			log.Printf("sockets.ReadData() - Error unmarshalling event: %v", err)
 
 			// In case of an error unmarshalling, it sends back an error event to the client.
 			errorEvent := events.Event{
-				Type:    "", // TODO: Add error event type
-				Payload: json.RawMessage(fmt.Sprintf(`{"error": "Failed to parse event: %v"}`, err)),
+				Type:    "error",
+				Payload: json.RawMessage(fmt.Sprintf(`{"sockets.ReadData() error": "Failed to parse event: %v"}`, err)),
 			}
 
 			eventBytes, _ := json.Marshal(errorEvent)
@@ -100,13 +109,13 @@ func (c *Client) ReadData() {
 		// If the event type exists in the map of handlers, execute the handler.
 		handler, ok := c.Manager.Handlers[event.Type]
 		if !ok {
-			log.Printf("No handler for event type %v", event.Type)
+			log.Printf("sockets.ReadData() - No handler for event type %v", event.Type)
 			break
 		}
 
 		err = handler(event, c)
 		if err != nil {
-			log.Printf("Error handling event: %v", err)
+			log.Printf("sockets.ReadData() - Error handling event: %v", err)
 			break
 		}
 	}
@@ -177,15 +186,18 @@ Run is the main loop for the Manager. It listens for incoming actions
 such as client registrations, unregistrations, and broadcasting messages.
 */
 func (m *Manager) Run() {
+	log.Println("sockets.Run() - Starting websocket manager")
 	for {
 		select {
 		// A new client is registering: Store it in the clients map.
 		case client := <-m.Register:
+			log.Println("sockets.Run() - Registering new client")
 			// The true value is just a placeholder, since the map is used as a set.
 			m.Clients.Store(client, true)
 
 		// A client is unregistering: If it exists in the clients map, remove it.
 		case client := <-m.Unregister:
+			log.Println("sockets.Run() - Deregistering new client")
 			if _, ok := m.Clients.Load(client); ok {
 				m.Clients.Delete(client)
 				close(client.Egress)
@@ -193,6 +205,7 @@ func (m *Manager) Run() {
 
 		// Data is being broadcast: Send it to all connected clients.
 		case data := <-m.Broadcast:
+			log.Println("sockets.Run() - Broadcasting data")
 			m.Clients.Range(func(key, value interface{}) bool {
 				client := key.(*Client)
 				select {

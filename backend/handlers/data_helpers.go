@@ -4,8 +4,6 @@ import (
 	"backend/db"
 	"backend/utils"
 	"errors"
-	"fmt"
-	"time"
 )
 
 /*
@@ -222,28 +220,11 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 }
 
 /*
-UpdateProfile is a function that updates the privacy of a user with the specified email.
-returns error if any occurred.
+ReadAllUsers function return all users in database except current user
+for each user it call FillProfile function to fill the profile struct
+base on the relation between current user and requested user profile
+if error occur then it return error else it returns profile struct and nil.
 */
-func UpdateProfile(userId int, privacy string) error {
-	user, err := fetchUser("userId", userId)
-	if err != nil {
-		return errors.New("Error fetching user " + err.Error())
-	}
-	// TODO:if frontend guys were too lazy to check if privacy changed really or same thing is sent again check it here before updating
-	fmt.Println("privacy:", privacy)
-	if user.Privacy == "public" {
-		privacy = "private"
-	} else {
-		privacy = "public"
-	}
-	err = db.UpdateData("users", privacy, user.UserId)
-	if err != nil {
-		return errors.New("Error updating user " + err.Error())
-	}
-	return nil
-}
-
 func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
 	dbUsers, err := db.FetchData("users", "")
 	if err != nil {
@@ -292,35 +273,9 @@ func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 	return nonMembers, nil
 }
 
-func InsertGroupInvitation(senderId int, groupId int, receiverId int, content string) error {
-	_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", content, time.Now())
-	if err != nil {
-		return errors.New("Error inserting group invitation" + err.Error())
-	}
-	return nil
-	// TODO: send notification to receiver
-}
-func InsertGroupRequest(senderId int, groupId int) error {
-	group, err := ReadGroup(groupId)
-	if err != nil {
-		return errors.New("Error fetching group" + err.Error())
-	}
-	receiverId := group.CreatorProfile.UserId
-	if receiverId == 0 {
-		return errors.New("error fetching group creator")
-	}
-	id, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_request", "", time.Now())
-	if err != nil {
-		return errors.New("Error inserting group request" + err.Error())
-	}
-	if id == 0 {
-		return errors.New("error inserting group request")
-	}
-	return nil
-}
-
 /*
-GroupInvitationCheck function check if user accept or reject or ignore the group invitation, then insert or delete the user from group_member table base on user decision
+GroupInvitationCheck function check if user accept or reject or ignore the group invitation,
+then insert or delete the user from group_member table base on user decision.
 if error occur then it return error
 */
 func GroupInvitationCheck(accept string, notifId int, userId int, groupId int) error {

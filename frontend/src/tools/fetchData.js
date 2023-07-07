@@ -10,14 +10,23 @@ export async function fetchData(method, type, payload) {
       type: type,
       payload: payload,
     }),
+  }).catch((error) => {
+    console.log("error", error);
   });
-  const responseData = await response.json();
-
-  //this is for debugging
-  if (responseData.statusCode !== 200) {
-    console.log("type", type, "error", responseData);
+  
+if (!response.ok) {
+  // Handle the error based on the response status
+  if (response.status === 401) {
+    // Unauthorized error
+    console.log("Unauthorized error");
+    logout();
+  } else {
+    // Other error
+    console.log("HTTP error:", response.status);
   }
-
+} else {
+  const responseData = await response.json();
+  console.log("response", response);
   if (type === "login") {
     if (responseData.statusCode === 200) {
       console.log("set cookie", responseData);
@@ -42,9 +51,10 @@ export async function fetchData(method, type, payload) {
     console.log("responseData", responseData)
     return responseData.event.payload;
   }
-  if (responseData.statusCode === 400) {
+  if (responseData.statusCode !== 200) {
     if (responseData.message === "Error handling event:Error fetchingUser:user not found"){
       logout();
     }
   }
+}
 }
