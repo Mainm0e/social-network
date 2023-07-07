@@ -10,6 +10,7 @@ const Explore = ({type}) => {
         const method = "POST"
         const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId")}
         fetchData(method,type,payload).then((data)=>{
+            console.log("is data ins explore",data)
             setData(data)
         })
         }, []);  
