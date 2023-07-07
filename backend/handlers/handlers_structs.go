@@ -17,8 +17,8 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"GetPosts":       GetPosts, // TODO: Change spelling / syntax
 	"createComment":  CreateComment,
 	"exploreUsers":   ExploreUsers,
-	"followRequest":  FollowRequest,
-	"followResponse": FollowResponse,
+	"followRequest":  FollowOrJoinRequest,
+	"followResponse": FollowOrJoinResponse,
 	"requestNotif":   RequestNotifications,
 	"createGroup":    CreateGroup,
 	"exploreGroups":  ExploreGroups,
@@ -164,7 +164,7 @@ type Group struct {
 	GroupId        int            `json:"groupId"`
 	Title          string         `json:"title"`
 	Description    string         `json:"description"`
-	Status         string         `json:"status"` // default, pending, waiting, member
+	Status         string         `json:"status"` // join, pending, waiting, member
 	NoMembers      int            `json:"noMembers"`
 	Members        []SmallProfile `json:"members"`
 	Date           string         `json:"date"`

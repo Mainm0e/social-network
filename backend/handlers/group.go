@@ -80,8 +80,8 @@ func CreateGroup(payload json.RawMessage) (Response, error) {
 /*
 groupUserRelation is a helper function that takes userId and groupId as an argument.
 it returns the relation between the user and the group as a string.
-base on "status" field in group_member table. if user does not have any relation with the group it returns "default".
-(status could be one of these four values: "member", "pending", "waiting", "default")
+base on "status" field in group_member table. if user does not have any relation with the group it returns "join".
+(status could be one of these four values: "member", "pending", "waiting", "join")
 if any error occurred it returns an error with a descriptive message.
 */
 func groupUserRelation(userId, groupId int) (string, error) {
@@ -97,7 +97,7 @@ func groupUserRelation(userId, groupId int) (string, error) {
 			return member.(db.GroupMember).Status, nil
 		}
 	}
-	return "default", nil
+	return "join", nil
 }
 
 /*
