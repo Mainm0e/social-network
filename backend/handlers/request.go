@@ -82,7 +82,12 @@ func insertFollowRequest(senderId int, receiverId int, notifId int) error {
 }
 
 /*
- */
+insertGroupRequest is a function to manage a click on the "join"/"pending"/"leave?" button in a group page. // todo: change the name of the button base on frontend naming
+based on the current relation between the user and the group. If the user is already a member of the group,
+the function deletes the user from the group. If the user is not a member of the group, the function inserts a request
+in the "notifications" table and a row in the "group_members" table with the status "pending." If the user has a invitation to the group already, //TODO: Idk what to do with this case ,again, it should be base on frontend naming
+Returns nil on success; otherwise, returns an error with a descriptive message.
+*/
 func insertGroupRequest(senderId int, groupId int) error {
 	dbGroups, err := db.FetchData("groups", "groupId", groupId)
 	if err != nil {
@@ -99,7 +104,6 @@ func insertGroupRequest(senderId int, groupId int) error {
 		return errors.New("Error checking users relation" + err.Error())
 	}
 	// dealing with request based on the relation type
-	fmt.Println("senderId", senderId, "receiverId", receiverId, "groupId", groupId, "relation", relation)
 	switch relation {
 
 	case "default":
@@ -193,6 +197,7 @@ func FollowOrJoinRequest(payload json.RawMessage) (Response, error) {
 }
 
 /*
+TODO: Not Used for group response yet
 DeleteRequest function delete the follow/join-group request from notification table and update the follow/group_member table base on user decision
 if error occur then it return error
 */
@@ -223,11 +228,12 @@ func deleteRequest(tableName string, senderId int, receiverId int, notifId int, 
 }
 
 /*
+TODO: Not Used for group response yet
 FollowResponse is a function that processes a response to follow request/following notification by unmarshaling the payload,
 validating the required fields, and calling deleteFollowRequest function to handle response and delete the notification.
 It returns a response with success/failure status and an event containing sessionId.
 */
-func FollowResponse(payload json.RawMessage) (Response, error) {
+func FollowOrJoinResponse(payload json.RawMessage) (Response, error) {
 	var response Response
 	var follow Request
 	err := json.Unmarshal(payload, &follow)
@@ -267,6 +273,8 @@ func FollowResponse(payload json.RawMessage) (Response, error) {
 }
 
 /*
+TODO: this function is not used yet , IN PROGRESS
+
 group invitation && group request to join
 */
 func insertGroupInvitation(senderId int, groupId int, receiverId int, content string) error {
@@ -276,6 +284,10 @@ func insertGroupInvitation(senderId int, groupId int, receiverId int, content st
 	}
 	return nil
 }
+
+/*
+TODO: this function is not used yet , IN PROGRESS
+*/
 func SendInvitation(payload json.RawMessage) (Response, error) {
 	var response Response
 	var invitation Request
@@ -307,6 +319,7 @@ func SendInvitation(payload json.RawMessage) (Response, error) {
 }
 
 /*
+TODO: this function is not used yet , IN PROGRESS
 GroupInvitationCheck function check if user accept or reject or ignore the group invitation,
 then insert or delete the user from group_member table base on user decision.
 if error occur then it return error
