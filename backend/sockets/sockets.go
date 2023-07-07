@@ -186,15 +186,18 @@ Run is the main loop for the Manager. It listens for incoming actions
 such as client registrations, unregistrations, and broadcasting messages.
 */
 func (m *Manager) Run() {
+	log.Println("sockets.Run() - Starting websocket manager")
 	for {
 		select {
 		// A new client is registering: Store it in the clients map.
 		case client := <-m.Register:
+			log.Println("sockets.Run() - Registering new client")
 			// The true value is just a placeholder, since the map is used as a set.
 			m.Clients.Store(client, true)
 
 		// A client is unregistering: If it exists in the clients map, remove it.
 		case client := <-m.Unregister:
+			log.Println("sockets.Run() - Deregistering new client")
 			if _, ok := m.Clients.Load(client); ok {
 				m.Clients.Delete(client)
 				close(client.Egress)
@@ -202,6 +205,7 @@ func (m *Manager) Run() {
 
 		// Data is being broadcast: Send it to all connected clients.
 		case data := <-m.Broadcast:
+			log.Println("sockets.Run() - Broadcasting data")
 			m.Clients.Range(func(key, value interface{}) bool {
 				client := key.(*Client)
 				select {
