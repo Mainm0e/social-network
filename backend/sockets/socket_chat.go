@@ -114,25 +114,28 @@ unmarshals it into a ChatHistoryRequest struct. It returns a pointer to the
 ChatHistoryRequest struct and an error value, which is non-nil if the
 unmarshalling operation failed.
 */
-func UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent events.Event) (*ChatHistoryRequest, error) {
+func UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent events.Event) (ChatHistoryRequest, error) {
 	var chatHistoryRequest ChatHistoryRequest
 	if err := json.Unmarshal(chatHistoryRequestEvent.Payload, &chatHistoryRequest); err != nil {
-		return nil, fmt.Errorf("UnmarshalEventToChatHistoryRequest() error: %v", err)
+		return chatHistoryRequest, fmt.Errorf("UnmarshalEventToChatHistoryRequest() error: %v", err)
 	}
-	return &chatHistoryRequest, nil
+	return chatHistoryRequest, nil
 }
 
 /*
 UnmarshalEventToChatHistory() takes an events.Event as input and unmarshals it
 into a ChatHistory struct. It returns a pointer to the ChatHistory struct and
 an error value, which is non-nil if the unmarshalling operation failed.
+
+**NOTE** This function is currently not used anywhere, but it is kept here
+for future use.
 */
-func UnmarshalEventToChatHistory(chatHistoryEvent events.Event) (*ChatHistory, error) {
+func UnmarshalEventToChatHistory(chatHistoryEvent events.Event) (ChatHistory, error) {
 	var chatHistory ChatHistory
 	if err := json.Unmarshal(chatHistoryEvent.Payload, &chatHistory); err != nil {
-		return nil, fmt.Errorf("UnmarshalEventToChatHistory() error: %v", err)
+		return chatHistory, fmt.Errorf("UnmarshalEventToChatHistory() error: %v", err)
 	}
-	return &chatHistory, nil
+	return chatHistory, nil
 }
 
 /*
@@ -331,6 +334,33 @@ func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) error 
 	return nil
 }
 
-// TODO: HandleChatHistoryRequestEvent(): Receive request event and broadcast chat history
+/*
+HandleChatHistoryRequestEvent() takes a ChatHistoryRequest event as input, along
+with a pointer to the client that sent the request, and handles it. This means that
+it first unmashals the event into a ChatHistoryRequest struct, then fetches the
+chat history from the database, and finally sends the chat history to the client.
+It returns an error value, which is non-nil if any of the operations failed.
+*/
+func (m *Manager) HandleChatHistoryRequestEvent(chatHistoryRequestEvent events.Event, client *Client) error {
+	// Unmarshal the event into a ChatHistoryRequest struct
+	chatHistoryRequest, err := UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent)
+	if err != nil {
+		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+	}
+
+	// Get chat history from database, returned as a pointer to a ChatHistory struct
+	chatHistory, err := FetchChatHistory(chatHistoryRequest)
+	if err != nil {
+		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+	}
+
+	// Send chat history to client
+	err = m.SendChatHistory(chatHistory)
+	if err != nil {
+		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+	}
+
+	return nil
+}
 
 // TODO: HandleIsTypingEvent(): Receive isTyping event and broadcast to all clients in chat
