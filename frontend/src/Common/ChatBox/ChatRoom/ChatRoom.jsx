@@ -31,9 +31,23 @@ const ChatRoom = (props) => {
   if (isClosed) {
     return null; // Return null if the ChatRoom is closed
   }
+  const test = () => {
+    const webSocket = new WebSocket("ws://localhost:8080");
+    webSocket.onopen = () => {
+      console.log("connected");
+    };
+    webSocket.onmessage = (message) => {
+      console.log(message);
+    };
+    webSocket.onclose = () => {
+      console.log("disconnected");
+    };
+    }
+  
 
   return (
     <div className="chat-room">
+      {test()}
       <div className="top-bar">
         <div className="chat-room-avatar">
           <img src={receiver.avatar} alt={receiver.name} />

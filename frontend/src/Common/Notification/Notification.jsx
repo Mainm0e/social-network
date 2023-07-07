@@ -39,6 +39,7 @@ const Notification = ({ clearBox }) => {
     ));
   };
   if (notificationData.length  > 0) {
+    console.log(notificationData, "notificationData", notificationData.length, "notificationData.length")
   return (
     <div className="notification-container">
       {showNotification && renderNotifications()}{" "}
@@ -74,8 +75,8 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
       const type = "followResponse";
       const payload = {
         sessionId: getCookie("sessionId"),
-        followeeId: getUserId("userId"),
-        followerId: notifications.senderId,
+        receiverId: getUserId("userId"),
+        senderId: notifications.senderId,
         notifId: notifications.notificationId,
         response: value, // Use the value parameter here
       };
@@ -113,8 +114,8 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
       const type = "followResponse";
       const payload = {
         sessionId: getCookie("sessionId"),
-        followeeId: getUserId("userId"),
-        followerId: notifications.senderId,
+        receiverId: getUserId("userId"),
+        senderId: notifications.senderId,
         notifId: notifications.notificationId,
         response: "", // Use the value parameter here
       };
