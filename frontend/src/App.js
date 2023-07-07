@@ -2,6 +2,7 @@ import LoginPage from "./LoginPage/LoginPage";
 import RegisterPage from "./RegisterPage/RegisterPage";
 import MainPage from "./MainPage/MainPage";
 import ErrorPage from "./ErrorPage/ErrorPage";
+import { WebSocketProvider } from './WebSocketContext/websocketcontext'; // import WebSocketProvider
 import './App.css';
 import {getCookie} from "./tools/cookie";
 
@@ -28,7 +29,9 @@ function App() {
   };
   return (
     <div className="App">
-      {getPage()}
+      <WebSocketProvider> {/* Wrap your app with WebSocketProvider */}
+        {getPage()}
+      </WebSocketProvider>
     </div>
   );
 };

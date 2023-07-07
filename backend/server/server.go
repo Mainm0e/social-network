@@ -231,6 +231,9 @@ func initialiseRoutes() http.Handler {
 	// Create a websocket manager
 	wsManager := sockets.NewManager()
 
+	// Start the manager's main loop in a separate goroutine.
+	go wsManager.Run()
+
 	// Register handler functions for various routes
 	mux.HandleFunc("/api", handlers.HTTPEventRouter)
 	mux.HandleFunc("/ws", wsManager.ServeWS)

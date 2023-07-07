@@ -1,6 +1,12 @@
 package sockets
 
-import "time"
+import (
+	"backend/db"
+	"backend/events"
+	"encoding/json"
+	"fmt"
+	"time"
+)
 
 /************************** COMMON EVENT STRUCTS **************************/
 type PrivateMsg struct {
@@ -18,7 +24,7 @@ type GroupMsg struct {
 }
 
 type IsTyping struct {
-	ChatType string `json:"chatType"`
+	ChatType string `json:"chatType"` // "private" or "group"
 	ClientID int    `json:"clientID"` // UserID of the client that is typing
 	TargetID int    `json:"targetID"` // UserID / GroupID to identify chat in which typing is happening
 }
@@ -26,7 +32,7 @@ type IsTyping struct {
 /*********************** ONLY FROM FRONTEND EVENT STRUCT ******************/
 
 type ChatHistoryRequest struct {
-	ChatType string `json:"chatType"`
+	ChatType string `json:"chatType"` // "private" or "group"
 	ClientID int    `json:"clientID"`
 	TargetID int    `json:"targetID"` // UserID or GroupID
 }
@@ -34,13 +40,35 @@ type ChatHistoryRequest struct {
 /*********************** ONLY FROM BACKEND EVENT STRUCT ******************/
 
 type ChatHistory struct {
-	ChatType    string   `json:"chatType"`
-	ClientID    int      `json:"clientID"`
-	TargetID    int      `json:"targetID"` // UserID or GroupID
-	ChatHistory []string `json:"chatHistory"`
+	ChatType    string       `json:"chatType"` // "private" or "group"
+	ClientID    int          `json:"clientID"`
+	TargetID    int          `json:"targetID"` // UserID or GroupID
+	ChatHistory []db.Message `json:"chatHistory"`
 }
 
-/*********************** INTERFACES & METHODS ****************************/
+func (c *ChatHistory) WrapEvent() (events.Event, error) {
+	payload, err := json.Marshal(struct {
+		ChatType    string       `json:"chatType"`
+		ClientID    int          `json:"clientID"`
+		TargetID    int          `json:"targetID"`
+		ChatHistory []db.Message `json:"chatHistory"`
+	}{
+		ChatType:    c.ChatType,
+		ClientID:    c.ClientID,
+		TargetID:    c.TargetID,
+		ChatHistory: c.ChatHistory,
+	})
+	if err != nil {
+		return events.Event{}, fmt.Errorf("ChatHistory.WrapEvent() - Error marshalling event: %v", err)
+	}
+
+	return events.Event{
+		Type:    "chatHistory",
+		Payload: payload,
+	}, nil
+}
+
+/******************** COMMON INTERFACES & METHODS ************************/
 /********* NOTE TO SELF: NEVER FORGET HOW COOL INTERFACES ARE! ***********/
 
 // ChatMsg is an interface that is implemented by both PrivateMsg and GroupMsg.
@@ -136,39 +164,67 @@ PrivateMsg and GroupMsg. This is useful when we want to send a message to
 the frontend, but we don't know if it is a PrivateMsg or GroupMsg.
 */
 func (p *PrivateMsg) WrapMsg() struct {
-	SenderID   int    `json:"senderID"`
-	ReceiverID int    `json:"receiverID"`
-	Message    string `json:"message"`
-	Timestamp  string `json:"timeStamp"`
-} {
-	return struct {
+	Type    string `json:"type"`
+	Payload struct {
 		SenderID   int    `json:"senderID"`
 		ReceiverID int    `json:"receiverID"`
 		Message    string `json:"message"`
 		Timestamp  string `json:"timeStamp"`
+	} `json:"payload"`
+} {
+	return struct {
+		Type    string `json:"type"`
+		Payload struct {
+			SenderID   int    `json:"senderID"`
+			ReceiverID int    `json:"receiverID"`
+			Message    string `json:"message"`
+			Timestamp  string `json:"timeStamp"`
+		} `json:"payload"`
 	}{
-		SenderID:   p.SenderID,
-		ReceiverID: p.ReceiverID,
-		Message:    p.Message,
-		Timestamp:  p.GetTimestamp(),
+		Type: "PrivateMsg",
+		Payload: struct {
+			SenderID   int    `json:"senderID"`
+			ReceiverID int    `json:"receiverID"`
+			Message    string `json:"message"`
+			Timestamp  string `json:"timeStamp"`
+		}{
+			SenderID:   p.SenderID,
+			ReceiverID: p.ReceiverID,
+			Message:    p.Message,
+			Timestamp:  p.GetTimestamp(),
+		},
 	}
 }
 
 func (g *GroupMsg) WrapMsg() struct {
-	SenderID   int    `json:"senderID"`
-	ReceiverID int    `json:"receiverID"`
-	Message    string `json:"message"`
-	Timestamp  string `json:"timeStamp"`
-} {
-	return struct {
+	Type    string `json:"type"`
+	Payload struct {
 		SenderID   int    `json:"senderID"`
 		ReceiverID int    `json:"receiverID"`
 		Message    string `json:"message"`
 		Timestamp  string `json:"timeStamp"`
+	} `json:"payload"`
+} {
+	return struct {
+		Type    string `json:"type"`
+		Payload struct {
+			SenderID   int    `json:"senderID"`
+			ReceiverID int    `json:"receiverID"`
+			Message    string `json:"message"`
+			Timestamp  string `json:"timeStamp"`
+		} `json:"payload"`
 	}{
-		SenderID:   g.SenderID,
-		ReceiverID: g.ReceiverID,
-		Message:    g.Message,
-		Timestamp:  g.GetTimestamp(),
+		Type: "GroupMsg",
+		Payload: struct {
+			SenderID   int    `json:"senderID"`
+			ReceiverID int    `json:"receiverID"`
+			Message    string `json:"message"`
+			Timestamp  string `json:"timeStamp"`
+		}{
+			SenderID:   g.SenderID,
+			ReceiverID: g.ReceiverID,
+			Message:    g.Message,
+			Timestamp:  g.GetTimestamp(),
+		},
 	}
 }
