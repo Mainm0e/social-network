@@ -17,7 +17,7 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"GetPosts":       GetPosts, // TODO: Change spelling / syntax
 	"createComment":  CreateComment,
 	"exploreUsers":   ExploreUsers,
-	"followRequest":  FollowRequest,
+	"followRequest":  FollowOrJoinRequest,
 	"followResponse": FollowResponse,
 	"requestNotif":   RequestNotifications,
 	"createGroup":    CreateGroup,

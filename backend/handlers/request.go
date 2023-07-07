@@ -152,7 +152,7 @@ FollowRequest is a function that processes a follow request by unmarshaling the 
 validating the required fields, and calling insertFollowRequest function to handle followRequest.
 It returns a response with success/failure status and an event containing sessionId.
 */
-func FollowRequest(payload json.RawMessage) (Response, error) {
+func FollowOrJoinRequest(payload json.RawMessage) (Response, error) {
 	var response Response
 	var follow Request
 	err := json.Unmarshal(payload, &follow)
@@ -240,18 +240,18 @@ func FollowResponse(payload json.RawMessage) (Response, error) {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if follow.SenderId == 0 {
-		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	if follow.ReceiverId == 0 {
-		response = Response{"followId is required", events.Event{}, http.StatusBadRequest}
-		return response, err
-	}
-	err = deleteRequest("follow", follow.SenderId, follow.ReceiverId, follow.NotifId, follow.Content)
-	if err != nil {
-		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-		return response, err
+	if follow.GroupId == 0 {
+		err = deleteRequest("follow", follow.SenderId, follow.ReceiverId, follow.NotifId, follow.Content)
+		if err != nil {
+			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return response, err
+		}
+	} else if follow.GroupId != 0 {
+		err = deleteRequest("group_member", follow.SenderId, follow.GroupId, follow.NotifId, follow.Content)
+		if err != nil {
+			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+			return response, err
+		}
 	}
 	payload, err = json.Marshal(map[string]string{"sessionId": follow.SessionId})
 	if err != nil {
