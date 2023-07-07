@@ -272,6 +272,18 @@ const PostBox = ({ id, from }) => {
   // submit post
   const handleSubmitPost = (postData) => {
     // Logic to handle the submission of the post data
+    //check url value
+    let groupId = 0;
+    const url = new URL(window.location.href);
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    if (url.pathname ==="/user") {
+      groupId = 0
+    } else if (url.pathname ==="/group") {
+      groupId = parseInt(id);
+    }
+
+
     const check = checkPostData(postData);
     if (check.status === true) {
       const sessionId = getCookie("sessionId");
@@ -287,7 +299,7 @@ const PostBox = ({ id, from }) => {
         content: postData.content,
         image: postData.image,
         status: postData.privacy,
-        groupId: 0,
+        groupId: groupId,
         comments: [],
         date: "",
         followers: postData.followers,
