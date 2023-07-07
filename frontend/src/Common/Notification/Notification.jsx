@@ -71,12 +71,14 @@ export default Notification;
 const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
   if (notifications.type === "follow_request" || notifications.type === "group_request" ) {
     const handleAccept = (value) => {
+      console.log(notifications, "notifications in handleAccept")
       const method = "POST";
       const type = "followResponse";
       const payload = {
         sessionId: getCookie("sessionId"),
         receiverId: getUserId("userId"),
         senderId: notifications.senderId,
+        groupId: notifications.groupId,
         notifId: notifications.notificationId,
         response: value, // Use the value parameter here
       };
