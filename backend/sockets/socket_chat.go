@@ -105,7 +105,7 @@ func (m *Manager) BroadcastGroupMsg(groupID int, payloadJSON []byte) error {
 	return nil
 }
 
-/********************** CHAT HISTORY LOGIC ***********************************/
+/********************** CHAT HISTORY / REQUEST LOGIC *************************/
 
 /*
 UnmarshalEventToChatHistoryRequest() takes an events.Event as input and
@@ -121,18 +121,34 @@ func UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent events.Event) (*
 	return &chatHistoryRequest, nil
 }
 
-/*
-UnmarshalEventToChatHistory() takes an events.Event as input and unmarshals it
-into a ChatHistory struct. It returns a pointer to the ChatHistory struct and
-an error value, which is non-nil if the unmarshalling operation failed.
-*/
-func UnmarshalEventToChatHistory(chatHistoryEvent events.Event) (*ChatHistory, error) {
-	var chatHistory ChatHistory
-	if err := json.Unmarshal(chatHistoryEvent.Payload, &chatHistory); err != nil {
-		return nil, fmt.Errorf("UnmarshalEventToChatHistory() error: %v", err)
-	}
-	return &chatHistory, nil
-}
+// TODO: GetPrivateChatHistory() - database operation
+
+// TODO: GetGroupChatHistory() - database operation
+
+// TODO: Fix FetchChatHistory() below
+
+// TODO: BroadcastChatHistory() - sockets operation
+
+// func FetchChatHistory(chatHistoryRequest ChatHistoryRequest) (*ChatHistory, error) {
+// 	// Check if the chat history is being requested for a private chat
+// 	if chatHistoryRequest.ChatType == "private" {
+// 		// Retrieve the chat history from the database
+// 		chatHistory, err := GetPrivateChatHistory(chatHistoryRequest.ChatID)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("FetchChatHistory() error: %v", err)
+// 		}
+// 		return chatHistory, nil
+// 	}
+// 	if chatHistoryRequest.ChatType == "group" {
+// 		// Retrieve the chat history from the database
+// 		chatHistory, err := GetGroupChatHistory(chatHistoryRequest.ChatID)
+// 		if err != nil {
+// 			return nil, fmt.Errorf("FetchChatHistory() error: %v", err)
+// 		}
+// 		return chatHistory, nil
+// 	}
+// 	return nil, fmt.Errorf("FetchChatHistory() error: invalid chat type")
+// }
 
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
 
@@ -242,3 +258,7 @@ func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) error 
 
 	return nil
 }
+
+// TODO: HandleChatHistoryRequestEvent(): Receive request event and broadcast chat history
+
+// TODO: HandleIsTypingEvent(): Receive isTyping event and broadcast to all clients in chat
