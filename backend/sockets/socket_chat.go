@@ -2,6 +2,7 @@ package sockets
 
 import (
 	"backend/db"
+	"backend/events"
 	"backend/handlers"
 	"encoding/json"
 	"errors"
@@ -12,15 +13,15 @@ import (
 /********************** PRIVATE MESSAGE LOGIC *******************************/
 
 /*
-UnmarshalJSONToPrivateMsg() takes a json byte array, which is usually received
+UnmarshalEventToPrivateMsg() takes an Event struct, which is usually received
 from the frontend in the form of a websocket message, and unmarshals it into
 a PrivateMsg struct. It then returns a pointer to this PrivateMsg struct, along
 with an error value, which is non-nil if the unmarshalling process failed.
 */
-func UnmarshalJSONToPrivateMsg(jsonMsg []byte) (*PrivateMsg, error) {
+func UnmarshalEventToPrivateMsg(msgEvent events.Event) (*PrivateMsg, error) {
 	var privateMsg PrivateMsg
-	if err := json.Unmarshal(jsonMsg, &privateMsg); err != nil {
-		return nil, fmt.Errorf("UnmarshalJSONToPrivateMsg() error: %v", err)
+	if err := json.Unmarshal(msgEvent.Payload, &privateMsg); err != nil {
+		return nil, fmt.Errorf("UnmarshalEventToPrivateMsg() error: %v", err)
 	}
 	return &privateMsg, nil
 }
@@ -62,15 +63,15 @@ func (m *Manager) BroadcastPrivateMsg(receiverID int, payloadJSON []byte) error 
 /********************** GROUP MESSAGE LOGIC **********************************/
 
 /*
-UmarshalJSONToGroupMsg() takes a json byte array, which is usually received
+UmarshalEventToGroupMsg() takes an Event struct, which is usually received
 from the frontend in the form of a websocket message, and unmarshals it into
 a GroupMsg struct. It then returns a pointer to this GroupMsg struct, along
 with an error value, which is non-nil if the unmarshalling process failed.
 */
-func UnmarshalJSONToGroupMsg(jsonMsg []byte) (*GroupMsg, error) {
+func UnmarshalEventToGroupMsg(msgEvent events.Event) (*GroupMsg, error) {
 	var groupMsg GroupMsg
-	if err := json.Unmarshal(jsonMsg, &groupMsg); err != nil {
-		return nil, fmt.Errorf("UnmarshalJSONToGroupMsg() error: %v", err)
+	if err := json.Unmarshal(msgEvent.Payload, &groupMsg); err != nil {
+		return nil, fmt.Errorf("UnmarshalEventToGroupMsg() error: %v", err)
 	}
 	return &groupMsg, nil
 }
@@ -214,17 +215,18 @@ GroupMsg, and handles it. This means that it records the message to the database
 and broadcasts it to all clients in the chat. It returns an error value, which
 is non-nil if any of the operations failed.
 */
-func (m *Manager) HandleChatMessage(msg ChatMsg) error {
+func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) error {
+
 	// Store message in database
 	err := RecordMsgToDB(msg)
 	if err != nil {
-		return fmt.Errorf("HandleMessage() error - %v", err)
+		return fmt.Errorf("HandleChatMessage() error - %v", err)
 	}
 
 	// Broadcast message to clients
 	err = m.BroadcastMessage(msg)
 	if err != nil {
-		return fmt.Errorf("HandleMessage() error - %v", err)
+		return fmt.Errorf("HandleChatMessage() error - %v", err)
 	}
 
 	return nil
