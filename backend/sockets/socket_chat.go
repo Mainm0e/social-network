@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -182,9 +183,44 @@ func FetchChatHistory(chatHistoryRequest ChatHistoryRequest) (*ChatHistory, erro
 	}, nil
 }
 
-// func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
-// 	// Marshal the chat history into a JSON byte array
-// }
+/*
+SendChatHistory() is a method of the Manager struct that takes a pointer to a
+ChatHistory struct as input and sends the chat history to the client with the
+matching ID. It returns an error value, which is non-nil if the operation failed,
+either in the wrapping of the ChatHistory struct into an events.Event struct,
+the marshalling of the event into JSON, or the sending of the event to the client.
+*/
+func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
+	// Wrap the ChatHistory struct in an events.Event struct
+	chatHistoryEvent, err := chatHistory.WrapEvent()
+	if err != nil {
+		return fmt.Errorf("sockets.SendChatHistory() error - %v", err)
+	}
+
+	// Marhsal the event into JSON
+	eventJSON, err := json.Marshal(chatHistoryEvent)
+	if err != nil {
+		return fmt.Errorf("sockets.SendChatHistory() error - %v", err)
+	}
+
+	// Find the client with the matching ID and send the event
+	m.Clients.Range(func(key interface{}, value interface{}) bool {
+		client := value.(*Client)
+		if client.ID == chatHistory.ClientID {
+			select {
+			case client.Egress <- eventJSON:
+			default:
+				// The Egress channel could be full or closed, or the client could be disconnected
+				log.Printf("SendChatHistory() error - Could not send message to client %d\n", chatHistory.ClientID)
+			}
+			return false // Stop ranging as we found the client
+		}
+		return true // Continue ranging
+	})
+
+	return nil
+
+}
 
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
 
