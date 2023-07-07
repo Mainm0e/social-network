@@ -136,39 +136,67 @@ PrivateMsg and GroupMsg. This is useful when we want to send a message to
 the frontend, but we don't know if it is a PrivateMsg or GroupMsg.
 */
 func (p *PrivateMsg) WrapMsg() struct {
-	SenderID   int    `json:"senderID"`
-	ReceiverID int    `json:"receiverID"`
-	Message    string `json:"message"`
-	Timestamp  string `json:"timeStamp"`
-} {
-	return struct {
+	Type    string `json:"type"`
+	Payload struct {
 		SenderID   int    `json:"senderID"`
 		ReceiverID int    `json:"receiverID"`
 		Message    string `json:"message"`
 		Timestamp  string `json:"timeStamp"`
+	} `json:"payload"`
+} {
+	return struct {
+		Type    string `json:"type"`
+		Payload struct {
+			SenderID   int    `json:"senderID"`
+			ReceiverID int    `json:"receiverID"`
+			Message    string `json:"message"`
+			Timestamp  string `json:"timeStamp"`
+		} `json:"payload"`
 	}{
-		SenderID:   p.SenderID,
-		ReceiverID: p.ReceiverID,
-		Message:    p.Message,
-		Timestamp:  p.GetTimestamp(),
+		Type: "PrivateMsg",
+		Payload: struct {
+			SenderID   int    `json:"senderID"`
+			ReceiverID int    `json:"receiverID"`
+			Message    string `json:"message"`
+			Timestamp  string `json:"timeStamp"`
+		}{
+			SenderID:   p.SenderID,
+			ReceiverID: p.ReceiverID,
+			Message:    p.Message,
+			Timestamp:  p.GetTimestamp(),
+		},
 	}
 }
 
 func (g *GroupMsg) WrapMsg() struct {
-	SenderID   int    `json:"senderID"`
-	ReceiverID int    `json:"receiverID"`
-	Message    string `json:"message"`
-	Timestamp  string `json:"timeStamp"`
-} {
-	return struct {
+	Type    string `json:"type"`
+	Payload struct {
 		SenderID   int    `json:"senderID"`
 		ReceiverID int    `json:"receiverID"`
 		Message    string `json:"message"`
 		Timestamp  string `json:"timeStamp"`
+	} `json:"payload"`
+} {
+	return struct {
+		Type    string `json:"type"`
+		Payload struct {
+			SenderID   int    `json:"senderID"`
+			ReceiverID int    `json:"receiverID"`
+			Message    string `json:"message"`
+			Timestamp  string `json:"timeStamp"`
+		} `json:"payload"`
 	}{
-		SenderID:   g.SenderID,
-		ReceiverID: g.ReceiverID,
-		Message:    g.Message,
-		Timestamp:  g.GetTimestamp(),
+		Type: "GroupMsg",
+		Payload: struct {
+			SenderID   int    `json:"senderID"`
+			ReceiverID int    `json:"receiverID"`
+			Message    string `json:"message"`
+			Timestamp  string `json:"timeStamp"`
+		}{
+			SenderID:   g.SenderID,
+			ReceiverID: g.ReceiverID,
+			Message:    g.Message,
+			Timestamp:  g.GetTimestamp(),
+		},
 	}
 }
