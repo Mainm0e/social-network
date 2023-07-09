@@ -72,7 +72,7 @@ func GetNonMembers(payload json.RawMessage) (Response, error) {
 		return response, err
 	}
 	event := events.Event{
-		Type:    "exploreUsers",
+		Type:    "getNonMembers",
 		Payload: payload,
 	}
 	return Response{"users retrieved successfully!", event, http.StatusOK}, nil
