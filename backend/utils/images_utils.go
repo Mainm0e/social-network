@@ -90,7 +90,7 @@ func RetrieveImage(filePath string) (string, error) {
 	imageData, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Println("Error reading image:", err)
-		return "", errors.New("Error reading image: " + err.Error())
+		return "", errors.New("Error reading image: " + err.Error() + " " + filePath)
 	}
 
 	// Determine the image type based on the file extension

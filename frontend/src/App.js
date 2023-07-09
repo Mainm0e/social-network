@@ -2,8 +2,10 @@ import LoginPage from "./LoginPage/LoginPage";
 import RegisterPage from "./RegisterPage/RegisterPage";
 import MainPage from "./MainPage/MainPage";
 import ErrorPage from "./ErrorPage/ErrorPage";
+import { WebSocketProvider } from './WebSocketContext/websocketcontext'; // import WebSocketProvider
 import './App.css';
 import {getCookie} from "./tools/cookie";
+
 
 function App() {
   // function handle that check url and return the page
@@ -21,15 +23,15 @@ function App() {
     if (sessionId !== null && page === "/"||sessionId !== null && page === "/register"||sessionId !== null && page === "/login"){
       return <MainPage />
     } else {
-      return <ErrorPage />
+      return  <MainPage />
     }
 
   };
-
-
   return (
     <div className="App">
-      {getPage()}
+      <WebSocketProvider> {/* Wrap your app with WebSocketProvider */}
+        {getPage()}
+      </WebSocketProvider>
     </div>
   );
 };

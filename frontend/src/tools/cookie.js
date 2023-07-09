@@ -7,3 +7,12 @@ export function getCookie(name) {
         return null
     }
     }
+
+export function getUserId(name){
+    const value = `${localStorage.getItem(name)}`;
+    if (value){
+        return parseInt(value)
+    } else {
+        return null
+    }
+}

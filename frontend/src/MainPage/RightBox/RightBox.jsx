@@ -1,23 +1,34 @@
 import React, { useState, useEffect } from "react";
 import "./RightBox.css";
 import UserList from "../../Common/UserList/UserList";
+import Notification from "../../Common/Notification/Notification";
 
-const RightBox = ({ profileId }) => {
+const RightBox = () => {
   const [box, setBox] = useState(null);
-
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1); // Remove the '#' character
+      // Get the URL
+       // Get the query parameters from the URL
+    const searchParams = new URLSearchParams(window.location.search);
 
+    // Get the value of the 'id' parameter
+    const id = searchParams.get('id');
       // Clear the box and create a new UserList component after a slight delay
       clearBox();
       setTimeout(() => {
         if (hash === "followers") {
-          setBox(<UserList title="followers" id={profileId} clearBox={clearBox} />);
+          setBox(
+            <UserList title="followers" id={parseInt(id)} clearBox={clearBox} />
+          );
         } else if (hash === "followings") {
-          setBox(<UserList title="followings" id={profileId} clearBox={clearBox} />);
+          setBox(
+            <UserList title="followings" id={parseInt(id)} clearBox={clearBox} />
+          );
+        } else if (hash === "notifications") {
+          setBox(<Notification clearBox={clearBox} />);
         } else {
-          setBox(<div className="loading">Loading...</div>);
+          setBox(null);
         }
       }, 10);
     };
@@ -31,13 +42,18 @@ const RightBox = ({ profileId }) => {
       // Cleanup the event listener on component unmount
       window.removeEventListener("hashchange", handleHashChange);
     };
-  }, [profileId]);
+  }, []);
 
   const clearBox = () => {
+    // delete # from url
     setBox(null);
   };
+  if (box === null) {
+    return null;
+  } else {
+    return <div className="right-box">{box}</div>;
+  }
 
-  return <div className="right-box">{box}</div>;
 };
 
 export default RightBox;

@@ -1,0 +1,61 @@
+.notification {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    border: black 1px solid;
+    -webkit-box-shadow: -10px 0px 13px -7px #FFEA00, 10px 0px 13px -7px #FFEA00, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+    box-shadow: -10px 0px 13px -7px #FFEA00, 10px 0px 13px -7px #FFEA00, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+}
+
+.notification-user {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    font-family: myFancyFont;
+}
+
+.notification-user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background: white;
+    border: black 1px solid;
+}
+
+.notification-user span {
+    width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notification-content {
+    flex-grow: 1;
+}
+
+.notification-content span {
+    font-weight: bold;
+    font-family: myFancyFont;
+}
+
+.notification-btn button {
+    margin-right: 5px;
+}
+
+.notification-btn span {
+    font-family: myFancyFont;
+    position: absolute;
+    top: 1px;
+    right: 5px;
+    font-weight: bold;
+}
+
+.notification-btn span:hover {
+    cursor: pointer;
+    color: #FFEA00;
+    transition: all 0.3s ease-in-out;
+}

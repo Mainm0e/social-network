@@ -1,23 +1,38 @@
 package handlers
 
 import (
+	"backend/db"
 	"backend/events"
 	"encoding/json"
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":         LoginPage,
-	"register":      RegisterPage,
-	"profile":       ProfilePage,
-	"profileList":   ProfileList,
-	"createPost":    CreatePost,
-	"GetPost":       GetPost,
-	"GetPosts":      GetPosts,
-	"createComment": CreateComment,
+	"login":    LoginPage,
+	"register": RegisterPage,
+	//TODO: "logout":         LogoutPage,
+	"profile":        ProfilePage,
+	"updatePrivacy":  UpdatePrivacy,
+	"profileList":    ProfileList,
+	"createPost":     CreatePost,
+	"GetPosts":       GetPosts, // TODO: Change spelling / syntax
+	"createComment":  CreateComment,
+	"exploreUsers":   ExploreUsers,
+	"followRequest":  FollowOrJoinRequest,
+	"followResponse": FollowOrJoinResponse,
+	"requestNotif":   RequestNotifications,
+	"createGroup":    CreateGroup,
+	"exploreGroups":  ExploreGroups,
+	"sendInvetaion":  SendInvitation,
 
-	//"getComment":    GetComment,
-	//"getComments":   GetComments,
-	//"requestPosts": GetPosts,
+	/*
+		TODO: im not saying that we should have these functions but we need the functionality of these functions:
+		"responseInvitation": AcceptInvitation,
+		"requestToJoin":      RequestToJoin,
+		"responseToJoin":     ResponseToJoin,
+		"getGroupEvents":     GetGroupEvents,
+		"responseEvent":      ResponseEvent,
+	*/
+
 }
 
 type Response struct {
@@ -62,6 +77,7 @@ type SmallProfile struct {
 	LastName  string  `json:"lastName"`
 	Avatar    *string `json:"avatar"`
 }
+
 type Profile struct {
 	SessionId    string         `json:"sessionId"`
 	UserId       int            `json:"userId"`
@@ -69,10 +85,19 @@ type Profile struct {
 	FirstName    string         `json:"firstName"`
 	LastName     string         `json:"lastName"`
 	Avatar       *string        `json:"avatar"` //
+	Relation     string         `json:"relation"`
+	Status       string         `json:"privacy"`
 	FollowerNum  int            `json:"followerNum"`
 	FollowingNum int            `json:"followingNum"`
 	PrivateData  PrivateProfile `json:"privateProfile"`
 }
+
+type PrivacyData struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	Privacy   string `json:"privacy"`
+}
+
 type PrivateProfile struct {
 	BirthDate string `json:"birthdate"`
 	Email     string `json:"email"`
@@ -91,6 +116,7 @@ type Comment struct {
 	Image          string       `json:"image,omitempty"`
 	Date           string       `json:"Date"`
 }
+
 type Post struct {
 	SessionId      string       `json:"sessionId"`
 	PostId         int          `json:"postId"`
@@ -105,6 +131,7 @@ type Post struct {
 	Comments       []Comment    `json:"comments"`
 	Date           string       `json:"date"`
 }
+
 type RequestPost struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
@@ -119,21 +146,38 @@ type ReqAllPosts struct {
 	GroupId   int    `json:"groupId"`
 }
 
-// add post struct coming from frontend
-/*
-	comment struct coming from frontend
-	type Comment struct {
-		PostId   int    `json:"postId"`
-		UserId   int    `json:"userId"`
-		Content  string `json:"content"`
-		ParentId int    `json:"parentId"`
-	}
+type Explore struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+}
+type Request struct {
+	SessionId  string `json:"sessionId"`
+	SenderId   int    `json:"senderId"`
+	ReceiverId int    `json:"receiverId"`
+	GroupId    int    `json:"groupId"`
+	NotifId    int    `json:"notifId"`
+	Content    string `json:"content"`
+}
+type Group struct {
+	SessionId      string         `json:"sessionId"`
+	CreatorProfile SmallProfile   `json:"creatorProfile"`
+	GroupId        int            `json:"groupId"`
+	Title          string         `json:"title"`
+	Description    string         `json:"description"`
+	Status         string         `json:"status"` // join, pending, waiting, member
+	NoMembers      int            `json:"noMembers"`
+	Members        []SmallProfile `json:"members"`
+	Date           string         `json:"date"`
+}
 
-	send post struct to frontend
-	type SendPost struct {
-	PostId   int    `json:"postId"`
-	Post    Post   `json:"post"`
-	Comments []Comment `json:"comments"`
-	}
+type GroupEvent struct {
+	SessionId    string                    `json:"sessionId"`
+	Event        db.Event                  `json:"event"`
+	Participants map[string][]SmallProfile `json:"participants"`
+}
 
-*/
+type Notification struct {
+	SessionId    string          `json:"sessionId"`
+	Profile      SmallProfile    `json:"profile"`
+	Notification db.Notification `json:"notifications"`
+}

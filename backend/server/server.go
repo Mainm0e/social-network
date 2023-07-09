@@ -2,12 +2,17 @@ package server
 
 import (
 	"backend/db"
+	"backend/events"
 	"backend/handlers"
 	"backend/server/sessions"
+	"backend/sockets"
 	"backend/utils"
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +20,40 @@ import (
 	"syscall"
 	"time"
 )
+
+/*
+logAndResetRequest() is a middleware helper function that logs the request body
+and resets the request body so that it can be read again by later middleware or
+handlers. This function takes a pointer to an http.Request and returns a pointer
+to an http.Request. It is also used for debugging purposes.
+*/
+func logAndResetRequest(r *http.Request) *http.Request {
+	// Read the request body
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return r
+	}
+	// Always close the request body after reading it to free up resources
+	defer r.Body.Close()
+
+	var event events.Event
+
+	// Decode json byte slice
+	if err := json.Unmarshal(body, &event); err != nil {
+		// If problem decoding, log the error, reset the request body and return
+		log.Println("logAndResetRequest() error - Error decoding event:", err)
+		r.Body = io.NopCloser(bytes.NewBuffer(body))
+		return r
+	}
+
+	// Print the event type
+	log.Println("logAndResetRequest() -- Event:", event.Type)
+
+	// Reset the request body
+	r.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	return r
+}
 
 /*
 initiateLogging creates a log file with each instance of server startup, and sets
@@ -50,13 +89,13 @@ to an http.Cookie and an error. It is used to extract the session cookie from th
 header. It returns an error which is non-nil if a cookie with the sessions.COOKIE_NAME is
 not present in the request header.
 */
-func extractCookie(r *http.Request) (*http.Cookie, error) {
-	cookie, err := r.Cookie(sessions.COOKIE_NAME)
-	if err != nil {
-		return nil, errors.New("error in server.extractCookie(): " + err.Error())
-	}
-	return cookie, nil
-}
+// func extractCookie(r *http.Request) (*http.Cookie, error) {
+// 	cookie, err := r.Cookie(sessions.COOKIE_NAME)
+// 	if err != nil {
+// 		return nil, errors.New("error in server.extractCookie(): " + err.Error())
+// 	}
+// 	return cookie, nil
+// }
 
 /*
 loggerMiddleware is a middleware function which logs the URL path of each request to the
@@ -72,8 +111,9 @@ This pattern facilitates ease of maintenance should additional middleware functi
 */
 func loggerMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("Request received at: %s\n", r.URL.Path) // ** ONLY FOR DEVELOPMENT, REMOVE LATER **
-		log.Println("Request received at: ", r.URL.Path)
+		// Print out entire request body for debugging purposes
+		r = logAndResetRequest(r)
+
 		handler.ServeHTTP(w, r)
 	})
 }
@@ -91,12 +131,14 @@ function.
 */
 func corsMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Allow requests with the "credentials" header set to "true"
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		// Allow requests from the specific origin of the frontend application
 		w.Header().Set("Access-Control-Allow-Origin", FRONTEND_ORIGIN) // Change this to your frontend origin
 		// Allow specific HTTP methods, which provides some protection against CSRF attacks
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		// Allow the Content-Type header, which is required to be sent with POST requests
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, credentials, withCredentials")
 		// Set the Access-Control-Max-Age header to cache preflight request (600 seconds = 10 minutes)
 		w.Header().Set("Access-Control-Max-Age", "600")
 
@@ -124,45 +166,54 @@ middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract the session cookie from the request header
-		// Copy the r into a new r
-		/* var event handlers.Event
-
-		body, err := ioutil.ReadAll(r.Body)
+		// Read the request body
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
-			// Handle the error
 			log.Println("Error reading request body", http.StatusBadRequest)
+			http.Error(w, "Invalid request", http.StatusBadRequest)
 			return
 		}
+		// Always close the request body after reading it to free up resources
 		defer r.Body.Close()
 
-		newBody := ioutil.NopCloser(bytes.NewReader(body))
-		newRequest := r.Clone(r.Context())
-		newRequest.Body = newBody
+		// Create a new reader with the body for JSON decoding
+		reader1 := io.NopCloser(bytes.NewReader(body))
+		// Initialise  event struct
+		var event events.Event
 
-		err = json.NewDecoder(newRequest.Body).Decode(&event)
+		err = json.NewDecoder(reader1).Decode(&event)
 		if err != nil {
-			// Handle the error
 			log.Println("Error decoding JSON", http.StatusBadRequest)
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
 			return
 		}
 
-		// Use the new request in subsequent middleware or handlers
-		// Access the event structure from the newRequest.Body here
+		// Refer to events catalogue in handlers package (handlers_structs.go)
+		if _, ok := handlers.Events[event.Type]; ok {
+			// Check that event type is not login or register (these events do not require authentication)
+			if event.Type != "login" && event.Type != "register" {
+				// Check if the request contains a sessionID cookie
+				cookie, err := r.Cookie(sessions.COOKIE_NAME)
+				if err != nil {
+					// Handle error: No sessionID cookie found.
+					log.Printf("authenticationWiddleware() error - No sessionID cookie found: %v", err)
+					http.Error(w, "Invalid session", http.StatusUnauthorized)
+					return
+				}
 
-		// Call the next middleware or handler
-		// Check if the event is a login or register event
-		if event.Event_type == "login" || event.Event_type == "register" {
-			// skip authentication check
-			log.Println("Skipping authentication check for login or register event", event)
-
-			handler.ServeHTTP(w, newRequest)
-			return
+				// Validate the sessionID cookie
+				isValid, err := sessions.CookieCheck(cookie)
+				if !isValid || err != nil {
+					// Handle error: Invalid sessionID cookie.
+					log.Printf("authenticationWiddleware() error - Invalid sessionID cookie: %v", err)
+					http.Error(w, "Invalid session", http.StatusUnauthorized)
+					return
+				}
+			}
 		}
 
-		// ... rest of your authentication logic ...
-
-		// If authenticated, pass to the next middleware or handler */
+		// Create a new reader with the body for the next handler
+		r.Body = io.NopCloser(bytes.NewReader(body))
 		handler.ServeHTTP(w, r)
 	})
 }
@@ -177,10 +228,15 @@ func initialiseRoutes() http.Handler {
 	// Create a new ServeMux
 	mux := http.NewServeMux()
 
+	// Create a websocket manager
+	wsManager := sockets.NewManager()
+
+	// Start the manager's main loop in a separate goroutine.
+	go wsManager.Run()
+
 	// Register handler functions for various routes
-	// TODO: fix "handlers" package, maybe make struct which can be looped over to register handlers?
 	mux.HandleFunc("/api", handlers.HTTPEventRouter)
-	//mux.HandleFunc("/ws", sockets.WebSocketEventRouter)
+	mux.HandleFunc("/ws", wsManager.ServeWS)
 
 	// Wrap the mux with the CORS middleware and return it
 	// Although the return type is an http.Handler, it is actually a wrapped *mux.Router which
@@ -286,8 +342,6 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	// Setup channel to receive the server instance, enabling graceful shutdown
 	serverCh := make(chan *http.Server)
-
-	// TODO: initialise websocket manager and associated event handlers
 
 	// If HTTP is specified, setup HTTP server in a goroutine
 	if protocol == "http" {
