@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/events"
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -41,26 +42,26 @@ func ExploreUsers(payload json.RawMessage) (Response, error) {
 	return Response{"users retrieved successfully!", event, http.StatusOK}, nil
 }
 
-/* func InviteUsers(payload json.RawMessage) (Response, error) {
+func GetNonMembers(payload json.RawMessage) (Response, error) {
 	var response Response
-	var explore Explore
-	err := json.Unmarshal(payload, &explore)
-	log.Println("User: ", explore)
+	var nonMembers NonMembers
+	err := json.Unmarshal(payload, &nonMembers)
+	log.Println("User: ", nonMembers)
 	if err != nil {
 		// handle the error
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if explore.SessionId == "" {
+	if nonMembers.SessionId == "" {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if explore.UserId == 0 {
+	if nonMembers.UserId == 0 {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 	//get users from database
-	users, err := NonMemberUsers(1, explore.UserId, explore.SessionId)
+	users, err := NonMemberUsers(nonMembers.GroupId, nonMembers.UserId, nonMembers.SessionId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
@@ -76,4 +77,3 @@ func ExploreUsers(payload json.RawMessage) (Response, error) {
 	}
 	return Response{"users retrieved successfully!", event, http.StatusOK}, nil
 }
-*/
