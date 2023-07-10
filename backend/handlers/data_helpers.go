@@ -260,13 +260,16 @@ func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 
 	memberIds := make(map[int]struct{})
 	for _, member := range members {
-		memberIds[member.(db.GroupMember).UserId] = struct{}{}
+		if member.(db.GroupMember).Status == "member" {
+			memberIds[member.(db.GroupMember).UserId] = struct{}{}
+		}
 	}
 
 	var nonMembers []Profile
 	for _, user := range users {
 		if _, exists := memberIds[user.UserId]; !exists {
 			nonMembers = append(nonMembers, user)
+
 		}
 	}
 
