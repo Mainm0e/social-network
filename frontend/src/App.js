@@ -1,7 +1,7 @@
 import LoginPage from "./LoginPage/LoginPage";
 import RegisterPage from "./RegisterPage/RegisterPage";
 import MainPage from "./MainPage/MainPage";
-import ErrorPage from "./ErrorPage/ErrorPage";
+// import ErrorPage from "./ErrorPage/ErrorPage";
 import { WebSocketProvider } from './WebSocketContext/websocketcontext'; // import WebSocketProvider
 import './App.css';
 import {getCookie} from "./tools/cookie";
@@ -20,7 +20,7 @@ function App() {
         return <RegisterPage />
       }
     }
-    if (sessionId !== null && page === "/"||sessionId !== null && page === "/register"||sessionId !== null && page === "/login"){
+    if ((sessionId !== null && page === "/") || (sessionId !== null && page === "/register") || (sessionId !== null && page === "/login")){
       return <MainPage />
     } else {
       return  <MainPage />
