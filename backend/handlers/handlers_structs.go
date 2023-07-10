@@ -7,9 +7,9 @@ import (
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":    LoginPage,
-	"register": RegisterPage,
-	//TODO: "logout":         LogoutPage,
+	"login":          LoginPage,
+	"register":       RegisterPage,
+	"logout":         LogoutPage,
 	"profile":        ProfilePage,
 	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
@@ -22,7 +22,11 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"requestNotif":   RequestNotifications,
 	"createGroup":    CreateGroup,
 	"exploreGroups":  ExploreGroups,
-	"sendInvetaion":  SendInvitation,
+	"getNonMembers":  GetNonMembers,
+	/* "createEvent":    CreateEvent,
+	"getGroupEvents": GetGroupEvents,
+	"responseEvent":  ResponseEvent,
+	*/
 
 	/*
 		TODO: im not saying that we should have these functions but we need the functionality of these functions:
@@ -180,4 +184,10 @@ type Notification struct {
 	SessionId    string          `json:"sessionId"`
 	Profile      SmallProfile    `json:"profile"`
 	Notification db.Notification `json:"notifications"`
+}
+type NonMembers struct {
+	SessionId  string         `json:"sessionId"`
+	UserId     int            `json:"userId"`
+	GroupId    int            `json:"groupId"`
+	NonMembers []SmallProfile `json:"nonMembers"`
 }
