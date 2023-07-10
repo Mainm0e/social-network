@@ -1,41 +1,79 @@
+import { useEffect, useState } from "react";
 import { getCookie, getUserId } from "../../tools/cookie";
 import { fetchData } from "../../tools/fetchData";
 
 const Invite = ({ clearBox }) => {
-
-    const test = () => {
-        const url = new URL(window.location.href);
-        const searchParams = new URLSearchParams(url.search);
-        const id = searchParams.get("id");
-        const method = "POST";
-        const type = "getNonMembers";
-        /* 
-        type NonMembers struct {
-    SessionId  string         `json:"sessionId"`
-    UserId     int            `json:"userId"`
-    GroupId    int            `json:"groupId"`
-    NonMembers []SmallProfile `json:"nonMembers"`
-}
-event type : "getNonMembers" */
-const payload = {
-    sessionId: getCookie("sessionId"),
-    userId: getUserId("userId"),
-    groupId: parseInt(id),
-};
-console.log("test case", payload)
-
-        fetchData (method, type, payload).then((data) => {
-            console.log(data);
-        });
+  const [data, setData] = useState(null);
+  const url = new URL(window.location.href);
+  const searchParams = new URLSearchParams(url.search);
+  const id = searchParams.get("id");
+  useEffect(() => {
+    const method = "POST";
+    const type = "getNonMembers";
+    const payload = {
+      sessionId: getCookie("sessionId"),
+      userId: getUserId("userId"),
+      groupId: parseInt(id),
     };
+    console.log("test case", payload);
 
-    return (
-        <div className="invite">
-            <h1>hello</h1>
-            <button onClick={test}>test</button>
-            <button onClick={clearBox}>close</button>
-        </div>
-    );
+    fetchData(method, type, payload).then((data) => {
+      setData(data);
+    });
+  }, []);
+
+  return (
+    <div className="invite-container">
+      <div className="invite-header">
+        <h1>Invite</h1>
+      </div>
+      <div className="invite-body">
+        {data &&
+            data.map((u, index) => (
+            <DisplayInvite
+                groupId={id}
+                key={index}
+                user={u}
+            />
+            ))}
+      </div>
+    </div>
+  );
 };
 
 export default Invite;
+
+const DisplayInvite = ({groupId, user, status }) => {
+    const sentInv = (e) => {
+      console.log(e)
+      const method = "POST";
+        const type = "invite";
+        const payload = {
+            sessionId: getCookie("sessionId"),
+            userId: getUserId("userId"),
+            groupId: parseInt(groupId),
+            inviteeId: user.id,
+            status: e,
+        };
+        /* fetchData(method, type, payload).then((data) => {
+            console.log(data);
+        } */
+        console.log("test case ", payload)
+    };
+    return (
+        <div className="notification">
+ <div className="notification-user">
+          <img src={user.avatar} alt="avatar" />
+          <span>
+            {user.firstName} {user.lastName}
+          </span>
+        </div>
+        <div className="notification-btn">
+          <button value="Invite" onClick={() => sentInv("accept")}>
+          Invite
+          </button>
+        </div>
+        </div>
+    )
+}
+
