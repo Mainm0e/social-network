@@ -23,6 +23,11 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"createGroup":    CreateGroup,
 	"exploreGroups":  ExploreGroups,
 	"getNonMembers":  GetNonMembers,
+	/* "createEvent":    CreateEvent,
+	"getGroupEvents": GetGroupEvents,
+	"responseEvent":  ResponseEvent,
+	*/
+
 	/*
 		TODO: im not saying that we should have these functions but we need the functionality of these functions:
 		"responseInvitation": AcceptInvitation,
