@@ -44,7 +44,7 @@ func fillSmallProfile(userId int) (SmallProfile, error) {
 	if user.Avatar != nil && *user.Avatar != "" {
 		imageUrl = *user.Avatar
 	} else {
-		imageUrl = "./images/avatars/default.png"
+		imageUrl = "./images/avatars/default.gif"
 	}
 	avatar, err := utils.RetrieveImage(imageUrl)
 	if err != nil {
@@ -169,7 +169,7 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 	if user.Avatar != nil && *user.Avatar != "" {
 		imageUrl = *user.Avatar
 	} else {
-		imageUrl = "./images/avatars/default.png"
+		imageUrl = "./images/avatars/default.gif"
 	}
 	avatar, err := utils.RetrieveImage(imageUrl)
 	if err != nil {
