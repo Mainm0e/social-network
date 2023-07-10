@@ -4,7 +4,6 @@ import (
 	"backend/db"
 	"backend/events"
 	"backend/handlers"
-	"backend/server/sessions"
 	"backend/sockets"
 	"backend/utils"
 	"bytes"
@@ -111,8 +110,8 @@ This pattern facilitates ease of maintenance should additional middleware functi
 */
 func loggerMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Print out entire request body for debugging purposes
-		r = logAndResetRequest(r)
+		// // Print out entire request body for debugging purposes
+		// r = logAndResetRequest(r)
 
 		handler.ServeHTTP(w, r)
 	})
@@ -131,26 +130,26 @@ function.
 */
 func corsMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Allow requests with the "credentials" header set to "true"
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		// Allow requests from the specific origin of the frontend application
-		w.Header().Set("Access-Control-Allow-Origin", FRONTEND_ORIGIN) // Change this to your frontend origin
-		// Allow specific HTTP methods, which provides some protection against CSRF attacks
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		// Allow the Content-Type header, which is required to be sent with POST requests
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, credentials, withCredentials")
-		// Set the Access-Control-Max-Age header to cache preflight request (600 seconds = 10 minutes)
-		w.Header().Set("Access-Control-Max-Age", "600")
+		// // Allow requests with the "credentials" header set to "true"
+		// w.Header().Set("Access-Control-Allow-Credentials", "true")
+		// // Allow requests from the specific origin of the frontend application
+		// w.Header().Set("Access-Control-Allow-Origin", FRONTEND_ORIGIN) // Change this to your frontend origin
+		// // Allow specific HTTP methods, which provides some protection against CSRF attacks
+		// w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		// // Allow the Content-Type header, which is required to be sent with POST requests
+		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, credentials, withCredentials")
+		// // Set the Access-Control-Max-Age header to cache preflight request (600 seconds = 10 minutes)
+		// w.Header().Set("Access-Control-Max-Age", "600")
 
-		// Handle preflight requests, which is another way of saying "handle OPTIONS requests"
-		// OPTIONS requests are sent by the browser to check if the server will allow a request
-		// with the specified method and headers. If the server responds with a 200 OK, the
-		// browser will send the actual request. If the server responds with a 403 Forbidden,
-		// the browser will not send the actual request.
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
+		// // Handle preflight requests, which is another way of saying "handle OPTIONS requests"
+		// // OPTIONS requests are sent by the browser to check if the server will allow a request
+		// // with the specified method and headers. If the server responds with a 200 OK, the
+		// // browser will send the actual request. If the server responds with a 403 Forbidden,
+		// // the browser will not send the actual request.
+		// if r.Method == http.MethodOptions {
+		// 	w.WriteHeader(http.StatusOK)
+		// 	return
+		// }
 
 		// Begin wrapping, call the next handler in the chain
 		handler.ServeHTTP(w, r)
@@ -166,54 +165,54 @@ middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Read the request body
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			log.Println("Error reading request body", http.StatusBadRequest)
-			http.Error(w, "Invalid request", http.StatusBadRequest)
-			return
-		}
-		// Always close the request body after reading it to free up resources
-		defer r.Body.Close()
+		// // Read the request body
+		// body, err := io.ReadAll(r.Body)
+		// if err != nil {
+		// 	log.Println("Error reading request body", http.StatusBadRequest)
+		// 	http.Error(w, "Invalid request", http.StatusBadRequest)
+		// 	return
+		// }
+		// // Always close the request body after reading it to free up resources
+		// defer r.Body.Close()
 
-		// Create a new reader with the body for JSON decoding
-		reader1 := io.NopCloser(bytes.NewReader(body))
-		// Initialise  event struct
-		var event events.Event
+		// // Create a new reader with the body for JSON decoding
+		// reader1 := io.NopCloser(bytes.NewReader(body))
+		// // Initialise  event struct
+		// var event events.Event
 
-		err = json.NewDecoder(reader1).Decode(&event)
-		if err != nil {
-			log.Println("Error decoding JSON", http.StatusBadRequest)
-			http.Error(w, "Invalid JSON", http.StatusBadRequest)
-			return
-		}
+		// err = json.NewDecoder(reader1).Decode(&event)
+		// if err != nil {
+		// 	log.Println("Error decoding JSON", http.StatusBadRequest)
+		// 	http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		// 	return
+		// }
 
-		// Refer to events catalogue in handlers package (handlers_structs.go)
-		if _, ok := handlers.Events[event.Type]; ok {
-			// Check that event type is not login or register (these events do not require authentication)
-			if event.Type != "login" && event.Type != "register" {
-				// Check if the request contains a sessionID cookie
-				cookie, err := r.Cookie(sessions.COOKIE_NAME)
-				if err != nil {
-					// Handle error: No sessionID cookie found.
-					log.Printf("authenticationWiddleware() error - No sessionID cookie found: %v", err)
-					http.Error(w, "Invalid session", http.StatusUnauthorized)
-					return
-				}
+		// // Refer to events catalogue in handlers package (handlers_structs.go)
+		// if _, ok := handlers.Events[event.Type]; ok {
+		// 	// Check that event type is not login or register (these events do not require authentication)
+		// 	if event.Type != "login" && event.Type != "register" {
+		// 		// Check if the request contains a sessionID cookie
+		// 		cookie, err := r.Cookie(sessions.COOKIE_NAME)
+		// 		if err != nil {
+		// 			// Handle error: No sessionID cookie found.
+		// 			log.Printf("authenticationWiddleware() error - No sessionID cookie found: %v", err)
+		// 			http.Error(w, "Invalid session", http.StatusUnauthorized)
+		// 			return
+		// 		}
 
-				// Validate the sessionID cookie
-				isValid, err := sessions.CookieCheck(cookie)
-				if !isValid || err != nil {
-					// Handle error: Invalid sessionID cookie.
-					log.Printf("authenticationWiddleware() error - Invalid sessionID cookie: %v", err)
-					http.Error(w, "Invalid session", http.StatusUnauthorized)
-					return
-				}
-			}
-		}
+		// 		// Validate the sessionID cookie
+		// 		isValid, err := sessions.CookieCheck(cookie)
+		// 		if !isValid || err != nil {
+		// 			// Handle error: Invalid sessionID cookie.
+		// 			log.Printf("authenticationWiddleware() error - Invalid sessionID cookie: %v", err)
+		// 			http.Error(w, "Invalid session", http.StatusUnauthorized)
+		// 			return
+		// 		}
+		// 	}
+		// }
 
-		// Create a new reader with the body for the next handler
-		r.Body = io.NopCloser(bytes.NewReader(body))
+		// // Create a new reader with the body for the next handler
+		// r.Body = io.NopCloser(bytes.NewReader(body))
 		handler.ServeHTTP(w, r)
 	})
 }
