@@ -130,26 +130,26 @@ function.
 */
 func corsMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// // Allow requests with the "credentials" header set to "true"
-		// w.Header().Set("Access-Control-Allow-Credentials", "true")
-		// // Allow requests from the specific origin of the frontend application
-		// w.Header().Set("Access-Control-Allow-Origin", FRONTEND_ORIGIN) // Change this to your frontend origin
-		// // Allow specific HTTP methods, which provides some protection against CSRF attacks
-		// w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		// // Allow the Content-Type header, which is required to be sent with POST requests
-		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, credentials, withCredentials")
-		// // Set the Access-Control-Max-Age header to cache preflight request (600 seconds = 10 minutes)
-		// w.Header().Set("Access-Control-Max-Age", "600")
+		// Allow requests with the "credentials" header set to "true"
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		// Allow requests from the specific origin of the frontend application
+		w.Header().Set("Access-Control-Allow-Origin", FRONTEND_ORIGIN) // Change this to your frontend origin
+		// Allow specific HTTP methods, which provides some protection against CSRF attacks
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		// Allow the Content-Type header, which is required to be sent with POST requests
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, credentials, withCredentials")
+		// Set the Access-Control-Max-Age header to cache preflight request (600 seconds = 10 minutes)
+		w.Header().Set("Access-Control-Max-Age", "600")
 
-		// // Handle preflight requests, which is another way of saying "handle OPTIONS requests"
-		// // OPTIONS requests are sent by the browser to check if the server will allow a request
-		// // with the specified method and headers. If the server responds with a 200 OK, the
-		// // browser will send the actual request. If the server responds with a 403 Forbidden,
-		// // the browser will not send the actual request.
-		// if r.Method == http.MethodOptions {
-		// 	w.WriteHeader(http.StatusOK)
-		// 	return
-		// }
+		// Handle preflight requests, which is another way of saying "handle OPTIONS requests"
+		// OPTIONS requests are sent by the browser to check if the server will allow a request
+		// with the specified method and headers. If the server responds with a 200 OK, the
+		// browser will send the actual request. If the server responds with a 403 Forbidden,
+		// the browser will not send the actual request.
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 
 		// Begin wrapping, call the next handler in the chain
 		handler.ServeHTTP(w, r)
