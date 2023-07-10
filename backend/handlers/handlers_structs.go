@@ -7,9 +7,9 @@ import (
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":    LoginPage,
-	"register": RegisterPage,
-	//TODO: "logout":         LogoutPage,
+	"login":          LoginPage,
+	"register":       RegisterPage,
+	"logout":         LogoutPage,
 	"profile":        ProfilePage,
 	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
