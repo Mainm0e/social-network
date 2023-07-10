@@ -161,7 +161,7 @@ func insertGroupInvitation(senderId int, groupId int, receiverId int) error {
 	if err != nil {
 		return errors.New("Error inserting group invitation" + err.Error())
 	}
-	db.InsertData("group_member", senderId, groupId, "waiting")
+	db.InsertData("group_member", receiverId, groupId, "waiting")
 	if err != nil {
 		return errors.New("Error inserting group invitation" + err.Error())
 	}
@@ -279,7 +279,7 @@ func FollowOrJoinResponse(payload json.RawMessage) (Response, error) {
 			return response, err
 		}
 	} else if follow.GroupId != 0 {
-		err = deleteRequest("group_member", follow.SenderId, follow.GroupId, follow.NotifId, follow.Content)
+		err = deleteRequest("group_member", follow.ReceiverId, follow.GroupId, follow.NotifId, follow.Content)
 		if err != nil {
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, err
