@@ -15,8 +15,6 @@ const Invite = ({ clearBox }) => {
       userId: getUserId("userId"),
       groupId: parseInt(id),
     };
-    console.log("test case", payload);
-
     fetchData(method, type, payload).then((data) => {
       setData(data);
     });
@@ -41,7 +39,6 @@ export default Invite;
 
 const DisplayInvite = ({ groupId, user, status }) => {
   const sentInv = (e) => {
-    console.log(e);
     const method = "POST";
     const type = "followRequest";
     const payload = {
