@@ -29,13 +29,9 @@ const Invite = ({ clearBox }) => {
       </div>
       <div className="invite-body">
         {data &&
-            data.map((u, index) => (
-            <DisplayInvite
-                groupId={id}
-                key={index}
-                user={u}
-            />
-            ))}
+          data.map((u, index) => (
+            <DisplayInvite groupId={id} key={index} user={u} />
+          ))}
       </div>
     </div>
   );
@@ -43,37 +39,36 @@ const Invite = ({ clearBox }) => {
 
 export default Invite;
 
-const DisplayInvite = ({groupId, user, status }) => {
-    const sentInv = (e) => {
-      console.log(e)
-      const method = "POST";
-        const type = "invite";
-        const payload = {
-            sessionId: getCookie("sessionId"),
-            userId: getUserId("userId"),
-            groupId: parseInt(groupId),
-            inviteeId: user.id,
-            status: e,
-        };
-        /* fetchData(method, type, payload).then((data) => {
-            console.log(data);
-        } */
-        console.log("test case ", payload)
+const DisplayInvite = ({ groupId, user, status }) => {
+  const sentInv = (e) => {
+    console.log(e);
+    const method = "POST";
+    const type = "followRequest";
+    const payload = {
+      sessionId: getCookie("sessionId"),
+      senderId: getUserId("userId"),
+      receiverId: parseInt(user.userId),
+      groupId: parseInt(groupId),
     };
-    return (
-        <div className="notification">
- <div className="notification-user">
-          <img src={user.avatar} alt="avatar" />
-          <span>
-            {user.firstName} {user.lastName}
-          </span>
-        </div>
-        <div className="notification-btn">
-          <button value="Invite" onClick={() => sentInv("accept")}>
-          Invite
-          </button>
-        </div>
-        </div>
-    )
-}
+    console.log("test case", payload);
 
+    fetchData(method, type, payload).then((data) => {
+        console.log(data);
+    });
+  };
+  return (
+    <div className="notification">
+      <div className="notification-user">
+        <img src={user.avatar} alt="avatar" />
+        <span>
+          {user.firstName} {user.lastName}
+        </span>
+      </div>
+      <div className="notification-btn">
+        <button value="Invite" onClick={() => sentInv(9)}>
+          Invite
+        </button>
+      </div>
+    </div>
+  );
+};
