@@ -210,12 +210,14 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 	m.Clients.Range(func(key interface{}, value interface{}) bool {
 		client, ok := value.(*Client)
 		if !ok {
+			log.Printf("SendChatHistory() error - Could not cast value to *Client")
 			// Handle the error if need be... The value is not of type *Client.
 			return true
 		}
 		if client.ID == chatHistory.ClientID {
 			select {
 			case client.Egress <- eventJSON:
+				log.Printf("SendChatHistory() - Sent chat history to client %d\n", chatHistory.ClientID)
 			default:
 				// The Egress channel could be full or closed, or the client could be disconnected
 				log.Printf("SendChatHistory() error - Could not send message to client %d\n", chatHistory.ClientID)
