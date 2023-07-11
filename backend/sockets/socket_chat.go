@@ -345,26 +345,30 @@ it first unmashals the event into a ChatHistoryRequest struct, then fetches the
 chat history from the database, and finally sends the chat history to the client.
 It returns an error value, which is non-nil if any of the operations failed.
 */
-func (m *Manager) HandleChatHistoryRequestEvent(chatHistoryRequestEvent events.Event, client *Client) error {
+func (m *Manager) HandleChatHistoryRequestEvent(chatHistoryRequestEvent events.Event, client *Client) {
 	// Unmarshal the event into a ChatHistoryRequest struct
 	chatHistoryRequest, err := UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent)
 	if err != nil {
-		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+		log.Printf("HandleChatHistoryRequestEvent() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
 
 	// Get chat history from database, returned as a pointer to a ChatHistory struct
 	chatHistory, err := FetchChatHistory(chatHistoryRequest)
 	if err != nil {
-		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+		log.Printf("HandleChatHistoryRequestEvent() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
 
 	// Send chat history to client
 	err = m.SendChatHistory(chatHistory)
 	if err != nil {
-		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+		log.Printf("HandleChatHistoryRequestEvent() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
-
-	return nil
 }
 
 /*
@@ -399,6 +403,7 @@ func (m *Manager) SendErrorMessageToClient(client *Client, message string, statu
 	default:
 		// The Egress channel could be full or closed, or the client could be disconnected
 		log.Printf("SendErrorMessageToClient() error - Could not send error message to client %d\n", client.ID)
+		return
 	}
 }
 
