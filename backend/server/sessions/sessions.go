@@ -4,6 +4,7 @@ import (
 	"backend/db"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -197,6 +198,8 @@ func Login(userName string, admin bool) (string, error) {
 	if err != nil {
 		return "", errors.New("error in sessions.Login(): " + err.Error())
 	}
+	// Log session creation
+	log.Printf("Session created for user \" %s \", with sessionID: %v", userName, sessionID)
 	return sessionID, nil
 }
 
