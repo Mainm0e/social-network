@@ -21,7 +21,7 @@ returns an error value, which is non-nil if an error occurs during the database 
 func getUserID(email string) (int, error) {
 	var userID int
 
-	user, err := db.FetchData("users", "email", email)
+	user, err := db.FetchData("users", "email = ?", email)
 	userID = user[0].(db.User).UserId
 	if err != nil {
 		return 0, fmt.Errorf("sessions.getUserID() error: %v", err)
