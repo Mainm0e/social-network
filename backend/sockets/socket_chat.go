@@ -279,6 +279,9 @@ GroupMsg, and broadcasts it to all clients in the chat. It returns an error valu
 which is non-nil if any of the broadcasting operations failed.
 */
 func (m *Manager) BroadcastMessage(msg ChatMsg) error {
+	// Log the broadcast attempt
+	log.Printf("BroadcastMessage() - Broadcasting message: %v\n", msg)
+
 	msgType := msg.GetMsgType()
 	receiverID := msg.GetReceiverID()
 	msgEvent := msg.WrapMsg()
@@ -317,6 +320,9 @@ and broadcasts it to all clients in the chat. It does not return anything, but
 logs errors if any are encountered.
 */
 func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) {
+	// Log the attempt to handle the event
+	log.Printf("HandleChatMessage() - Received event: %v\n", chatEvent)
+
 	// Unmarshal the event into a ChatMsg interface
 	msg, err := UnmarshalEventToChatMsg(chatEvent)
 	if err != nil {
@@ -350,6 +356,9 @@ chat history from the database, and finally sends the chat history to the client
 It does not return anything, but logs errors if any are encountered.
 */
 func (m *Manager) HandleChatHistoryRequestEvent(chatHistoryRequestEvent events.Event, client *Client) {
+	// Log the attempt to handle the event
+	log.Printf("HandleChatHistoryRequestEvent() - Received event: %v\n", chatHistoryRequestEvent)
+
 	// Unmarshal the event into a ChatHistoryRequest struct
 	chatHistoryRequest, err := UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent)
 	if err != nil {
