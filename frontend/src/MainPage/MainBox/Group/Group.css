@@ -5,6 +5,22 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    font-family: myFancyFont;
+    font-size: 24px;
+}
+
+.register-box {
+    background: yellow;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.register-box label {
+    color: red;
+}
+
+.register-box input {
     background: red;
 }
 

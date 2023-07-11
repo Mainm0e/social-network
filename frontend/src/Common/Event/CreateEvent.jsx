@@ -44,7 +44,7 @@ const CreateEvent = ({profileId,groupId}) => {
   return (
     <div className="container">
       <div className="row">
-        <div className="col-md-6">
+        <div className="header">
           <h1>Create Event</h1>
           <form>
             <div className="form-group">
