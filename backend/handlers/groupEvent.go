@@ -23,7 +23,7 @@ func InsertEventOption(eventId int, memberId int, option string) error {
 	return nil
 }
 func ReadEventOptions(eventId int) (map[string][]SmallProfile, error) {
-	options, err := db.FetchData("event_member", "eventId", eventId)
+	options, err := db.FetchData("event_member", "eventId = ?", eventId)
 	if err != nil {
 		return nil, errors.New("Error fetching event options" + err.Error())
 	}
