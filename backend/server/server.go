@@ -366,11 +366,6 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 	ctx, cancel := context.WithTimeout(context.Background(), SHUTDOWN_TIMEOUT)
 	defer cancel()
 
-	// Close log file (package level variable)
-	if LogFile != nil {
-		LogFile.Close()
-	}
-
 	// Perform the graceful shutdown
 	if err := srv.Shutdown(ctx); err != nil {
 		return errors.New("Graceful shutdown of server failed: " + err.Error())
@@ -378,6 +373,11 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	fmt.Println("\nServer shutdown gracefully... like a rabid five-winged swan!") // Keep this during development, for debugging via terminal
 	log.Print("Server exited properly")
+
+	// Close log file (package level variable)
+	if LogFile != nil {
+		LogFile.Close()
+	}
 
 	return nil
 }
