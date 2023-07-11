@@ -131,7 +131,7 @@ if current user follow requested user then it return 'following' if they already
 if error occur then it return error
 */
 func checkUserRelation(userId int, profileId int) (string, error) {
-	followings, err := db.FetchData("follow", "followerId", userId)
+	followings, err := db.FetchData("follow", "followerId = ?", userId)
 	if err != nil {
 		return "", errors.New("Error fetching follow data" + err.Error())
 	}
