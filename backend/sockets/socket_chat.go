@@ -367,4 +367,39 @@ func (m *Manager) HandleChatHistoryRequestEvent(chatHistoryRequestEvent events.E
 	return nil
 }
 
+/*
+SendErrorMessageToClient() is a method of the Manager struct. It takes a pointer
+to a client, an error message string and a status code integer as input, and sends
+the error message to the client. It returns nothing.
+*/
+func (m *Manager) SendErrorMessageToClient(client *Client, message string, statusCode int) {
+	// Create ErrorMessage
+	errMsg := events.ErrorMessage{
+		Message:    message,
+		StatusCode: statusCode,
+	}
+
+	// Package ErrorMessage into an Event
+	event, err := events.PackageErrorEvent(errMsg)
+	if err != nil {
+		log.Printf("SendErrorMessageToClient error packaging error: %v", err)
+		return
+	}
+
+	// Convert Event to JSON
+	eventJSON, err := json.Marshal(event)
+	if err != nil {
+		log.Printf("SendErrorMessageToClient error marshalling event: %v", err)
+		return
+	}
+
+	// Send the Event JSON to client
+	select {
+	case client.Egress <- eventJSON:
+	default:
+		// The Egress channel could be full or closed, or the client could be disconnected
+		log.Printf("SendErrorMessageToClient() error - Could not send error message to client %d\n", client.ID)
+	}
+}
+
 // TODO: HandleIsTypingEvent(): Receive isTyping event and broadcast to all clients in chat
