@@ -113,11 +113,11 @@ func (c *Client) ReadData() {
 			break
 		}
 
-		err = handler(event, c)
-		if err != nil {
-			log.Printf("sockets.ReadData() - Error handling event: %v", err)
-			break
-		}
+		handler(event, c)
+		// if err != nil {
+		// 	log.Printf("sockets.ReadData() - Error handling event: %v", err)
+		// 	break
+		// }
 	}
 }
 
