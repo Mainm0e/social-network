@@ -4,7 +4,6 @@ import (
 	"backend/db"
 	"backend/events"
 	"backend/handlers"
-	"backend/server/sessions"
 	"backend/sockets"
 	"backend/utils"
 	"bytes"
@@ -111,8 +110,8 @@ This pattern facilitates ease of maintenance should additional middleware functi
 */
 func loggerMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Print out entire request body for debugging purposes
-		r = logAndResetRequest(r)
+		// // Print out entire request body for debugging purposes
+		// r = logAndResetRequest(r)
 
 		handler.ServeHTTP(w, r)
 	})
@@ -166,54 +165,54 @@ middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Read the request body
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			log.Println("Error reading request body", http.StatusBadRequest)
-			http.Error(w, "Invalid request", http.StatusBadRequest)
-			return
-		}
-		// Always close the request body after reading it to free up resources
-		defer r.Body.Close()
+		// // Read the request body
+		// body, err := io.ReadAll(r.Body)
+		// if err != nil {
+		// 	log.Println("Error reading request body", http.StatusBadRequest)
+		// 	http.Error(w, "Invalid request", http.StatusBadRequest)
+		// 	return
+		// }
+		// // Always close the request body after reading it to free up resources
+		// defer r.Body.Close()
 
-		// Create a new reader with the body for JSON decoding
-		reader1 := io.NopCloser(bytes.NewReader(body))
-		// Initialise  event struct
-		var event events.Event
+		// // Create a new reader with the body for JSON decoding
+		// reader1 := io.NopCloser(bytes.NewReader(body))
+		// // Initialise  event struct
+		// var event events.Event
 
-		err = json.NewDecoder(reader1).Decode(&event)
-		if err != nil {
-			log.Println("Error decoding JSON", http.StatusBadRequest)
-			http.Error(w, "Invalid JSON", http.StatusBadRequest)
-			return
-		}
+		// err = json.NewDecoder(reader1).Decode(&event)
+		// if err != nil {
+		// 	log.Println("Error decoding JSON", http.StatusBadRequest)
+		// 	http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		// 	return
+		// }
 
-		// Refer to events catalogue in handlers package (handlers_structs.go)
-		if _, ok := handlers.Events[event.Type]; ok {
-			// Check that event type is not login or register (these events do not require authentication)
-			if event.Type != "login" && event.Type != "register" {
-				// Check if the request contains a sessionID cookie
-				cookie, err := r.Cookie(sessions.COOKIE_NAME)
-				if err != nil {
-					// Handle error: No sessionID cookie found.
-					log.Printf("authenticationWiddleware() error - No sessionID cookie found: %v", err)
-					http.Error(w, "Invalid session", http.StatusUnauthorized)
-					return
-				}
+		// // Refer to events catalogue in handlers package (handlers_structs.go)
+		// if _, ok := handlers.Events[event.Type]; ok {
+		// 	// Check that event type is not login or register (these events do not require authentication)
+		// 	if event.Type != "login" && event.Type != "register" {
+		// 		// Check if the request contains a sessionID cookie
+		// 		cookie, err := r.Cookie(sessions.COOKIE_NAME)
+		// 		if err != nil {
+		// 			// Handle error: No sessionID cookie found.
+		// 			log.Printf("authenticationWiddleware() error - No sessionID cookie found: %v", err)
+		// 			http.Error(w, "Invalid session", http.StatusUnauthorized)
+		// 			return
+		// 		}
 
-				// Validate the sessionID cookie
-				isValid, err := sessions.CookieCheck(cookie)
-				if !isValid || err != nil {
-					// Handle error: Invalid sessionID cookie.
-					log.Printf("authenticationWiddleware() error - Invalid sessionID cookie: %v", err)
-					http.Error(w, "Invalid session", http.StatusUnauthorized)
-					return
-				}
-			}
-		}
+		// 		// Validate the sessionID cookie
+		// 		isValid, err := sessions.CookieCheck(cookie)
+		// 		if !isValid || err != nil {
+		// 			// Handle error: Invalid sessionID cookie.
+		// 			log.Printf("authenticationWiddleware() error - Invalid sessionID cookie: %v", err)
+		// 			http.Error(w, "Invalid session", http.StatusUnauthorized)
+		// 			return
+		// 		}
+		// 	}
+		// }
 
-		// Create a new reader with the body for the next handler
-		r.Body = io.NopCloser(bytes.NewReader(body))
+		// // Create a new reader with the body for the next handler
+		// r.Body = io.NopCloser(bytes.NewReader(body))
 		handler.ServeHTTP(w, r)
 	})
 }
@@ -367,11 +366,6 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 	ctx, cancel := context.WithTimeout(context.Background(), SHUTDOWN_TIMEOUT)
 	defer cancel()
 
-	// Close log file (package level variable)
-	if LogFile != nil {
-		LogFile.Close()
-	}
-
 	// Perform the graceful shutdown
 	if err := srv.Shutdown(ctx); err != nil {
 		return errors.New("Graceful shutdown of server failed: " + err.Error())
@@ -379,6 +373,11 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	fmt.Println("\nServer shutdown gracefully... like a rabid five-winged swan!") // Keep this during development, for debugging via terminal
 	log.Print("Server exited properly")
+
+	// Close log file (package level variable)
+	if LogFile != nil {
+		LogFile.Close()
+	}
 
 	return nil
 }

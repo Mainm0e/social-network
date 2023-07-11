@@ -52,7 +52,7 @@ func insertFollowRequest(senderId int, receiverId int, notifId int) error {
 		// if sender requested to follow the receiver before then they's trying to take it back by click on follow button.
 		// so we delete that follow_requset notification.
 	} else if relation == "pending" {
-		notifications, err := db.FetchData("notifications", "senderId", senderId)
+		notifications, err := db.FetchData("notifications", "senderId = ?", senderId)
 		if err != nil {
 			return errors.New("Error fetching notifications" + err.Error())
 		}
@@ -89,7 +89,7 @@ in the "notifications" table and a row in the "group_members" table with the sta
 Returns nil on success; otherwise, returns an error with a descriptive message.
 */
 func insertGroupRequest(senderId int, groupId int) error {
-	dbGroups, err := db.FetchData("groups", "groupId", groupId)
+	dbGroups, err := db.FetchData("groups", "groupId = ?", groupId)
 	if err != nil {
 		return errors.New("Error fetching groups" + err.Error())
 	}
@@ -125,7 +125,7 @@ func insertGroupRequest(senderId int, groupId int) error {
 		}
 	case "pending":
 		//delete group request from notifications table
-		Notifications, err := db.FetchData("notifications", "groupId", groupId)
+		Notifications, err := db.FetchData("notifications", "groupId = ?", groupId)
 		if err != nil {
 			return errors.New("Error fetching notifications" + err.Error())
 		}

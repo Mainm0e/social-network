@@ -85,7 +85,7 @@ base on "status" field in group_member table. if user does not have any relation
 if any error occurred it returns an error with a descriptive message.
 */
 func groupUserRelation(userId, groupId int) (string, error) {
-	groupMember, err := db.FetchData("group_member", "groupId", groupId)
+	groupMember, err := db.FetchData("group_member", "groupId = ?", groupId)
 	if err != nil {
 		return "", errors.New("Error fetching group member" + err.Error())
 	}
