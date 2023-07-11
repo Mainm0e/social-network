@@ -258,7 +258,7 @@ func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 		return []Profile{}, errors.New("Error fetching users: " + err.Error())
 	}
 
-	members, err := db.FetchData("group_member", "groupId", groupId)
+	members, err := db.FetchData("group_member", "groupId = ?", groupId)
 	if err != nil {
 		return []Profile{}, errors.New("Error fetching members: " + err.Error())
 	}
