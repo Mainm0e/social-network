@@ -172,6 +172,13 @@ middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// If this is a WebSocket handshake request, don't try to read the body
+		if r.Header.Get("Upgrade") == "websocket" {
+			// TODO: maybe implement websocket authentication here (?)
+			handler.ServeHTTP(w, r)
+			return
+		}
+
 		// Read the request body
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
