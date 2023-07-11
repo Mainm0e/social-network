@@ -53,7 +53,7 @@ func ReadEventOptions(eventId int) (map[string][]SmallProfile, error) {
 	return result, nil
 }
 func ReadGroupEvents(groupId int) ([]GroupEvent, error) {
-	events, err := db.FetchData("events", "groupId", groupId)
+	events, err := db.FetchData("events", "groupId = ?", groupId)
 	if err != nil {
 		return nil, errors.New("Error fetching group events" + err.Error())
 	}
