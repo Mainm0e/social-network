@@ -313,29 +313,33 @@ func (m *Manager) BroadcastMessage(msg ChatMsg) error {
 /*
 HandleChatMessage() takes a ChatMsg interface, which is either a PrivateMsg or a
 GroupMsg, and handles it. This means that it records the message to the database
-and broadcasts it to all clients in the chat. It returns an error value, which
-is non-nil if any of the operations failed.
+and broadcasts it to all clients in the chat. It does not return anything, but
+logs errors if any are encountered.
 */
-func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) error {
+func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) {
 	// Unmarshal the event into a ChatMsg interface
 	msg, err := UnmarshalEventToChatMsg(chatEvent)
 	if err != nil {
-		return fmt.Errorf("HandleChatMessage() error - %v", err)
+		log.Printf("HandleChatMessage() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
 
 	// Store message in database
 	err = RecordMsgToDB(msg)
 	if err != nil {
-		return fmt.Errorf("HandleChatMessage() error - %v", err)
+		log.Printf("HandleChatMessage() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
 
 	// Broadcast message to clients
 	err = m.BroadcastMessage(msg)
 	if err != nil {
-		return fmt.Errorf("HandleChatMessage() error - %v", err)
+		log.Printf("HandleChatMessage() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
-
-	return nil
 }
 
 /*
@@ -343,7 +347,7 @@ HandleChatHistoryRequestEvent() takes a ChatHistoryRequest event as input, along
 with a pointer to the client that sent the request, and handles it. This means that
 it first unmashals the event into a ChatHistoryRequest struct, then fetches the
 chat history from the database, and finally sends the chat history to the client.
-It returns an error value, which is non-nil if any of the operations failed.
+It does not return anything, but logs errors if any are encountered.
 */
 func (m *Manager) HandleChatHistoryRequestEvent(chatHistoryRequestEvent events.Event, client *Client) {
 	// Unmarshal the event into a ChatHistoryRequest struct
