@@ -104,8 +104,12 @@ func findFollowers(userId int) ([]int, error) {
 	return followerIds, nil
 }
 
+/*
+findFollowings() takes a userID integer and returns a slice of integers containing the IDs of the users that the user with the given ID is following.
+It also returns an error value, which is non-nil if an error occurred during the process.
+*/
 func findFollowings(userId int) ([]int, error) {
-	followings, err := db.FetchData("follow", "followerId", userId)
+	followings, err := db.FetchData("follow", "followerId = ?", userId)
 	if len(followings) == 0 {
 		return nil, nil
 	}
