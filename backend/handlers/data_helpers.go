@@ -88,7 +88,7 @@ findFollowers and findFollowings function return the list of followers and follo
 if error occur then it return error
 */
 func findFollowers(userId int) ([]int, error) {
-	followers, err := db.FetchData("follow", "followeeId", userId)
+	followers, err := db.FetchData("follow", "followeeId = ?", userId)
 	if len(followers) == 0 {
 		return nil, nil
 	}
@@ -103,6 +103,7 @@ func findFollowers(userId int) ([]int, error) {
 	}
 	return followerIds, nil
 }
+
 func findFollowings(userId int) ([]int, error) {
 	followings, err := db.FetchData("follow", "followerId", userId)
 	if len(followings) == 0 {
