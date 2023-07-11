@@ -20,6 +20,7 @@ export const group_link ={
     "Create event": '#createevent',
     "Explore user": "/user",
     "Explore groups": "/group",
+    "Invite": "#invite_to_group",
 }
 
 export const default_link ={

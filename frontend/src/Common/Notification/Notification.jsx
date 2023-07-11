@@ -68,7 +68,7 @@ else {
 export default Notification;
 
 const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
-  if (notifications.type === "follow_request" || notifications.type === "group_request" ) {
+  if (notifications.type === "follow_request" || notifications.type === "group_request" || notifications.type === "group_invitation") {
     const handleAccept = (value) => {
       console.log(notifications, "notifications in handleAccept")
       const method = "POST";
