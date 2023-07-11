@@ -11,9 +11,9 @@ fetchUser get a user from the database using the userId.
 It returns the user and any error encountered during the process.
 */
 func fetchUser(key string, value any) (db.User, error) {
-	users, err := db.FetchData("users", key, value)
+	users, err := db.FetchData("users", key+" = ?", value)
 	if err != nil {
-		return db.User{}, errors.New("Error fetching user data" + err.Error())
+		return db.User{}, errors.New("Error fetching user data: " + err.Error())
 	}
 	if len(users) == 0 {
 		return db.User{}, errors.New("user not found")
