@@ -233,12 +233,6 @@ reading and writing goroutines for that client. Parameters:
 func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	log.Println("Websocket initialisation started...")
 
-	conn, err := websocketUpgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Printf("Failed to set websocket upgrade: %+v", err)
-		return
-	}
-
 	// Perform validation checks on the session cookie.
 	cookie, err := r.Cookie(sessions.COOKIE_NAME)
 	if err != nil {
@@ -259,6 +253,13 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	userSession, sessionExists, err := sessions.Store.Get(sessionID)
 	if err != nil || !sessionExists {
 		log.Printf("sockets.ServeWS() error - Failed to retrieve UserID from sessions Store: %v", err)
+		return
+	}
+
+	// Upgrade the HTTP connection to a WebSocket connection.
+	conn, err := websocketUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Printf("Failed to set websocket upgrade: %+v", err)
 		return
 	}
 
