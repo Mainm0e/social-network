@@ -291,7 +291,7 @@ func GetAllGroupMemberIDs(groupId int) ([]int, error) {
 	var userIds []int
 
 	// Fetch all group members from the database
-	dbGroupMembers, err := db.FetchData("group_member", "groupId", groupId)
+	dbGroupMembers, err := db.FetchData("group_member", "groupId = ?", groupId)
 	if err != nil {
 		return userIds, errors.New("Error fetching group members" + err.Error())
 	}
