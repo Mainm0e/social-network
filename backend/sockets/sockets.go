@@ -242,7 +242,7 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	} else {
 		isValid, err := sessions.CookieCheck(cookie)
 		if !isValid || err != nil {
-			log.Printf("sessions.ServeWS() error - Invalid sessionID cookie: %v", err)
+			log.Printf("sessions.ServeWS() error - Invalid sessionID cookie for session \" %v \": %v", cookie.Value, err)
 			http.Error(w, "Invalid session", http.StatusUnauthorized)
 			return
 		}
@@ -252,7 +252,7 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the associated UserID from the sessions Store.
 	userSession, sessionExists, err := sessions.Store.Get(sessionID)
 	if err != nil || !sessionExists {
-		log.Printf("sockets.ServeWS() error - Failed to retrieve UserID from sessions Store: %v", err)
+		log.Printf("sockets.ServeWS() error - Failed to retrieve UserID for session \" %v \" from sessions Store: %v", sessionID, err)
 		return
 	}
 
