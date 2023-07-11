@@ -15,7 +15,7 @@ to the frontend / client.
 func PackageErrorEvent(errMsg ErrorMessage) (*Event, error) {
 	errMsgBytes, err := json.Marshal(errMsg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal ErrorMessage: %v", err)
+		return nil, fmt.Errorf("PackageErrorEvent() error - failed to marshal ErrorMessage: %v", err)
 	}
 	return &Event{
 		Type:    "error",
