@@ -10,6 +10,7 @@ import (
 
 /************************** COMMON EVENT STRUCTS **************************/
 type PrivateMsg struct {
+	SessionID  string `json:"sessionID"` // Client / sender's sessionID
 	SenderID   int    `json:"senderID"`
 	ReceiverID int    `json:"receiverID"`
 	Message    string `json:"message"`
@@ -17,6 +18,7 @@ type PrivateMsg struct {
 }
 
 type GroupMsg struct {
+	SessionID  string `json:"sessionID"` // Client / sender's sessionID
 	SenderID   int    `json:"senderID"`
 	ReceiverID int    `json:"receiverID"`
 	Message    string `json:"message"`
@@ -24,22 +26,25 @@ type GroupMsg struct {
 }
 
 type IsTyping struct {
-	ChatType string `json:"chatType"` // "private" or "group"
-	ClientID int    `json:"clientID"` // UserID of the client that is typing
-	TargetID int    `json:"targetID"` // UserID / GroupID to identify chat in which typing is happening
+	SessionID string `json:"sessionID"` // Client / sender's sessionID
+	ChatType  string `json:"chatType"`  // "private" or "group"
+	ClientID  int    `json:"clientID"`  // UserID of the client that is typing
+	TargetID  int    `json:"targetID"`  // UserID / GroupID to identify chat in which typing is happening
 }
 
 /*********************** ONLY FROM FRONTEND EVENT STRUCT ******************/
 
 type ChatHistoryRequest struct {
-	ChatType string `json:"chatType"` // "private" or "group"
-	ClientID int    `json:"clientID"`
-	TargetID int    `json:"targetID"` // UserID or GroupID
+	SessionID string `json:"sessionID"` // Client / sender's sessionID
+	ChatType  string `json:"chatType"`  // "private" or "group"
+	ClientID  int    `json:"clientID"`
+	TargetID  int    `json:"targetID"` // UserID or GroupID
 }
 
 /*********************** ONLY FROM BACKEND EVENT STRUCT ******************/
 
 type ChatHistory struct {
+	// Not including SessionID for now as this is assumed to not be processed by frontend
 	ChatType    string       `json:"chatType"` // "private" or "group"
 	ClientID    int          `json:"clientID"`
 	TargetID    int          `json:"targetID"` // UserID or GroupID

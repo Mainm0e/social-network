@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 	migrate "github.com/rubenv/sql-migrate"
@@ -377,13 +378,20 @@ func FetchData(table string, condition string, args ...any) ([]any, error) {
 	if _, ok := FetchRules[table]; !ok {
 		return nil, fmt.Errorf("unknown table: %s", table)
 	}
+
+	// Prepare the SQL query
 	var query string
 	if condition == "" {
 		query = fmt.Sprintf("SELECT %s FROM %s", FetchRules[table].SelectFields, table)
 	} else {
-		// Prepare the SQL query
-		query = fmt.Sprintf("SELECT %s FROM %s WHERE %s=? ", FetchRules[table].SelectFields, table, condition)
+		// Count the number of placeholders needed
+		placeholders := strings.Count(condition, "?")
+		if placeholders != len(args) {
+			return nil, fmt.Errorf("the number of args does not match the number of placeholders in the condition")
+		}
+		query = fmt.Sprintf("SELECT %s FROM %s WHERE %s", FetchRules[table].SelectFields, table, condition)
 	}
+
 	// Execute the query
 	rows, err := DB.Query(query, args...)
 	if err != nil {

@@ -23,7 +23,7 @@ readComments function read all comments related to a post and return it as a lis
 */
 func readComments(postId int) ([]Comment, error) {
 	// now that we know user has permission to see this post we can fetch comments
-	comments, err := db.FetchData("comments", "postId", postId)
+	comments, err := db.FetchData("comments", "postId = ?", postId)
 	if err != nil {
 		return []Comment{}, errors.New("Error fetching comments" + err.Error())
 	}
@@ -73,7 +73,7 @@ func checkPostPermission(dbPost db.Post, userId int) (bool, error) {
 	switch dbPost.Status {
 	case "semi-private":
 		{
-			semiPrivates, err := db.FetchData("semiPrivate", "postId", dbPost.PostId)
+			semiPrivates, err := db.FetchData("semiPrivate", "postId = ?", dbPost.PostId)
 			if err != nil {
 				return false, errors.New("Error fetching semiPrivate" + err.Error())
 			}
@@ -101,7 +101,7 @@ func checkPostPermission(dbPost db.Post, userId int) (bool, error) {
 		}
 	case "group":
 		{
-			groups, err := db.FetchData("group_memeber", "userId", userId)
+			groups, err := db.FetchData("group_member", "userId = ?", userId)
 			if err != nil {
 				return false, errors.New("Error fetching group" + err.Error())
 			}
@@ -128,7 +128,7 @@ ReadPost function read post from database and check if current user has permissi
 it return post if user has permission, error if error occur or post not found.
 */
 func readPost(postId int, userId int) (Post, error) {
-	dbPosts, err := db.FetchData("posts", "postId", postId)
+	dbPosts, err := db.FetchData("posts", "postId = ?", postId)
 	if err != nil {
 		return Post{}, errors.New("Error fetching post" + err.Error())
 	}
@@ -183,7 +183,7 @@ it return list of posts if found, error if error occur or posts not found.
 */
 func readPosts(currentUserId int, key string, value int, groupFlag bool) ([]Post, error) {
 	var posts []Post
-	dbPosts, err := db.FetchData("posts", key, value)
+	dbPosts, err := db.FetchData("posts", key+" = ?", value)
 	if err != nil {
 		return []Post{}, errors.New("Error fetching posts" + err.Error())
 	}

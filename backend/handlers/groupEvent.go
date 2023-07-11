@@ -23,7 +23,7 @@ func InsertEventOption(eventId int, memberId int, option string) error {
 	return nil
 }
 func ReadEventOptions(eventId int) (map[string][]SmallProfile, error) {
-	options, err := db.FetchData("event_member", "eventId", eventId)
+	options, err := db.FetchData("event_member", "eventId = ?", eventId)
 	if err != nil {
 		return nil, errors.New("Error fetching event options" + err.Error())
 	}
@@ -53,7 +53,7 @@ func ReadEventOptions(eventId int) (map[string][]SmallProfile, error) {
 	return result, nil
 }
 func ReadGroupEvents(groupId int) ([]GroupEvent, error) {
-	events, err := db.FetchData("events", "groupId", groupId)
+	events, err := db.FetchData("events", "groupId = ?", groupId)
 	if err != nil {
 		return nil, errors.New("Error fetching group events" + err.Error())
 	}

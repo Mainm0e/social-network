@@ -10,7 +10,7 @@ import (
 )
 
 func readNotifications(userId int, sessionId string) ([]Notification, error) {
-	notifications, err := db.FetchData("notifications", "receiverId", userId)
+	notifications, err := db.FetchData("notifications", "receiverId = ?", userId)
 	if err != nil {
 		return []Notification{}, errors.New("Error fetching notifications" + err.Error())
 	}
