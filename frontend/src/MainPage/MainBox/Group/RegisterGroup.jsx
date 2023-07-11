@@ -32,7 +32,7 @@ const RegisterGroup = (user) => {
     return (
         <div className="registerGroup">
             <h1>Register Group</h1>
-            <form onSubmit={sendRequest}>
+            <form onSubmit={sendRequest} className='register-box'>
                 <label htmlFor="name">Name</label>
                 <input type="text" name="name" id="name" />
                 <label htmlFor="description">Description</label>
