@@ -192,8 +192,7 @@ func (m *Manager) Run() {
 		// A new client is registering: Store it in the clients map.
 		case client := <-m.Register:
 			log.Println("sockets.Run() - Registering new client")
-			// The true value is just a placeholder, since the map is used as a set.
-			m.Clients.Store(client, true)
+			m.Clients.Store(client.ID, client)
 
 		// A client is unregistering: If it exists in the clients map, remove it.
 		case client := <-m.Unregister:
