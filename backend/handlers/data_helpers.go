@@ -11,9 +11,9 @@ fetchUser get a user from the database using the userId.
 It returns the user and any error encountered during the process.
 */
 func fetchUser(key string, value any) (db.User, error) {
-	users, err := db.FetchData("users", key, value)
+	users, err := db.FetchData("users", key+" = ?", value)
 	if err != nil {
-		return db.User{}, errors.New("Error fetching user data" + err.Error())
+		return db.User{}, errors.New("Error fetching user data: " + err.Error())
 	}
 	if len(users) == 0 {
 		return db.User{}, errors.New("user not found")
@@ -88,7 +88,7 @@ findFollowers and findFollowings function return the list of followers and follo
 if error occur then it return error
 */
 func findFollowers(userId int) ([]int, error) {
-	followers, err := db.FetchData("follow", "followeeId", userId)
+	followers, err := db.FetchData("follow", "followeeId = ?", userId)
 	if len(followers) == 0 {
 		return nil, nil
 	}
@@ -103,8 +103,13 @@ func findFollowers(userId int) ([]int, error) {
 	}
 	return followerIds, nil
 }
+
+/*
+findFollowings() takes a userID integer and returns a slice of integers containing the IDs of the users that the user with the given ID is following.
+It also returns an error value, which is non-nil if an error occurred during the process.
+*/
 func findFollowings(userId int) ([]int, error) {
-	followings, err := db.FetchData("follow", "followerId", userId)
+	followings, err := db.FetchData("follow", "followerId = ?", userId)
 	if len(followings) == 0 {
 		return nil, nil
 	}
@@ -126,7 +131,7 @@ if current user follow requested user then it return 'following' if they already
 if error occur then it return error
 */
 func checkUserRelation(userId int, profileId int) (string, error) {
-	followings, err := db.FetchData("follow", "followerId", userId)
+	followings, err := db.FetchData("follow", "followerId = ?", userId)
 	if err != nil {
 		return "", errors.New("Error fetching follow data" + err.Error())
 	}
@@ -253,7 +258,7 @@ func NonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 		return []Profile{}, errors.New("Error fetching users: " + err.Error())
 	}
 
-	members, err := db.FetchData("group_member", "groupId", groupId)
+	members, err := db.FetchData("group_member", "groupId = ?", groupId)
 	if err != nil {
 		return []Profile{}, errors.New("Error fetching members: " + err.Error())
 	}
@@ -286,7 +291,7 @@ func GetAllGroupMemberIDs(groupId int) ([]int, error) {
 	var userIds []int
 
 	// Fetch all group members from the database
-	dbGroupMembers, err := db.FetchData("group_member", "groupId", groupId)
+	dbGroupMembers, err := db.FetchData("group_member", "groupId = ?", groupId)
 	if err != nil {
 		return userIds, errors.New("Error fetching group members" + err.Error())
 	}

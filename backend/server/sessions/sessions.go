@@ -4,6 +4,7 @@ import (
 	"backend/db"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -20,7 +21,7 @@ returns an error value, which is non-nil if an error occurs during the database 
 func getUserID(email string) (int, error) {
 	var userID int
 
-	user, err := db.FetchData("users", "email", email)
+	user, err := db.FetchData("users", "email = ?", email)
 	userID = user[0].(db.User).UserId
 	if err != nil {
 		return 0, fmt.Errorf("sessions.getUserID() error: %v", err)
@@ -197,6 +198,8 @@ func Login(userName string, admin bool) (string, error) {
 	if err != nil {
 		return "", errors.New("error in sessions.Login(): " + err.Error())
 	}
+	// Log session creation
+	log.Printf("Session created for user \" %s \", with sessionID: %v", userName, sessionID)
 	return sessionID, nil
 }
 

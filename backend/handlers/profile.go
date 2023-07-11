@@ -14,7 +14,7 @@ import (
 Update Follow requests to be accepted when user change their privacy to public
 */
 func UpdateFollowRequests(userId int) error {
-	notifications, err := db.FetchData("notifications", "receiverId", userId)
+	notifications, err := db.FetchData("notifications", "receiverId = ?", userId)
 	if err != nil {
 		return errors.New("Error fetching notifications" + err.Error())
 	}
