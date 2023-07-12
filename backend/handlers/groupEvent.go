@@ -37,7 +37,7 @@ func ReadEventOptions(eventId int) (map[string][]SmallProfile, error) {
 		return nil, errors.New("Error fetching event options" + err.Error())
 	}
 	if len(options) == 0 {
-		return nil, errors.New("no options found")
+		return nil, nil
 	}
 	result := make(map[string][]SmallProfile, len(options))
 	for i, o := range options {
@@ -103,6 +103,48 @@ func CreateEvent(payload json.RawMessage) (Response, error) {
 	}
 	eventEvent := events.Event{
 		Type:    "createEvent",
+		Payload: payload,
+	}
+	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
+}
+func GetGroupEvents(payload json.RawMessage) (Response, error) {
+	var eventRequest Request
+	err := json.Unmarshal(payload, &eventRequest)
+	if err != nil {
+		return Response{}, errors.New("Error unmarshalling event" + err.Error())
+	}
+	groupEvents, err := ReadGroupEvents(eventRequest.GroupId)
+	if err != nil {
+		return Response{}, errors.New("Error reading group events" + err.Error())
+	}
+	payload, err = json.Marshal(map[string][]GroupEvent{"events": groupEvents})
+	if err != nil {
+		return Response{}, errors.New("Error marshalling group events" + err.Error())
+	}
+	eventEvent := events.Event{
+		Type:    "getGroupEvents",
+		Payload: payload,
+	}
+	fmt.Println("eventEvent: ", groupEvents)
+	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
+
+}
+func ParticipateInEvent(payload json.RawMessage) (Response, error) {
+	var participateEvent db.EventMember
+	err := json.Unmarshal(payload, &participateEvent)
+	if err != nil {
+		return Response{}, errors.New("Error unmarshalling event" + err.Error())
+	}
+	err = InsertEventOption(participateEvent.EventId, participateEvent.MemberId, participateEvent.Option)
+	if err != nil {
+		return Response{}, errors.New("Error inserting event option" + err.Error())
+	}
+	payload, err = json.Marshal(map[string]string{"sessionId": participateEvent.SessionId})
+	if err != nil {
+		return Response{}, errors.New("Error marshalling event option" + err.Error())
+	}
+	eventEvent := events.Event{
+		Type:    "participateInEvent",
 		Payload: payload,
 	}
 	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil

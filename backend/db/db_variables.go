@@ -223,7 +223,7 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"events": {
-		SelectFields: "eventId, creatorId, groupId, title, content, creationTime",
+		SelectFields: "eventId, creatorId, groupId, title, content, creationTime, date",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var event Event
 			err := rows.Scan(&event.EventId, &event.CreatorId, &event.GroupId, &event.Title, &event.Content, &event.CreationTime, &event.Date)

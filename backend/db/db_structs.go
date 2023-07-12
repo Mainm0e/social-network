@@ -99,9 +99,10 @@ type Event struct {
 	CreationTime string `json:"creationTime"`
 }
 type EventMember struct {
-	EventId  int    `json:"eventId"`
-	MemberId int    `json:"memberId"`
-	Option   string `json:"option"` // going, not_going
+	SessionId string `json:"sessionId"`
+	EventId   int    `json:"eventId"`
+	MemberId  int    `json:"memberId"`
+	Option    string `json:"option"` // going, not_going
 }
 
 type InsertRule struct {
