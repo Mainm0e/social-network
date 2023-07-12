@@ -4,7 +4,7 @@ import { fetchData } from "../../tools/fetchData";
 import "./Event.css";
 const CreateEvent = ({profileId,groupId}) => {
   // Create Event Form
-
+  //
   const [eventTitle, setEventTitle] = useState("");
     const [eventDescription, setEventDescription] = useState("");
     const [eventDate, setEventDate] = useState("");
