@@ -72,10 +72,6 @@ const CreateEvent = ({profileId,groupId}) => {
               <label htmlFor="eventDate">Event Date</label>
               <input type="date" className="form-control" id="eventDate" onChange={handleEventDate} />
             </div>
-            <div className="form-group">
-              <label htmlFor="eventTime">Event Time</label>
-              <input type="time" className="form-control" id="eventTime" onChange={handleEventTime}/>
-            </div>
           </form>
           <button type="submit" className="btn btn-primary" onClick={handleCreateEvent}>
             Create Event
