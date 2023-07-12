@@ -25,7 +25,9 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"getNonMembers":  GetNonMembers,
 	"createEvent":    CreateEvent,
 	"getGroupEvents": GetGroupEvents,
+	"participate":    ParticipateInEvent,
 	/*"
+
 	"responseEvent":  ResponseEvent,
 	*/
 
@@ -176,8 +178,9 @@ type Group struct {
 }
 
 type GroupEvent struct {
-	SessionId    string                    `json:"sessionId"`
-	Event        db.Event                  `json:"event"`
+	SessionId string   `json:"sessionId"`
+	Event     db.Event `json:"event"`
+
 	Participants map[string][]SmallProfile `json:"participants"`
 }
 

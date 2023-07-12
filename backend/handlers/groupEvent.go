@@ -129,6 +129,26 @@ func GetGroupEvents(payload json.RawMessage) (Response, error) {
 	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
 
 }
+func ParticipateInEvent(payload json.RawMessage) (Response, error) {
+	var participateEvent db.EventMember
+	err := json.Unmarshal(payload, &participateEvent)
+	if err != nil {
+		return Response{}, errors.New("Error unmarshalling event" + err.Error())
+	}
+	err = InsertEventOption(participateEvent.EventId, participateEvent.MemberId, participateEvent.Option)
+	if err != nil {
+		return Response{}, errors.New("Error inserting event option" + err.Error())
+	}
+	payload, err = json.Marshal(map[string]string{"sessionId": participateEvent.SessionId})
+	if err != nil {
+		return Response{}, errors.New("Error marshalling event option" + err.Error())
+	}
+	eventEvent := events.Event{
+		Type:    "participateInEvent",
+		Payload: payload,
+	}
+	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
+}
 
 /*
 TODO:
