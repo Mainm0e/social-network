@@ -23,7 +23,8 @@ func InsertEvent(event db.Event) error {
 }
 
 /*
- */
+InsertEventOption inserts the going/not-going of a group member to an event, into the database and returns an error if it fails
+*/
 func InsertEventOption(eventId int, memberId int, option string) error {
 	_, err := db.InsertData("event_member", eventId, memberId, option)
 	if err != nil {
@@ -31,6 +32,10 @@ func InsertEventOption(eventId int, memberId int, option string) error {
 	}
 	return nil
 }
+
+/*
+ReadEventOptions
+*/
 func ReadEventOptions(eventId int) (map[string][]SmallProfile, error) {
 	options, err := db.FetchData("event_member", "eventId = ?", eventId)
 	if err != nil {
@@ -73,6 +78,11 @@ func ReadGroupEvents(groupId int) ([]GroupEvent, error) {
 	for i, e := range events {
 		if event, ok := e.(db.Event); ok {
 			result[i].Event = event
+			creatorProfile, err := fillSmallProfile(event.CreatorId)
+			if err != nil {
+				return nil, errors.New("Error fetching event creator profile" + err.Error())
+			}
+			result[i].CreatorProfile = creatorProfile
 			users, err := ReadEventOptions(event.EventId)
 			if err != nil {
 				return nil, errors.New("Error fetching event options" + err.Error())
