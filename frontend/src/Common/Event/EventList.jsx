@@ -1,13 +1,13 @@
 import { useEffect } from "react"
 import { fetchData } from "../../tools/fetchData"
-import { getCookie } from "../../tools/cookie"
+import { getCookie, getUserId } from "../../tools/cookie"
 import { useState } from "react"
 
 const EventList = ({ clearBox }) => {
     const url = new URL(window.location.href)
     const searchParams = new URLSearchParams(url.search)
     const id = searchParams.get("id")
-    const [data, setData] = useState()
+    const [event, setEvent] = useState([])
 
 
     useEffect(() => {
@@ -16,53 +16,53 @@ const EventList = ({ clearBox }) => {
         const payload = { sessionId: getCookie("sessionId"), groupId: parseInt(id) }
         fetchData(method, type, payload).then((data) => {
             console.log("EventList",payload)
-            setData(data)
+            setEvent(data)
         }
         )
     }, [id])
-    /* if (data.length === 0) {
-        return (
-            <div className="event-list">
-                <div className="event-list-header">
-                    <h1>Events</h1>
-                </div>
-                <div className="event-list-body">
-                    <div className="event-list-item">
-                        <div className="event-list-item-header">
-                            <h2>No events</h2>
+        const acceptEvent = (event) => {
+            const method = "POST"
+            const type = "participate"
+            const payload = { sessionId: getCookie("sessionId"), eventId: event.id,memberId:getUserId("userId"),option:event }
+            fetchData(method, type, payload).then((data) => {
+                console.log(data)
+            })
+        }
+
+        const renderNotifications = () => {
+            return (
+                <>
+                {event.events.map((event, index) => (
+                    <div className="event-list-item" key={index}>
+                      <div className="event-list-item-header">
+                        <h2>{event.event.title}</h2>
+                      </div>
+                      <div className="event-list-item-body">
+                        <p>{event.event.content}</p>
+                        {/* creater */}
+                        <div className="event-creater">
+                            <p>Created by: {event.creatorProfile.firstName}</p>
                         </div>
-                        <div className="event-list-item-body">
-                            <p>There are no events in this group</p>
+                      </div>
+                      <div className="event-list-item-footer">
+                        <p>{event.event.date}</p>
+                      </div>
+                        <div className="event-list-item-footer">
+                            <button onClick={() => acceptEvent("going")}>Going</button>
+                            <button onClick={() => acceptEvent("not_going")}>Not going</button>
                         </div>
                     </div>
-                </div>
-                <div className="event-list-footer">
-                    <button onClick={clearBox}>Close</button>
-                </div>
-            </div>
-        )
-    } else {
-        console.log(data) */
+                ))}
+                </>
+            )
+        };
     return (
         <div className="event-list">
         <div className="event-list-header">
           <h1>Events</h1>
         </div>
         <div className="event-list-body">
-            {console.log(data,"data")}
-          {data.map((event, index) => (
-            <div className="event-list-item" key={index}>
-              <div className="event-list-item-header">
-                <h2>{event.title}</h2>
-              </div>
-              <div className="event-list-item-body">
-                <p>{event.content}</p>
-              </div>
-              <div className="event-list-item-footer">
-                <p>{event.date}</p>
-              </div>
-            </div>
-          ))}
+            {renderNotifications()}
         </div>
         <div className="event-list-footer">
           <button onClick={clearBox}>Close</button>

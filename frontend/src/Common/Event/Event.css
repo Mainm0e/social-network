@@ -31,3 +31,11 @@
 .container .header .form-group textarea {
     outline: none;
 }
+
+.event-list-item {
+    background: green;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 0 100px;
+}
