@@ -37,7 +37,7 @@ func ReadEventOptions(eventId int) (map[string][]SmallProfile, error) {
 		return nil, errors.New("Error fetching event options" + err.Error())
 	}
 	if len(options) == 0 {
-		return nil, errors.New("no options found")
+		return nil, nil
 	}
 	result := make(map[string][]SmallProfile, len(options))
 	for i, o := range options {
@@ -125,7 +125,9 @@ func GetGroupEvents(payload json.RawMessage) (Response, error) {
 		Type:    "getGroupEvents",
 		Payload: payload,
 	}
+	fmt.Println("eventEvent: ", groupEvents)
 	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
+
 }
 
 /*
