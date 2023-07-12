@@ -2,11 +2,17 @@ package handlers
 
 import (
 	"backend/db"
+	"backend/events"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 )
 
+/*
+InsertEvent inserts an given event into the database and returns an error if it fails
+*/
 func InsertEvent(event db.Event) error {
 	_, err := db.InsertData("events", event.CreatorId, event.GroupId, event.Title, event.Content, time.Now(), event.Date)
 	if err != nil {
@@ -15,6 +21,9 @@ func InsertEvent(event db.Event) error {
 	return nil
 
 }
+
+/*
+ */
 func InsertEventOption(eventId int, memberId int, option string) error {
 	_, err := db.InsertData("event_member", eventId, memberId, option)
 	if err != nil {
@@ -74,6 +83,29 @@ func ReadGroupEvents(groupId int) ([]GroupEvent, error) {
 		}
 	}
 	return result, nil
+}
+func CreateEvent(payload json.RawMessage) (Response, error) {
+	var event GroupEvent
+	var response Response
+	err := json.Unmarshal(payload, &event)
+	if err != nil {
+		return Response{}, errors.New("Error unmarshalling event" + err.Error())
+	}
+	fmt.Println("event: ", event)
+	err = InsertEvent(event.Event)
+	if err != nil {
+		return Response{}, errors.New("Error inserting event" + err.Error())
+	}
+	payload, err = json.Marshal(map[string]string{"sessionId": event.SessionId})
+	if err != nil {
+		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+		return response, err
+	}
+	eventEvent := events.Event{
+		Type:    "createEvent",
+		Payload: payload,
+	}
+	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
 }
 
 /*

@@ -22,23 +22,28 @@ const CreateEvent = ({profileId,groupId}) => {
     const handleEventTime = (e) => {
         setEventTime(e.target.value);
     };
-
+    console.log("groupId",groupId);
     const handleCreateEvent = (e) => {
         e.preventDefault();
         const method = "POST";
         const type = "createEvent";
+         
         const payload = {
             sessionId: getCookie("sessionId"),
-            userId: getUserId("userId"),
-            eventTitle: eventTitle,
-            eventDescription: eventDescription,
-            eventDate: eventDate,
-            eventTime: eventTime,
+            event:{
+            creatorId: getUserId("userId"),
+            groupId: parseInt(groupId),
+            title: eventTitle,
+            content: eventDescription,
+            date: eventDate,
+            },
+
         };
         console.log("test case",type,"payload",payload);
-     /*    fetchData(method, type, payload).then((data) => {
-            window.location.reload();
-        }); */
+      fetchData(method, type, payload).then((data) => {
+            console.log("data", data);
+            //window.location.reload();
+        }); 
     };
 
   return (
