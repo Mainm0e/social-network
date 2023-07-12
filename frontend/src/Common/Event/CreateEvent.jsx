@@ -8,7 +8,6 @@ const CreateEvent = ({profileId,groupId}) => {
   const [eventTitle, setEventTitle] = useState("");
     const [eventDescription, setEventDescription] = useState("");
     const [eventDate, setEventDate] = useState("");
-    const [eventTime, setEventTime] = useState("");
 
     const handleEventTitle = (e) => {
         setEventTitle(e.target.value);
@@ -19,9 +18,7 @@ const CreateEvent = ({profileId,groupId}) => {
     const handleEventDate = (e) => {
         setEventDate(e.target.value);
     };
-    const handleEventTime = (e) => {
-        setEventTime(e.target.value);
-    };
+
 
     const handleCreateEvent = (e) => {
         e.preventDefault();
@@ -33,7 +30,6 @@ const CreateEvent = ({profileId,groupId}) => {
             eventTitle: eventTitle,
             eventDescription: eventDescription,
             eventDate: eventDate,
-            eventTime: eventTime,
         };
         console.log("test case",type,"payload",payload);
      /*    fetchData(method, type, payload).then((data) => {

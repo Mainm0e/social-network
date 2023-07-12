@@ -25,10 +25,8 @@
 }
 
 .group-header {
+    margin-top: 100px;
     background: red;
-}
-
-.group-header {
     background-color: #f2f2f2;
     padding: 10px;
     border: 1px solid #ccc;
