@@ -107,6 +107,26 @@ func CreateEvent(payload json.RawMessage) (Response, error) {
 	}
 	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
 }
+func GetGroupEvents(payload json.RawMessage) (Response, error) {
+	var eventRequest Request
+	err := json.Unmarshal(payload, &eventRequest)
+	if err != nil {
+		return Response{}, errors.New("Error unmarshalling event" + err.Error())
+	}
+	groupEvents, err := ReadGroupEvents(eventRequest.GroupId)
+	if err != nil {
+		return Response{}, errors.New("Error reading group events" + err.Error())
+	}
+	payload, err = json.Marshal(map[string][]GroupEvent{"events": groupEvents})
+	if err != nil {
+		return Response{}, errors.New("Error marshalling group events" + err.Error())
+	}
+	eventEvent := events.Event{
+		Type:    "getGroupEvents",
+		Payload: payload,
+	}
+	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
+}
 
 /*
 TODO:

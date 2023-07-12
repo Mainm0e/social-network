@@ -24,7 +24,8 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"exploreGroups":  ExploreGroups,
 	"getNonMembers":  GetNonMembers,
 	"createEvent":    CreateEvent,
-	/*"getGroupEvents": GetGroupEvents,
+	"getGroupEvents": GetGroupEvents,
+	/*"
 	"responseEvent":  ResponseEvent,
 	*/
 
