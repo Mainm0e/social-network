@@ -17,10 +17,11 @@ const EventList = ({ clearBox }) => {
       groupId: parseInt(id),
     };
     fetchData(method, type, payload).then((data) => {
-      setData(data.events);
+      if (data !== undefined) setData(data.events
+        );
     });
-    console.log("aösldkfjasödlkfjaösldkfj",data);
   }, [id]);
+
   const acceptEvent = (event,option) => {
     const method = "POST";
     const type = "participate";
@@ -32,13 +33,12 @@ const EventList = ({ clearBox }) => {
       option: option,
     };
     fetchData(method, type, payload).then((data) => {
-       console.log("data", payload); 
-      console.log(data);
+      if (data !== []) setData(data.events
+      );
     });
   };
 
   const renderNotifications = () => {
-    console.log("data", data);
     return (
       <>
         {data.map((event, index) => (
@@ -66,21 +66,7 @@ const EventList = ({ clearBox }) => {
       </>
     ); 
   };
-  if (data !== undefined) {
-  return (
-    <div className="event-list">
-      <div className="event-list-header">
-        <h1>Events</h1>
-      </div>
-      <div className="event-list-body">
-       {renderNotifications()}  
-      </div>
-      <div className="event-list-footer">
-        <button onClick={clearBox}>Close</button>
-      </div>
-    </div>
-  );
-  } else if (data === []){
+ if (data === []){
     return (
       <div className="event-list">
         <div className="event-list-header">
@@ -94,7 +80,21 @@ const EventList = ({ clearBox }) => {
         </div>
       </div>
     );
-  }
+  } else   if (data !== undefined) {
+    return (
+      <div className="event-list">
+        <div className="event-list-header">
+          <h1>Events</h1>
+        </div>
+        <div className="event-list-body">
+         {renderNotifications()}  
+        </div>
+        <div className="event-list-footer">
+          <button onClick={clearBox}>Close</button>
+        </div>
+      </div>
+    );
+    }
 };
 
 export default EventList;
