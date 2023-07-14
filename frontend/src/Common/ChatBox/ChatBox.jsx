@@ -23,9 +23,13 @@ const ChatBox = () => {
       );
     };
   
-    const handleUserSelection = (selectedUser) => {
+    const handleUserSelection = (selectedUser,type) => {
       setRoom(null);
-      setRoom(selectedUser);
+      const payload = {
+        type: type,
+        selectedUser: selectedUser,
+      };
+      setRoom(payload);
     };
   
     const handleCloseChatRoom = (isClosed) => {
@@ -38,7 +42,7 @@ const ChatBox = () => {
       <>
         <div className="chat-container">
           {room && (
-            <ChatRoom receiver={room} onClose={handleCloseChatRoom} />
+            <ChatRoom receiver={room.selectedUser} type={room.type} onClose={handleCloseChatRoom} />
           )}
           {chat_list ? (
             <>

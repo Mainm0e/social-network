@@ -6,13 +6,18 @@ import { getCookie, getUserId } from "../../../tools/cookie";
 
 const ChatRoom = (props) => {
   const sender = getUserId("userId");
-  const { receiver, onClose } = props;
+  const { receiver, type ,onClose } = props;
   const [isClosed, setIsClosed] = useState(false);
   const socket = useContext(WebSocketContext);
   const [messageInput, setMessageInput] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [newChatContent , setNewChatContent] = useState(null); // store new chat content from server
+  // for chat history
+  const [targetID, setTargetID] = useState(receiver.userId);
 
+  // for sending message
+  const [chatType, setChatType] = useState("privateMsg");
+  
 
  // todo: add functionality when user is typing
  // todo: add functionality when user is sending message successfully sroll to bottom
@@ -21,9 +26,9 @@ const ChatRoom = (props) => {
   const getChatContent = () => {
     const payload = {
       sessionID: getCookie("sessionId"),
-      chatType: "private",
+      chatType: type,
       clientID: getUserId("userId"),
-      targetID: receiver.userId,
+      targetID: targetID,
     };
     const chatHistoryRequest = {
       type: "chatHistoryRequest",
@@ -34,9 +39,24 @@ const ChatRoom = (props) => {
 
   // get chat content from server
   useEffect(() => {
-    getChatContent();
+    console.log("type", type);
+  
+    const updateChatSettings = async () => {
+      if (type === "group") {
+        setTargetID(receiver.groupId);
+        // for sending message
+        setChatType("groupMsg");
+      }
+    };
+  
+    const getChatContentAsync = async () => {
+      await updateChatSettings();
+      getChatContent();
+    };
+  
+    getChatContentAsync();
   }, [receiver]);
-
+  
   const chatContent = chatHistory.map((message,index) => {
     const isSender = message.senderId === sender;
     const isReceiver = message.receiverId === sender;
@@ -82,16 +102,16 @@ const ChatRoom = (props) => {
       const message = {
         sessionID: getCookie("sessionId"),
         senderID: getUserId("userId"),
-        receiverID: parseInt(receiver.userId),
+        receiverID: parseInt(targetID),
         message: messageInput,
         timeStamp: "",
       };
       setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
-      const privateMessageEvent = {
-        type: "privateMsg",
+      const messageEvent = {
+        type: chatType,
         payload: message,
       };
-      socket.send(JSON.stringify(privateMessageEvent)); // Send the message as a string
+      socket.send(JSON.stringify(messageEvent)); // Send the message as a string
       setMessageInput(""); // Clear the input field
 
 
@@ -121,7 +141,6 @@ const ChatRoom = (props) => {
     } else if (message.type === "PrivateMsg") {
       // ! SAME HERE
       // ! struct message that i got from server is different from getChatHistory 
-      console.log("onmessage", message)
       const newMessage = {
         senderId: message.payload.senderID,
         receiverId: message.payload.receiverID,
