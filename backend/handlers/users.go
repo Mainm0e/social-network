@@ -3,7 +3,6 @@ package handlers
 import (
 	"backend/events"
 	"encoding/json"
-	"log"
 	"net/http"
 )
 
@@ -46,7 +45,6 @@ func GetNonMembers(payload json.RawMessage) (Response, error) {
 	var response Response
 	var nonMembers NonMembers
 	err := json.Unmarshal(payload, &nonMembers)
-	log.Println("User: ", nonMembers)
 	if err != nil {
 		// handle the error
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}

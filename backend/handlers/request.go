@@ -152,15 +152,27 @@ func insertGroupRequest(senderId int, groupId int) error {
 }
 
 /*
-TODO: this function is not used yet , IN PROGRESS
-
-group invitation && group request to join
+insertGroupInvitation is a function to manage a click on the "invite" button in a group page.
+If the user is already invited to the group by same sender, the function does nothing. If the user is not invited to the group,
+the function inserts a request in the "notifications" table and a row in the "group_members" table with the status "waiting" for the receiver.
+Returns nil on success; otherwise, returns an error with a descriptive message.
 */
 func insertGroupInvitation(senderId int, groupId int, receiverId int) error {
-	_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", time.Now())
+	// checking if the receiver is already invited to the group by the specific sender
+	notif, err := db.FetchData("notifications", "receiverId = ? AND senderId = ? AND groupId = ?", receiverId, senderId, groupId)
+	if err != nil {
+		return errors.New("Error fetching notifications" + err.Error())
+	}
+	// if the receiver is already invited to the group by the specific sender we return nil and do nothing
+	if len(notif) != 0 {
+		return nil
+	}
+	// insert group invitation in notifications table
+	_, err = db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", time.Now())
 	if err != nil {
 		return errors.New("Error inserting group invitation" + err.Error())
 	}
+	// insert receiverId in group_members table with status "waiting"
 	db.InsertData("group_member", receiverId, groupId, "waiting")
 	if err != nil {
 		return errors.New("Error inserting group invitation" + err.Error())
