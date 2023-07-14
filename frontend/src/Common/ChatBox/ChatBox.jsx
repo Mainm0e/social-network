@@ -4,33 +4,6 @@ import ChatList from './ChatList/ChatList';
 import ChatRoom from './ChatRoom/ChatRoom';
 const ChatBox = () => {
 
-/*   //start socket connection
-  useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080.ws');
-
-    // Connection opened
-    socket.addEventListener('open', (event) => {
-      console.log('WebSocket connected');
-    });
-
-    // Listen for messages
-    socket.addEventListener('message', (event) => {
-      console.log('Received message:', event.data);
-    });
-
-    // Connection closed
-    socket.addEventListener('close', (event) => {
-      console.log('WebSocket disconnected');
-    });
-
-    // Clean up the WebSocket connection on component unmount
-    return () => {
-      socket.close();
-    };
-  }, []); // Empty dependency array to run the effect only once
- */
-  
-
     const [chat_list, setChatlist] = useState(false);
     const [room, setRoom] = useState(null);
   
@@ -51,6 +24,7 @@ const ChatBox = () => {
     };
   
     const handleUserSelection = (selectedUser) => {
+      setRoom(null);
       setRoom(selectedUser);
     };
   

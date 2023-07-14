@@ -4,11 +4,10 @@ import { fetchData } from "../../tools/fetchData";
 import "./Event.css";
 const CreateEvent = ({profileId,groupId}) => {
   // Create Event Form
-
+  //
   const [eventTitle, setEventTitle] = useState("");
     const [eventDescription, setEventDescription] = useState("");
     const [eventDate, setEventDate] = useState("");
-    const [eventTime, setEventTime] = useState("");
 
     const handleEventTitle = (e) => {
         setEventTitle(e.target.value);
@@ -19,10 +18,8 @@ const CreateEvent = ({profileId,groupId}) => {
     const handleEventDate = (e) => {
         setEventDate(e.target.value);
     };
-    const handleEventTime = (e) => {
-        setEventTime(e.target.value);
-    };
-    console.log("groupId",groupId);
+
+
     const handleCreateEvent = (e) => {
         e.preventDefault();
         const method = "POST";
@@ -39,7 +36,7 @@ const CreateEvent = ({profileId,groupId}) => {
             },
 
         };
-        console.log("test case",type,"payload",payload);
+
       fetchData(method, type, payload).then((data) => {
             console.log("data", data);
             //window.location.reload();
@@ -74,10 +71,6 @@ const CreateEvent = ({profileId,groupId}) => {
             <div className="form-group">
               <label htmlFor="eventDate">Event Date</label>
               <input type="date" className="form-control" id="eventDate" onChange={handleEventDate} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="eventTime">Event Time</label>
-              <input type="time" className="form-control" id="eventTime" onChange={handleEventTime}/>
             </div>
           </form>
           <button type="submit" className="btn btn-primary" onClick={handleCreateEvent}>

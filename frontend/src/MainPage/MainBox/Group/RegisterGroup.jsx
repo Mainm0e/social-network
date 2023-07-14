@@ -24,7 +24,9 @@ const RegisterGroup = (user) => {
             description: e.target.description.value,
             date:null
         };
-       fetchData(method, type, payload).then((data) => console.log(data));
+       fetchData(method, type, payload).then((data) => {
+                window.location.href = "/group";
+       });
     }
 
     /* registerGroup form */
