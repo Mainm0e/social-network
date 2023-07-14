@@ -20,10 +20,11 @@ const ChatRoom = (props) => {
   
 
  // todo: add functionality when user is typing
- // todo: add functionality when user is sending message successfully sroll to bottom
- // todo: notication when user is offline
 
-  const getChatContent = () => {
+ // !! how to get chat history from server is confusing right now  in GroupChat 
+
+
+const getChatContent = () => {
     const payload = {
       sessionID: getCookie("sessionId"),
       chatType: type,
