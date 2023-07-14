@@ -112,17 +112,32 @@
     margin: 0;
 }
 
-.explore_list_item_right_bottom button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
+.explore_list_item_follow_btn button {
+    width: 100%;
+    background-color: #ddd;
+    color: black;
     border-radius: 4px;
     cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
 }
 
-.explore_list_item_right_bottom button:hover {
-    background-color: #0056b3;
+.explore_list_item_follow_btn button:hover {
+    background-color: #ccc;
+}
+
+.explore_list_item_go_to_page button {
+    width: 100%;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
+}
+
+.explore_list_item_go_to_page button:hover {
+    background-color: #ccc;
 }
 
 @media screen and (max-width:1400px) {

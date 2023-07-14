@@ -39,7 +39,7 @@ const RegisterGroup = (user) => {
                 <input type="text" name="name" id="name" />
                 <label htmlFor="description">Description</label>
                 <textarea name="description" id="description" />
-                <input type="submit" value="Register" />
+                <input  className="submit-register" type="submit" value="Register" />
             </form>
         </div>
     );

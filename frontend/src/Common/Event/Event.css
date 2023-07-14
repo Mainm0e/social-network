@@ -1,27 +1,49 @@
 .container {
-    background: red;
+    display: flex;
+    background: #FFEA00;
     padding: 10px;
     border-radius: 10px;
+    border: 4px solid black;
+    width: 100%;
+    justify-content: center;
+}
+
+.container .row {
     display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .container .header {
+    display: flex;
     font-family: myFancyFont;
-    background: pink;
     font-size: 24px;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.container .header h1 {
+    margin: 0;
 }
 
 .container .header .form-group {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: yellow;
 }
 
 
 /* style input box */
 
 .container .header .form-group input {
+    font-family: myFancyFont;
+    width: 300px;
+    height: 30px;
+    padding: 5px;
+    border: 4px solid black;
+    border-radius: 10px;
     outline: none;
 }
 
@@ -29,7 +51,27 @@
 /* style text area */
 
 .container .header .form-group textarea {
+    font-family: myFancyFont;
+    width: 300px;
+    height: 100px;
+    padding: 5px;
+    border: 4px solid black;
+    border-radius: 10px;
     outline: none;
+}
+
+.container .header .submit-event {
+    width: 100%;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 18px;
+}
+
+.container .header .submit-event:hover {
+    background-color: #ccc;
 }
 
 .event-list-item {
