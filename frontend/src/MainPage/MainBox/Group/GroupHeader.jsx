@@ -1,3 +1,4 @@
+import cleanTimestamp from "../../../tools/cleanTimestamp";
 const GroupHeader = ({ group, handleRefresh }) => {
 
   const test = () => {
@@ -37,7 +38,7 @@ const GroupHeader = ({ group, handleRefresh }) => {
       </div>
       <div className="group-header-date">
         <label htmlFor="group-date">Date:</label>
-        <span id="group-date">{group.date}</span>
+        <span id="group-date">{cleanTimestamp(group.date)}</span>
       </div>
     </div>
   );

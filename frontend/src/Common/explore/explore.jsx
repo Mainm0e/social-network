@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getCookie,getUserId } from "../../tools/cookie";
 import { fetchData } from "../../tools/fetchData";
+import cleanTimestamp from "../../tools/cleanTimestamp";
 import "./explore.css"
 ;
 
@@ -54,9 +55,8 @@ const Explore = ({type}) => {
                             </div>
                         </div>
                         <div className="explore_list_item_create_time">
-                            <p>{group.date}</p>
+                            <p>{cleanTimestamp(group.date)}</p>
                         </div>
-                        // TODO: add a button to follow the group
                         {group.status !== "member" ? 
                         <div className="explore_list_item_follow_btn">
                         <button onClick={() => followRequest(group.groupId)}>{group.status}</button>

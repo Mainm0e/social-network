@@ -5,6 +5,7 @@ import { getCookie, getUserId } from "../../tools/cookie";
 import { checkPostData } from "../../tools/checkdata";
 import { fetchData } from "../../tools/fetchData";
 import CreateEvent from "../Event/CreateEvent";
+import cleanTimestamp from "../../tools/cleanTimestamp";
 
 const PostList = ({ profileId, groupId, from }) => {
   const [postData, setPostData] = useState(null);
@@ -35,7 +36,7 @@ const PostList = ({ profileId, groupId, from }) => {
           title={post.title}
           content={post.content}
           image={post.image}
-          time={post.date}
+          time={cleanTimestamp(post.date)}
           user={post.creatorProfile}
           comments={post.comments}
         />
@@ -250,7 +251,6 @@ const FollowerList = ({ users, followers, handleFollowerChange }) => {
 
 // !! Main Component !!
 const PostBox = ({ id, from }) => {
-  console.log("PostBox", id, from);
   const [body, setBody] = useState("");
   useEffect(() => {
     const handleHashChange = () => {
