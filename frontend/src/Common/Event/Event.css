@@ -1,0 +1,41 @@
+.container {
+    background: red;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+}
+
+.container .header {
+    font-family: myFancyFont;
+    background: pink;
+    font-size: 24px;
+}
+
+.container .header .form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: yellow;
+}
+
+
+/* style input box */
+
+.container .header .form-group input {
+    outline: none;
+}
+
+
+/* style text area */
+
+.container .header .form-group textarea {
+    outline: none;
+}
+
+.event-list-item {
+    background: green;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 0 100px;
+}

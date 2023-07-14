@@ -3,6 +3,7 @@ import "./RightBox.css";
 import UserList from "../../Common/UserList/UserList";
 import Notification from "../../Common/Notification/Notification";
 import Invite from "../../Common/Invite/Invite";
+import EventList from "../../Common/Event/EventList"; 
 
 const RightBox = () => {
   const [box, setBox] = useState(null);
@@ -30,6 +31,9 @@ const RightBox = () => {
           setBox(<Notification clearBox={clearBox} />);
         } else if (hash === "invite_to_group") {
           setBox(<Invite clearBox={clearBox} />);
+        } else if (hash === "eventlist") {
+          setBox(<EventList clearBox={clearBox} />);
+
         } else {
           setBox(null);
         }

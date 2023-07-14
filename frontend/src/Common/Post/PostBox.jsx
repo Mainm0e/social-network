@@ -4,6 +4,7 @@ import "./Post.css";
 import { getCookie, getUserId } from "../../tools/cookie";
 import { checkPostData } from "../../tools/checkdata";
 import { fetchData } from "../../tools/fetchData";
+import CreateEvent from "../Event/CreateEvent";
 
 const PostList = ({ profileId, groupId, from }) => {
   const [postData, setPostData] = useState(null);
@@ -22,7 +23,7 @@ const PostList = ({ profileId, groupId, from }) => {
     fetchData(method, type, payload).then((responseData) => {
       setPostData(responseData);
     });
-  }, []);
+  }, [profileId,groupId,from]);
 
   const createPost = () => {
     if (postData !== null) {
@@ -49,7 +50,6 @@ const PostList = ({ profileId, groupId, from }) => {
   }
 };
 const Post = ({ id, title, content, image, time, user, comments }) => {
-  const postId = id;
 
   const checkImage = () => {
     if (image === "" || image === null || image === undefined) {
@@ -252,7 +252,6 @@ const FollowerList = ({ users, followers, handleFollowerChange }) => {
 const PostBox = ({ id, from }) => {
   console.log("PostBox", id, from);
   const [body, setBody] = useState("");
-  const [data, setData] = useState(null);
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1);
@@ -276,13 +275,12 @@ const PostBox = ({ id, from }) => {
     let groupId = 0;
     const url = new URL(window.location.href);
     const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
-    if (url.pathname ==="/user") {
-      groupId = 0
-    } else if (url.pathname ==="/group") {
+    const id = urlParams.get("id");
+    if (url.pathname === "/user") {
+      groupId = 0;
+    } else if (url.pathname === "/group") {
       groupId = parseInt(id);
     }
-
 
     const check = checkPostData(postData);
     if (check.status === true) {
@@ -326,6 +324,15 @@ const PostBox = ({ id, from }) => {
             profileId={from === "profile" ? id : 0}
             groupId={from === "group" ? id : 0}
             from={from}
+          />
+        </section>
+      )}
+
+      {body === "createevent" && (
+        <section id="createevent">
+          <CreateEvent
+            profileId={from === "profile" ? id : 0}
+            groupId={from === "group" ? id : 0}
           />
         </section>
       )}

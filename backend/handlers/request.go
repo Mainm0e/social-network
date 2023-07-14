@@ -228,7 +228,7 @@ DeleteRequest function delete the follow/join-group request from notification ta
 if error occur then it return error
 */
 
-func deleteRequest(tableName string, senderId int, receiverId int, notifId int, response string) error {
+func deleteRequest(tableName string, userId int, receiverId int, notifId int, response string) error {
 	err := db.DeleteData("notifications", notifId)
 	if err != nil {
 		return errors.New("Error deleting request" + err.Error())
@@ -240,12 +240,12 @@ func deleteRequest(tableName string, senderId int, receiverId int, notifId int, 
 		} else {
 			status = "member"
 		}
-		err = db.UpdateData(tableName, status, senderId, receiverId)
+		err = db.UpdateData(tableName, status, userId, receiverId)
 		if err != nil {
 			return errors.New("Error updating request" + err.Error())
 		}
 	} else if response == "reject" {
-		err = db.DeleteData(tableName, senderId, receiverId)
+		err = db.DeleteData(tableName, userId, receiverId)
 		if err != nil {
 			return errors.New("Error deleting  request" + err.Error())
 		}
@@ -279,10 +279,19 @@ func FollowOrJoinResponse(payload json.RawMessage) (Response, error) {
 			return response, err
 		}
 	} else if follow.GroupId != 0 {
-		err = deleteRequest("group_member", follow.ReceiverId, follow.GroupId, follow.NotifId, follow.Content)
-		if err != nil {
-			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-			return response, err
+
+		if follow.ReceiverId != 0 {
+			err = deleteRequest("group_member", follow.ReceiverId, follow.GroupId, follow.NotifId, follow.Content)
+			if err != nil {
+				response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+				return response, err
+			}
+		} else if follow.SenderId != 0 {
+			err = deleteRequest("group_member", follow.SenderId, follow.GroupId, follow.NotifId, follow.Content)
+			if err != nil {
+				response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
+				return response, err
+			}
 		}
 	}
 	payload, err = json.Marshal(map[string]string{"sessionId": follow.SessionId})
