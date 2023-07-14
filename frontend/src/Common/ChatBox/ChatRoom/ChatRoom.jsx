@@ -119,9 +119,9 @@ const ChatRoom = (props) => {
     if (message.type === "chatHistory") {
       setChatHistory(message.payload.chatHistory);
     } else if (message.type === "PrivateMsg") {
-
       // ! SAME HERE
       // ! struct message that i got from server is different from getChatHistory 
+      console.log("onmessage", message)
       const newMessage = {
         senderId: message.payload.senderID,
         receiverId: message.payload.receiverID,
