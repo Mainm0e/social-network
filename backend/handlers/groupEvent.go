@@ -32,7 +32,6 @@ func CreateEvent(payload json.RawMessage) (Response, error) {
 	if err != nil {
 		return Response{}, errors.New("Error unmarshalling event" + err.Error())
 	}
-	fmt.Println("event: ", event)
 	err = InsertEvent(event.Event)
 	if err != nil {
 		return Response{}, errors.New("Error inserting event" + err.Error())
@@ -140,7 +139,6 @@ func GetGroupEvents(payload json.RawMessage) (Response, error) {
 		Type:    "getGroupEvents",
 		Payload: payload,
 	}
-	fmt.Println("eventEvent: ", groupEvents)
 	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
 
 }
@@ -149,7 +147,12 @@ func GetGroupEvents(payload json.RawMessage) (Response, error) {
 InsertEventOption inserts the going/not-going of a group member to an event, into the database and returns an error if it fails
 */
 func InsertEventOption(eventId int, memberId int, option string) error {
-	_, err := db.InsertData("event_member", eventId, memberId, option)
+	// try to update the option if it already exists
+	err := db.UpdateData("event_member", option, eventId, memberId)
+	if err == nil {
+		return nil
+	}
+	_, err = db.InsertData("event_member", eventId, memberId, option)
 	if err != nil {
 		return errors.New("Error inserting event option" + err.Error())
 	}
