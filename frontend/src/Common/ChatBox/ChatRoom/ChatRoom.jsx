@@ -13,6 +13,7 @@ const ChatRoom = (props) => {
   const [chatHistory, setChatHistory] = useState([]);
   const [newChatContent , setNewChatContent] = useState(null); // store new chat content from server
 
+
  // todo: add functionality when user is typing
  // todo: add functionality when user is sending message successfully sroll to bottom
  // todo: notication when user is offline
@@ -34,7 +35,7 @@ const ChatRoom = (props) => {
   // get chat content from server
   useEffect(() => {
     getChatContent();
-  }, []);
+  }, [receiver]);
 
   const chatContent = chatHistory.map((message,index) => {
     const isSender = message.senderId === sender;
@@ -93,10 +94,10 @@ const ChatRoom = (props) => {
       socket.send(JSON.stringify(privateMessageEvent)); // Send the message as a string
       setMessageInput(""); // Clear the input field
 
-      // todo: scroll to bottom when user send message
-      // ? why is not work 
+
+      // scroll to bottom when user send message
       setTimeout(() => {
-        const chatMessages = document.getElementById("chat-messages");
+        const chatMessages = document.getElementById("chat-container");
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }, 100);
     
@@ -104,15 +105,15 @@ const ChatRoom = (props) => {
   };
   
 
-
+ 
   const handleUserClick = () => {
     setIsClosed(true);
     onClose(true); // Pass the boolean value back to the parent component
   };
 
-  if (isClosed) {
-    return null; // Return null if the ChatRoom is closed
-  }
+  // onmessage event listener
+  // for catching event from server
+
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
     if (message.type === "chatHistory") {
@@ -134,7 +135,9 @@ const ChatRoom = (props) => {
     }
   };
   
-
+  if (isClosed) {
+    return null; // Return null if the ChatRoom is closed
+  }
   return (
     <div className="chat-room">
       <div className="top-bar">
@@ -147,7 +150,7 @@ const ChatRoom = (props) => {
         </span>
       </div>
       <div className="chat-room-content">
-      <div id="chat-messages" className="chat-messages">{chatContent}</div>
+      <div id="chat-container" className="chat-messages">{chatContent}</div>
       </div>
       <div className="chat-room-input">
         <input

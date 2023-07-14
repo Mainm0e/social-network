@@ -82,15 +82,17 @@
     margin-bottom: 10px;
 }
 
+.chat-room .chat-messages {
+    max-height: 300px;
+    overflow-y: auto
+}
+
 .chat-room .chat-message {
     padding: 10px;
     border-radius: 5px;
     background-color: #e1f5fe;
     color: #000;
     margin: 0 10px;
-    max-height: 400px;
-    /* Set the desired maximum height */
-    overflow-y: auto
 }
 
 .chat-room .sender-message .chat-message {
