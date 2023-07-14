@@ -89,7 +89,7 @@ which contain the event, the profile of the creator of the event, the participan
 using the ReadEventOptions function and the fillSmallProfile function,
 and returns the slice and an error if it fails
 */
-func ReadGroupEvents(groupId int) ([]GroupEvent, error) {
+func ReadGroupEvents(groupId int, userId int) ([]GroupEvent, error) {
 	events, err := db.FetchData("events", "groupId = ?", groupId)
 	if err != nil {
 		return nil, errors.New("Error fetching group events" + err.Error())
@@ -111,6 +111,22 @@ func ReadGroupEvents(groupId int) ([]GroupEvent, error) {
 				return nil, errors.New("Error fetching event options" + err.Error())
 			}
 			result[i].Participants = users
+			// check this user's option
+			// TODO i don't think this is the best way to do this
+			for _, u := range users["going"] {
+				if u.UserId == userId {
+					result[i].Status = "going"
+					break
+				}
+			}
+			if result[i].Status == "" {
+				for _, u := range users["not_going"] {
+					if u.UserId == userId {
+						result[i].Status = "not_going"
+						break
+					}
+				}
+			}
 		} else {
 			return nil, fmt.Errorf("invalid event type at index %d", i)
 		}
@@ -123,11 +139,12 @@ TODO GetGroupEvents commenttts
 */
 func GetGroupEvents(payload json.RawMessage) (Response, error) {
 	var eventRequest Request
+
 	err := json.Unmarshal(payload, &eventRequest)
 	if err != nil {
 		return Response{}, errors.New("Error unmarshalling event" + err.Error())
 	}
-	groupEvents, err := ReadGroupEvents(eventRequest.GroupId)
+	groupEvents, err := ReadGroupEvents(eventRequest.GroupId, eventRequest.SenderId)
 	if err != nil {
 		return Response{}, errors.New("Error reading group events" + err.Error())
 	}

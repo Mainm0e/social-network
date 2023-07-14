@@ -178,6 +178,7 @@ type GroupEvent struct {
 	SessionId      string                    `json:"sessionId"`
 	CreatorProfile SmallProfile              `json:"creatorProfile"`
 	Event          db.Event                  `json:"event"`
+	Status         string                    `json:"status"` // going,not_going
 	Participants   map[string][]SmallProfile `json:"participants"`
 }
 
