@@ -13,6 +13,10 @@ const ChatRoom = (props) => {
   const [chatHistory, setChatHistory] = useState([]);
   const [newChatContent , setNewChatContent] = useState(null); // store new chat content from server
 
+ // todo: add functionality when user is typing
+ // todo: add functionality when user is sending message successfully sroll to bottom
+ // todo: notication when user is offline
+
   const getChatContent = () => {
     const payload = {
       sessionID: getCookie("sessionId"),
@@ -32,7 +36,7 @@ const ChatRoom = (props) => {
     getChatContent();
   }, []);
 
-  const chatContent = chatHistory.map((message) => {
+  const chatContent = chatHistory.map((message,index) => {
     const isSender = message.senderId === sender;
     const isReceiver = message.receiverId === sender;
     if (!isSender && !isReceiver) {
@@ -43,7 +47,7 @@ const ChatRoom = (props) => {
         className={`${
           isSender ? "sender" : isReceiver ? "receiver" : ""
         }-message`}
-        key={message.id}
+        key={index}
       >
         <div className="chat-message">{message.messageContent}</div>
       </div>
@@ -67,6 +71,13 @@ const ChatRoom = (props) => {
   // send message to server when user press enter
   const sendMessage = () => {
     if (messageInput.trim() !== "") {
+      // ! struct message that need to send to server is different from message that need to display on client
+      // ! that why we have message and newMessage
+      const newMessage = {
+        senderId: getUserId("userId"),
+        receiverId: receiver.id,
+        messageContent: messageInput,
+      };
       const message = {
         sessionID: getCookie("sessionId"),
         senderID: getUserId("userId"),
@@ -74,15 +85,24 @@ const ChatRoom = (props) => {
         message: messageInput,
         timeStamp: "",
       };
+      setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
       const privateMessageEvent = {
         type: "privateMsg",
         payload: message,
       };
-
       socket.send(JSON.stringify(privateMessageEvent)); // Send the message as a string
       setMessageInput(""); // Clear the input field
+
+      // todo: scroll to bottom when user send message
+      // ? why is not work 
+      setTimeout(() => {
+        const chatMessages = document.getElementById("chat-messages");
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 100);
+    
     }
   };
+  
 
 
   const handleUserClick = () => {
@@ -97,19 +117,23 @@ const ChatRoom = (props) => {
     const message = JSON.parse(event.data);
     if (message.type === "chatHistory") {
       setChatHistory(message.payload.chatHistory);
-    }
-    if (message.type === "PrivateMsg") {
-     const newMessage = addNewMessage("receiver",message.payload);
-     
+    } else if (message.type === "PrivateMsg") {
 
+      // ! SAME HERE
+      // ! struct message that i got from server is different from getChatHistory 
+      const newMessage = {
+        senderId: message.payload.senderID,
+        receiverId: message.payload.receiverID,
+        messageContent: message.payload.message,
+        sendTime: message.payload.timeStamp,
+      };
 
-      document.getElementsByClassName("chat-messages")[0].scrollTop =
-      document.getElementsByClassName("chat-messages")[0].scrollHeight;
-    } else if (message.type !== "chatHistory") {
+      setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+    } else {
       console.log("message", message);
     }
   };
-
+  
 
   return (
     <div className="chat-room">
@@ -123,10 +147,7 @@ const ChatRoom = (props) => {
         </span>
       </div>
       <div className="chat-room-content">
-        <div className="chat-messages">
-          {chatContent}
-
-          </div>
+      <div id="chat-messages" className="chat-messages">{chatContent}</div>
       </div>
       <div className="chat-room-input">
         <input
@@ -146,11 +167,3 @@ const ChatRoom = (props) => {
 };
 
 export default ChatRoom;
-
-const addNewMessage = (who,message) => {
-    return (
-      <div className={who+"-message"}>
-        <div className="chat-message">{message.messageContent}</div>
-      </div>
-    );
-}
