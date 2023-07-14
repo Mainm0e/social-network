@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCookie,getUserId } from "../../tools/cookie";
 import { fetchData } from "../../tools/fetchData";
-import cleanTimestamp from "../../tools/cleanTimestamp";
 import "./explore.css"
 ;
 
@@ -55,7 +54,7 @@ const Explore = ({type}) => {
                             </div>
                         </div>
                         <div className="explore_list_item_create_time">
-                            <p>{cleanTimestamp(group.date)}</p>
+                            <p>{group.date}</p>
                         </div>
                         {group.status !== "member" ? 
                         <div className="explore_list_item_follow_btn">

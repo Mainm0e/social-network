@@ -17,6 +17,7 @@ const EventList = ({ clearBox }) => {
       groupId: parseInt(id),
     };
     fetchData(method, type, payload).then((data) => {
+      console.log("data",data)
       if (data !== undefined) setData(data.events
         );
     });
@@ -56,6 +57,11 @@ const EventList = ({ clearBox }) => {
               <p>{event.event.date}</p>
             </div>
             <div className="event-list-item-footer">
+              {event.participate === "going" ? (
+                  <p>Going</p>
+                ) : (
+                  <p>Not going</p>
+                )}
               <button onClick={() => acceptEvent(event.event,"going")}>Going</button>
               <button onClick={() => acceptEvent(event.event,"not_going")}>
                 Not going

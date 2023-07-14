@@ -3,7 +3,7 @@ import { getCookie, getUserId } from "../../tools/cookie";
 import "./CommentBox.css";
 import { checkCommentData } from "../../tools/checkdata";
 import { fetchData } from "../../tools/fetchData";
-import cleanTimestamp from "../../tools/cleanTimestamp";
+
 const CommentBox = ({ id, comments, activePost }) => {
   // return createcomment and commentlist button and default commentlist
   const [boxState, setBoxState] = useState(null);
@@ -172,7 +172,7 @@ const CommentList = ({ comments }) => {
         </div>
         <div className="comment_list_item_header_left">
           <div className="comment_list_item_header_info">
-            <p>{cleanTimestamp(comment.Date)}</p>
+            <p>{comment.Date}</p>
           </div>
         </div>
         {checkImage(comment.image)}

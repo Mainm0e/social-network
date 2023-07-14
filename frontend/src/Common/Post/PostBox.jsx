@@ -5,7 +5,6 @@ import { getCookie, getUserId } from "../../tools/cookie";
 import { checkPostData } from "../../tools/checkdata";
 import { fetchData } from "../../tools/fetchData";
 import CreateEvent from "../Event/CreateEvent";
-import cleanTimestamp from "../../tools/cleanTimestamp";
 
 const PostList = ({ profileId, groupId, from }) => {
   const [postData, setPostData] = useState(null);
@@ -36,7 +35,7 @@ const PostList = ({ profileId, groupId, from }) => {
           title={post.title}
           content={post.content}
           image={post.image}
-          time={cleanTimestamp(post.date)}
+          time={post.date}
           user={post.creatorProfile}
           comments={post.comments}
         />

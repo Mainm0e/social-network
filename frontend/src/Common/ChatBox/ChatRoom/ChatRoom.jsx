@@ -23,7 +23,7 @@ const ChatRoom = (props) => {
       sessionID: getCookie("sessionId"),
       chatType: "private",
       clientID: getUserId("userId"),
-      targetID: receiver.id,
+      targetID: receiver.userId,
     };
     const chatHistoryRequest = {
       type: "chatHistoryRequest",
@@ -60,7 +60,7 @@ const ChatRoom = (props) => {
     if (receiver.status === "online") {
       const message = {
         sender: getUserId("userId"),
-        receiver: parseInt(receiver.id),
+        receiver: parseInt(receiver.userId),
         message: "typing",
       };
       /* socket.send(JSON.stringify(message)); // Send the message as a string */
@@ -76,13 +76,13 @@ const ChatRoom = (props) => {
       // ! that why we have message and newMessage
       const newMessage = {
         senderId: getUserId("userId"),
-        receiverId: receiver.id,
+        receiverId: parseInt(receiver.userId),
         messageContent: messageInput,
       };
       const message = {
         sessionID: getCookie("sessionId"),
         senderID: getUserId("userId"),
-        receiverID: parseInt(receiver.id),
+        receiverID: parseInt(receiver.userId),
         message: messageInput,
         timeStamp: "",
       };
@@ -142,9 +142,9 @@ const ChatRoom = (props) => {
     <div className="chat-room">
       <div className="top-bar">
         <div className="chat-room-avatar">
-          <img src={receiver.avatar} alt={receiver.name} />
+          <img src={receiver.avatar} alt={receiver.firstName} />
         </div>
-        <div className="chat-room-name">{receiver.name}</div>
+        <div className="chat-room-name">{receiver.firstName}</div>
         <span className="close-button" onClick={handleUserClick}>
           close
         </span>
