@@ -1,9 +1,13 @@
+import { useEffect } from "react";
 
 const GroupHeader = ({ group, handleRefresh }) => {
-
+  
   const test = () => {
     console.log("test", group);
   };
+  useEffect(() => {
+    test();
+  }, [group]);
 
   return (
     <div className="group-header">
