@@ -101,7 +101,6 @@ func CreateEvent(payload json.RawMessage) (Response, error) {
 	if err != nil {
 		return Response{}, errors.New("Error unmarshalling event" + err.Error())
 	}
-	fmt.Println("event: ", event)
 	err = InsertEvent(event.Event)
 	if err != nil {
 		return Response{}, errors.New("Error inserting event" + err.Error())
@@ -135,7 +134,6 @@ func GetGroupEvents(payload json.RawMessage) (Response, error) {
 		Type:    "getGroupEvents",
 		Payload: payload,
 	}
-	fmt.Println("eventEvent: ", groupEvents)
 	return Response{"users retrieved successfully!", eventEvent, http.StatusOK}, nil
 
 }
