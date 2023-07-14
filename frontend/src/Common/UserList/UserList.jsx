@@ -23,7 +23,7 @@ const UserList = ({ title, id, clearBox }) => {
       userId: id,
       request: title,
     };
-    console.log(payload);
+    console.log("idont no",payload);
     fetchData(method, type, payload).then((data) => {
       setData(data);
     });
