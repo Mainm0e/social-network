@@ -81,3 +81,8 @@
     margin-bottom: 10px;
     padding: 0 100px;
 }
+
+.highlight {
+    background-color: yellow;
+    /* Add any other styling you want for the highlighted button */
+}
