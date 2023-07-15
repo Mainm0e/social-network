@@ -125,24 +125,18 @@ func insertGroupRequest(senderId int, groupId int) error {
 		}
 	case "pending":
 		//delete group request from notifications table
-		Notifications, err := db.FetchData("notifications", "groupId = ?", groupId)
+		notifications, err := db.FetchData("notifications", "groupId = ? AND senderId = ? AND type = ?", groupId, senderId, "group_request")
 		if err != nil {
 			return errors.New("Error fetching notifications" + err.Error())
 		}
-		for _, n := range Notifications {
-			if notification, ok := n.(db.Notification); ok {
-				if notification.SenderId == senderId && notification.Type == "group_request" {
-					err = db.DeleteData("notifications", notification.NotificationId)
-					if err != nil {
-						return errors.New("Error deleting notification" + err.Error())
-					}
-					err = db.DeleteData("group_member", groupId, senderId)
-					if err != nil {
-						return errors.New("Error deleting group member" + err.Error())
-					}
-					break
-				}
-			}
+		err = db.DeleteData("notifications", notifications[0].(db.Notification).NotificationId)
+		if err != nil {
+			return errors.New("Error deleting notification" + err.Error())
+		}
+		//delete user from group_members table
+		err = db.DeleteData("group_member", groupId, senderId)
+		if err != nil {
+			return errors.New("Error deleting group member" + err.Error())
 		}
 	case "waiting":
 		fmt.Println("waiting")

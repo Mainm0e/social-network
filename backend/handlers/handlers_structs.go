@@ -53,6 +53,11 @@ type ProfileRequest struct {
 	UserId    int    `json:"userId"`
 	ProfileId int    `json:"profileId"`
 }
+type RequestPost struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	PostId    int    `json:"postId"`
+}
 type RegisterData struct {
 	NickName  string `json:"nickName,omitempty"` // optional
 	FirstName string `json:"firstName"`
@@ -83,12 +88,6 @@ type Profile struct {
 	FollowerNum  int            `json:"followerNum"`
 	FollowingNum int            `json:"followingNum"`
 	PrivateData  PrivateProfile `json:"privateProfile"`
-}
-
-type PrivacyData struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-	Privacy   string `json:"privacy"`
 }
 
 type PrivateProfile struct {
@@ -123,12 +122,6 @@ type Post struct {
 	GroupId        int          `json:"groupId"` // ---> if post is a group post
 	Comments       []Comment    `json:"comments"`
 	Date           string       `json:"date"`
-}
-
-type RequestPost struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-	PostId    int    `json:"postId"`
 }
 
 type ReqAllPosts struct {
