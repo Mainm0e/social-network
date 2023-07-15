@@ -8,23 +8,23 @@ import (
 
 func ExploreUsers(payload json.RawMessage) (Response, error) {
 	var response Response
-	var explore Explore
-	err := json.Unmarshal(payload, &explore)
+	var credential UserCredential
+	err := json.Unmarshal(payload, &credential)
 	if err != nil {
 		// handle the error
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if explore.SessionId == "" {
+	if credential.SessionId == "" {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if explore.UserId == 0 {
+	if credential.UserId == 0 {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 	//get users from database
-	users, err := ReadAllUsers(explore.UserId, explore.SessionId)
+	users, err := ReadAllUsers(credential.UserId, credential.SessionId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err

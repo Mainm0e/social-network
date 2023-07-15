@@ -95,8 +95,8 @@ type PrivateProfile struct {
 	BirthDate string `json:"birthdate"`
 	Email     string `json:"email"`
 	AboutMe   string `json:"aboutme"`
-	Followers []int  `json:"followers"` // become array of uuid
-	Following []int  `json:"following"` // become array of uuid
+	Followers []int  `json:"followers"`
+	Following []int  `json:"following"`
 }
 
 type Comment struct {
@@ -117,8 +117,8 @@ type Post struct {
 	CreatorProfile SmallProfile `json:"creatorProfile"`
 	Title          string       `json:"title"`
 	Content        string       `json:"content"`
-	Status         string       `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
-	Followers      []int        `json:"followers"` //---> this one related to status
+	Status         string       `json:"status"`    //---> if the post is "public", "private" or "semi-private"s.
+	Followers      []int        `json:"followers"` //---> selected followers list, if its semi-private.
 	Image          string       `json:"image,omitempty"`
 	GroupId        int          `json:"groupId"` // ---> if post is a group post
 	Comments       []Comment    `json:"comments"`
@@ -139,10 +139,6 @@ type ReqAllPosts struct {
 	GroupId   int    `json:"groupId"`
 }
 
-type Explore struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-}
 type Request struct {
 	SessionId  string `json:"sessionId"`
 	SenderId   int    `json:"senderId"`
