@@ -63,6 +63,7 @@
 }
 
 .chat-room .chat-room-input input {
+    /* d */
     flex-grow: 1;
     /* Take up remaining horizontal space */
     padding: 5px;

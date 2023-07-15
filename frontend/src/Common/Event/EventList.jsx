@@ -14,6 +14,7 @@ const EventList = ({ clearBox }) => {
     const type = "getGroupEvents";
     const payload = {
       sessionId: getCookie("sessionId"),
+      senderId : getUserId("userId"),
       groupId: parseInt(id),
     };
     fetchData(method, type, payload).then((data) => {
