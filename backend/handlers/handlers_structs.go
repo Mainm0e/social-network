@@ -9,7 +9,7 @@ import (
 var Events = map[string]func(json.RawMessage) (Response, error){
 	"login":          LoginPage,
 	"register":       RegisterPage,
-	"logout":         LogoutPage,
+	"logout":         Logout,
 	"profile":        ProfilePage,
 	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
@@ -26,17 +26,6 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"createEvent":    CreateEvent,
 	"getGroupEvents": GetGroupEvents,
 	"participate":    ParticipateInEvent,
-	/*"
-
-	"responseEvent":  ResponseEvent,
-	*/
-
-	/*
-		TODO: im not saying that we should have these functions but we need the functionality of these functions:
-		"getGroupEvents":     GetGroupEvents,
-		"responseEvent":      ResponseEvent,
-	*/
-
 }
 
 type Response struct {
@@ -48,7 +37,7 @@ type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
-type LoginResponse struct {
+type UserCredential struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 }
