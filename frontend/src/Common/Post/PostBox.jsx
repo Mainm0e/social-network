@@ -27,7 +27,6 @@ const PostList = ({ profileId, groupId, from }) => {
 
   const createPost = () => {
     if (postData !== null) {
-      console.log("in createPost", postData.length);
       return postData.map((post) => (
         <Post
           key={post.postId}
