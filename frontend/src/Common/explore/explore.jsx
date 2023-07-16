@@ -11,14 +11,13 @@ const Explore = ({type}) => {
         const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId")}
         fetchData(method,type,payload).then((data)=>{
             setData(data)
-            console.log("is data ins explore",data)
         })
         }, []);  
         const followRequest = async (id) => {
         const method = "POST"
         const type = "followRequest"
         const payload ={ sessionId: getCookie("sessionId"), senderId: getUserId("userId"), groupId:id}
-        fetchData(method,type,payload).then((data) => {console.log(data)})
+        fetchData(method,type,payload).then((data) => {})
         /* refect */
         window.location.reload();
       };
