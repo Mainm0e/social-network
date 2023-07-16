@@ -229,7 +229,6 @@ func FollowOrJoinRequest(payload json.RawMessage) (Response, error) {
 }
 
 /*
-TODO: Not Used for group invitation yet
 DeleteRequest function delete the follow/join-group request from notification table and update the follow/group_member table base on user decision
 if error occur then it return error
 */
@@ -260,7 +259,6 @@ func deleteRequest(tableName string, userId int, receiverId int, notifId int, re
 }
 
 /*
-TODO: Not Used for group response yet
 FollowResponse is a function that processes a response to follow request/following notification by unmarshaling the payload,
 validating the required fields, and calling deleteFollowRequest function to handle response and delete the notification.
 It returns a response with success/failure status and an event containing sessionId.
