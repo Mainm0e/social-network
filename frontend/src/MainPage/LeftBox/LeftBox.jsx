@@ -20,7 +20,6 @@ const LeftBox = ({user,link}) => {
           sessionId: getCookie("sessionId"),
         };
         fetchData(method, type, payload).then((data) => {
-          console.log(data.length);
           setNotification(data.length);
         });
         }, []);

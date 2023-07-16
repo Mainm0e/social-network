@@ -14,15 +14,17 @@ const EventList = ({ clearBox }) => {
     const type = "getGroupEvents";
     const payload = {
       sessionId: getCookie("sessionId"),
+      senderId: getUserId("userId"),
       groupId: parseInt(id),
     };
     fetchData(method, type, payload).then((data) => {
-      if (data !== undefined) setData(data.events
-        );
+      console.log("data", data);
+      if (data !== undefined) setData(data.events);
     });
   }, [id]);
 
-  const acceptEvent = (event,option) => {
+  const acceptEvent = (event, option, status) => {
+    if (status!==option) {
     const method = "POST";
     const type = "participate";
     const payload = {
@@ -33,9 +35,50 @@ const EventList = ({ clearBox }) => {
       option: option,
     };
     fetchData(method, type, payload).then((data) => {
-      if (data !== []) setData(data.events
-      );
+      if (data !== []) setData(data.events);
     });
+    closeBox();
+  }
+  };
+  const getGoingAndNotGoing = (event) => {
+    if (event.participants !== null) {
+     if (event.participants.going !== undefined && event.participants.not_going !== undefined) {
+      return (
+        <div className="event-list-item-footer">
+          <p>Not going: {event.participants.not_going.length}</p>
+          <p>Going: {event.participants.going.length}</p>
+        </div>
+      );
+    } else if (event.participants.going !== undefined) {  
+      return (
+        <div className="event-list-item-footer">
+          <p>Not going: 0</p>
+          <p>Going: {event.participants.going.length}</p>
+        </div>
+      );
+    } else if (event.participants.not_going !== undefined) {
+      return (
+        <div className="event-list-item-footer">
+          <p>Not going: {event.participants.not_going.length}</p>
+          <p>Going: 0</p>
+        </div>
+      );
+    } else {
+      return (
+        <div className="event-list-item-footer">
+          <p>Not going: 0</p>
+          <p>Going: 0</p>
+        </div>
+      );
+    }
+  } else {
+    return (
+      <div className="event-list-item-footer">
+        <p>Not going: 0</p>
+        <p>Going: 0</p>
+      </div>
+    );
+  };
   };
 
   const renderNotifications = () => {
@@ -44,7 +87,7 @@ const EventList = ({ clearBox }) => {
         {data.map((event, index) => (
           <div className="event-list-item" key={index}>
             <div className="event-list-item-header">
-              <h2>{event.event.title}</h2>
+              <h1>{event.event.title}</h1>
             </div>
             <div className="event-list-item-body">
               <p>{event.event.content}</p>
@@ -53,20 +96,33 @@ const EventList = ({ clearBox }) => {
               </div>
             </div>
             <div className="event-list-item-footer">
-              <p>{event.event.date}</p>
+              <p>date :{event.event.date}</p>
+             {getGoingAndNotGoing(event)}
             </div>
             <div className="event-list-item-footer">
-              <button onClick={() => acceptEvent(event.event,"going")}>Going</button>
-              <button onClick={() => acceptEvent(event.event,"not_going")}>
+              <button
+                className={event.status === "not_going" ? "highlight" : "default"}
+                onClick={() => acceptEvent(event.event, "not_going",event.status)}
+              >
                 Not going
+              </button>
+              <button
+                className={event.status === "going" ? "highlight" : "default"}
+                onClick={() => acceptEvent(event.event, "going",event.status)}
+              >
+                Going
               </button>
             </div>
           </div>
         ))}
       </>
-    ); 
+    );
   };
- if (data === []){
+  const closeBox = () => {
+    window.location.hash = "";
+    clearBox();
+  };
+  if (data === []) {
     return (
       <div className="event-list">
         <div className="event-list-header">
@@ -76,25 +132,23 @@ const EventList = ({ clearBox }) => {
           <p>No events</p>
         </div>
         <div className="event-list-footer">
-          <button onClick={clearBox}>Close</button>
+          <button onClick={closeBox}>Close</button>
         </div>
       </div>
     );
-  } else   if (data !== undefined) {
+  } else if (data !== undefined) {
     return (
       <div className="event-list">
         <div className="event-list-header">
           <h1>Events</h1>
         </div>
-        <div className="event-list-body">
-         {renderNotifications()}  
-        </div>
+        <div className="event-list-body">{renderNotifications()}</div>
         <div className="event-list-footer">
-          <button onClick={clearBox}>Close</button>
+          <button onClick={closeBox}>Close</button>
         </div>
       </div>
     );
-    }
+  }
 };
 
 export default EventList;

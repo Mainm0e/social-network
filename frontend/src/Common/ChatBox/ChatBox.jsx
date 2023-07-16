@@ -6,7 +6,6 @@ const ChatBox = () => {
 
     const [chat_list, setChatlist] = useState(false);
     const [room, setRoom] = useState(null);
-  
     const openChatList = () => {
       setChatlist(true);
     };
@@ -23,9 +22,14 @@ const ChatBox = () => {
       );
     };
   
-    const handleUserSelection = (selectedUser) => {
+    const handleUserSelection = (selectedUser,type,id) => {
       setRoom(null);
-      setRoom(selectedUser);
+      const payload = {
+        type: type,
+        selectedUser: selectedUser,
+        id: id,
+      };
+      setRoom(payload);
     };
   
     const handleCloseChatRoom = (isClosed) => {
@@ -33,12 +37,12 @@ const ChatBox = () => {
         setRoom(null);
       }
     };
-  
+    
     return (
       <>
         <div className="chat-container">
           {room && (
-            <ChatRoom receiver={room} onClose={handleCloseChatRoom} />
+            <ChatRoom receiver={room.selectedUser} type={room.type} id={room.id} onClose={handleCloseChatRoom} />
           )}
           {chat_list ? (
             <>

@@ -6,25 +6,33 @@ import { getCookie, getUserId } from "../../../tools/cookie";
 
 const ChatRoom = (props) => {
   const sender = getUserId("userId");
-  const { receiver, onClose } = props;
+  const { receiver,type, id ,onClose } = props;
   const [isClosed, setIsClosed] = useState(false);
   const socket = useContext(WebSocketContext);
   const [messageInput, setMessageInput] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [newChatContent , setNewChatContent] = useState(null); // store new chat content from server
+  // for chat history
 
+  // for sending message
+  const [chatType, setChatType] = useState("privateMsg");
+  
 
  // todo: add functionality when user is typing
- // todo: add functionality when user is sending message successfully sroll to bottom
- // todo: notication when user is offline
 
-  const getChatContent = () => {
+ // !! how to get chat history from server is confusing right now  in GroupChat 
+
+
+const getChatContent = () => {
     const payload = {
       sessionID: getCookie("sessionId"),
-      chatType: "private",
+      chatType: type,
       clientID: getUserId("userId"),
-      targetID: receiver.id,
+      targetID: receiver.userId,
     };
+    if (type === "group") {
+      payload.targetID = id;
+    }
     const chatHistoryRequest = {
       type: "chatHistoryRequest",
       payload: payload,
@@ -34,10 +42,33 @@ const ChatRoom = (props) => {
 
   // get chat content from server
   useEffect(() => {
-    getChatContent();
+    console.log(receiver,"chat")
+    const updateChatSettings = async () => {
+      if (type === "group") {
+        // for sending message
+        setChatType("groupMsg");
+      }
+    };
+  
+    const getChatContentAsync = async () => {
+      await updateChatSettings();
+      getChatContent();
+    };
+  
+    getChatContentAsync();
   }, [receiver]);
-
+  
+  const getSenderName = (senderId) => {
+    if (type === "group"){
+      for (let i = 0; i < receiver.members.length; i++) {
+        if (receiver.members[i].userId === senderId) {
+          return receiver.members[i].firstName;
+        }
+      }
+    }
+  }
   const chatContent = chatHistory.map((message,index) => {
+   if (type === "private") {
     const isSender = message.senderId === sender;
     const isReceiver = message.receiverId === sender;
     if (!isSender && !isReceiver) {
@@ -53,18 +84,41 @@ const ChatRoom = (props) => {
         <div className="chat-message">{message.messageContent}</div>
       </div>
     );
-  });
+  } else if (type === "group") {
+    const isSender = message.senderId === sender;
+    const otherMember = message.senderId !== sender;
+    if (!isSender && !otherMember) {
+      return null;
+    }
+    return (
+      <div
+        className={`${
+          isSender ? "sender" : otherMember ? "receiver" : ""
+        }-message`}
+        key={index}
+      >
+      <div className="chat-message">
+        {message.messageContent}
+        {otherMember && 
+      <div className="chat-message-sender">
+        {getSenderName(message.senderId)}
+      </div>
+      }
+      </div>
+      </div>
+    );
+  }
+});
 
   // send typing event to server when user is typing
   const typingMessage = (e) => {
     if (receiver.status === "online") {
       const message = {
         sender: getUserId("userId"),
-        receiver: parseInt(receiver.id),
+        receiver: parseInt(receiver.userId),
         message: "typing",
       };
       /* socket.send(JSON.stringify(message)); // Send the message as a string */
-      /*   console.log("Message sent: ", message); */
     }
     setMessageInput(e);
   };
@@ -76,22 +130,22 @@ const ChatRoom = (props) => {
       // ! that why we have message and newMessage
       const newMessage = {
         senderId: getUserId("userId"),
-        receiverId: receiver.id,
+        receiverId: parseInt(receiver.userId),
         messageContent: messageInput,
       };
       const message = {
         sessionID: getCookie("sessionId"),
         senderID: getUserId("userId"),
-        receiverID: parseInt(receiver.id),
+        receiverID: id,
         message: messageInput,
         timeStamp: "",
       };
       setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
-      const privateMessageEvent = {
-        type: "privateMsg",
+      const messageEvent = {
+        type: chatType,
         payload: message,
       };
-      socket.send(JSON.stringify(privateMessageEvent)); // Send the message as a string
+      socket.send(JSON.stringify(messageEvent)); // Send the message as a string
       setMessageInput(""); // Clear the input field
 
 
@@ -119,7 +173,6 @@ const ChatRoom = (props) => {
     if (message.type === "chatHistory") {
       setChatHistory(message.payload.chatHistory);
     } else if (message.type === "PrivateMsg") {
-
       // ! SAME HERE
       // ! struct message that i got from server is different from getChatHistory 
       const newMessage = {
@@ -142,9 +195,16 @@ const ChatRoom = (props) => {
     <div className="chat-room">
       <div className="top-bar">
         <div className="chat-room-avatar">
-          <img src={receiver.avatar} alt={receiver.name} />
+          {type === "private" && (
+            <img src={receiver.avatar} alt={receiver.firstName} />
+          )  
+          }
+          {type === "group" && (
+            <p>{receiver.title}</p>
+          )
+          }
         </div>
-        <div className="chat-room-name">{receiver.name}</div>
+        <div className="chat-room-name">{receiver.firstName}</div>
         <span className="close-button" onClick={handleUserClick}>
           close
         </span>

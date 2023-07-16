@@ -20,3 +20,6 @@ export const link_followers = () => {
 export const link_notifications = () => {
     window.location.href = "#notifications";
   }
+  export const link_eventlist = () => {
+    window.location.href = "#eventlist";
+  }

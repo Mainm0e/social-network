@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCookie,getUserId } from "../../tools/cookie";
 import { fetchData } from "../../tools/fetchData";
-import cleanTimestamp from "../../tools/cleanTimestamp";
 import "./explore.css"
 ;
 
@@ -12,15 +11,15 @@ const Explore = ({type}) => {
         const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId")}
         fetchData(method,type,payload).then((data)=>{
             setData(data)
-            console.log("is data ins explore",data)
         })
         }, []);  
         const followRequest = async (id) => {
         const method = "POST"
         const type = "followRequest"
         const payload ={ sessionId: getCookie("sessionId"), senderId: getUserId("userId"), groupId:id}
-        fetchData(method,type,payload).then((data) => {console.log(data)})
-       /*  navigateToProfile(type,id) */
+        fetchData(method,type,payload).then((data) => {})
+        /* refect */
+        window.location.reload();
       };
         
         const generateExploreList = () => {
@@ -55,7 +54,7 @@ const Explore = ({type}) => {
                             </div>
                         </div>
                         <div className="explore_list_item_create_time">
-                            <p>{cleanTimestamp(group.date)}</p>
+                            <p>{group.date}</p>
                         </div>
                         {group.status !== "member" ? 
                         <div className="explore_list_item_follow_btn">

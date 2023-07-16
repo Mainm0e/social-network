@@ -1,4 +1,4 @@
-function cleanTimestamp(timestamp) {
+function ct(timestamp) {
     const dateObj = new Date(timestamp);
     const year = dateObj.getFullYear();
     const month = String(dateObj.getMonth() + 1).padStart(2, "0");
@@ -6,4 +6,4 @@ function cleanTimestamp(timestamp) {
     
     return `${year}-${month}-${day}`;
   }
-  export default cleanTimestamp;
+  export default ct;

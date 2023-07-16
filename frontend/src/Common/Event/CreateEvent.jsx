@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { getCookie, getUserId } from "../../tools/cookie";
 import { fetchData } from "../../tools/fetchData";
 import "./Event.css";
+import { link_eventlist } from "../../tools/link";
 const CreateEvent = ({profileId,groupId}) => {
   // Create Event Form
   //
@@ -39,6 +40,7 @@ const CreateEvent = ({profileId,groupId}) => {
 
       fetchData(method, type, payload).then((data) => {
             console.log("data", data);
+            link_eventlist();
             //window.location.reload();
         }); 
     };
@@ -50,7 +52,7 @@ const CreateEvent = ({profileId,groupId}) => {
           <h1>Create Event</h1>
           <form>
             <div className="form-group">
-              <label htmlFor="eventTitle">Event Title</label>
+              <label htmlFor="eventTitle">Title</label>
               <input
                 type="text"
                 className="form-control"
@@ -60,7 +62,7 @@ const CreateEvent = ({profileId,groupId}) => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="eventDescription">Event Description</label>
+              <label htmlFor="eventDescription">Description</label>
               <textarea
                 className="form-control"
                 id="eventDescription"
@@ -69,11 +71,11 @@ const CreateEvent = ({profileId,groupId}) => {
               ></textarea>
             </div>
             <div className="form-group">
-              <label htmlFor="eventDate">Event Date</label>
+              <label htmlFor="eventDate">Date</label>
               <input type="date" className="form-control" id="eventDate" onChange={handleEventDate} />
             </div>
           </form>
-          <button type="submit" className="btn btn-primary" onClick={handleCreateEvent}>
+          <button type="submit" className="submit-event" onClick={handleCreateEvent}>
             Create Event
           </button>
         </div>

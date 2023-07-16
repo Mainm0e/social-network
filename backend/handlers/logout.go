@@ -15,7 +15,6 @@ func LogoutPage(payload json.RawMessage) (Response, error) {
 		// handle the error
 		log.Println("Error unmarshaling JSON to LogoutData:", err)
 	}
-	log.Println("Logout try by:", logoutData)
 	err = sessions.Logout(logoutData.SessionId)
 	if err != nil {
 		response := Response{err.Error(), events.Event{}, http.StatusBadRequest}

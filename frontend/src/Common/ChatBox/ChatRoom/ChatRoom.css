@@ -63,6 +63,7 @@
 }
 
 .chat-room .chat-room-input input {
+    /* d */
     flex-grow: 1;
     /* Take up remaining horizontal space */
     padding: 5px;
@@ -88,11 +89,13 @@
 }
 
 .chat-room .chat-message {
+    display: flex;
     padding: 10px;
     border-radius: 5px;
     background-color: #e1f5fe;
     color: #000;
     margin: 0 10px;
+    flex-direction: column;
 }
 
 .chat-room .sender-message .chat-message {
@@ -101,4 +104,15 @@
 
 .chat-room .receiver-message .chat-message {
     background-color: #e1f5fe;
+}
+
+
+/* for group message */
+
+.chat-room .chat-message-sender {
+    font-size: 10px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: flex-end;
+    color: #87c6fa;
 }
