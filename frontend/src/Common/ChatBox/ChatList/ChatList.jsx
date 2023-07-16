@@ -5,9 +5,9 @@ import { getCookie, getUserId } from "../../../tools/cookie";
 import { fetchData } from "../../../tools/fetchData";
 import { useState } from "react";
 const ChatList = ({ onUserSelection }) => {
-  const handleUserClick = (selectedUser,type) => {
+  const handleUserClick = (selectedUser,type,id) => {
     // Pass the selected user data to the parent component
-    onUserSelection(selectedUser,type);
+    onUserSelection(selectedUser,type,id);
   };
   const [contactList, setContactList] = useState([]);
   const [memberlist, setMemberlist] = useState(null);
@@ -35,8 +35,6 @@ const ChatList = ({ onUserSelection }) => {
       fetchData(method, type, payload).then((data) => {
         for (let i = 0; i < data.length; i++) {
           if (data[i].groupId === parseInt(state)) {
-            console.log(data[i].members, "fine memberlist");
-            console.log(data[i], "fine group")
             setGroup(data[i]);
             setMemberlist(data[i].members);
           }
@@ -50,10 +48,10 @@ const ChatList = ({ onUserSelection }) => {
     <div className="chat-list">
       {memberlist !== null ? (
         <div className="chat-list-item"
-        onClick={() => handleUserClick(group,"group")}>
+        onClick={() => handleUserClick(group,"group",parseInt(state))}>
             <div className="chat-list-item-content">
             <div className="chat-list-item-content-name">
-              {group.title}
+              <p>Group Chat</p>              
               </div>
           </div>
         </div> 
@@ -63,7 +61,7 @@ const ChatList = ({ onUserSelection }) => {
         <div
           className="chat-list-item"
           key={user.userId}
-          onClick={() => handleUserClick(user, "private")}
+          onClick={() => handleUserClick(user, "private",0)}
         >
           <div className="chat-list-item-avatar">
             <img src={user.avatar} alt={user.firstName} />
