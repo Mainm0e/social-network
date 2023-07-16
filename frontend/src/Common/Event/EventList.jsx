@@ -23,7 +23,8 @@ const EventList = ({ clearBox }) => {
     });
   }, [id]);
 
-  const acceptEvent = (event, option) => {
+  const acceptEvent = (event, option, status) => {
+    if (status!==option) {
     const method = "POST";
     const type = "participate";
     const payload = {
@@ -36,6 +37,48 @@ const EventList = ({ clearBox }) => {
     fetchData(method, type, payload).then((data) => {
       if (data !== []) setData(data.events);
     });
+    closeBox();
+  }
+  };
+  const getGoingAndNotGoing = (event) => {
+    if (event.participants !== null) {
+     if (event.participants.going !== undefined && event.participants.not_going !== undefined) {
+      return (
+        <div className="event-list-item-footer">
+          <p>Not going: {event.participants.not_going.length}</p>
+          <p>Going: {event.participants.going.length}</p>
+        </div>
+      );
+    } else if (event.participants.going !== undefined) {  
+      return (
+        <div className="event-list-item-footer">
+          <p>Not going: 0</p>
+          <p>Going: {event.participants.going.length}</p>
+        </div>
+      );
+    } else if (event.participants.not_going !== undefined) {
+      return (
+        <div className="event-list-item-footer">
+          <p>Not going: {event.participants.not_going.length}</p>
+          <p>Going: 0</p>
+        </div>
+      );
+    } else {
+      return (
+        <div className="event-list-item-footer">
+          <p>Not going: 0</p>
+          <p>Going: 0</p>
+        </div>
+      );
+    }
+  } else {
+    return (
+      <div className="event-list-item-footer">
+        <p>Not going: 0</p>
+        <p>Going: 0</p>
+      </div>
+    );
+  };
   };
 
   const renderNotifications = () => {
@@ -44,7 +87,7 @@ const EventList = ({ clearBox }) => {
         {data.map((event, index) => (
           <div className="event-list-item" key={index}>
             <div className="event-list-item-header">
-              <h2>{event.event.title}</h2>
+              <h1>{event.event.title}</h1>
             </div>
             <div className="event-list-item-body">
               <p>{event.event.content}</p>
@@ -53,27 +96,31 @@ const EventList = ({ clearBox }) => {
               </div>
             </div>
             <div className="event-list-item-footer">
-              <p>{event.event.date}</p>
+              <p>date :{event.event.date}</p>
+             {getGoingAndNotGoing(event)}
             </div>
             <div className="event-list-item-footer">
-              <p>Participants: {event.status}</p>
               <button
-                className={event.status === "going" ? "highlight" : ""}
-                onClick={() => acceptEvent(event.event, "going")}
-              >
-                Going
-              </button>
-              <button
-                className={event.status === "not_going" ? "highlight" : ""}
-                onClick={() => acceptEvent(event.event, "not_going")}
+                className={event.status === "not_going" ? "highlight" : "default"}
+                onClick={() => acceptEvent(event.event, "not_going",event.status)}
               >
                 Not going
+              </button>
+              <button
+                className={event.status === "going" ? "highlight" : "default"}
+                onClick={() => acceptEvent(event.event, "going",event.status)}
+              >
+                Going
               </button>
             </div>
           </div>
         ))}
       </>
     );
+  };
+  const closeBox = () => {
+    window.location.hash = "";
+    clearBox();
   };
   if (data === []) {
     return (
@@ -85,7 +132,7 @@ const EventList = ({ clearBox }) => {
           <p>No events</p>
         </div>
         <div className="event-list-footer">
-          <button onClick={clearBox}>Close</button>
+          <button onClick={closeBox}>Close</button>
         </div>
       </div>
     );
@@ -97,7 +144,7 @@ const EventList = ({ clearBox }) => {
         </div>
         <div className="event-list-body">{renderNotifications()}</div>
         <div className="event-list-footer">
-          <button onClick={clearBox}>Close</button>
+          <button onClick={closeBox}>Close</button>
         </div>
       </div>
     );

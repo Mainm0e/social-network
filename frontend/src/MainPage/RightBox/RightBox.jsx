@@ -55,6 +55,7 @@ const RightBox = () => {
 
   const clearBox = () => {
     // delete # from url
+    
     setBox(null);
   };
   if (box === null) {

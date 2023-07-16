@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-
+import "./Group.css";
 const GroupHeader = ({ group, handleRefresh }) => {
   
   const test = () => {
@@ -11,9 +11,9 @@ const GroupHeader = ({ group, handleRefresh }) => {
 
   return (
     <div className="group-header">
-      <div className="group-header-title">
-        <label htmlFor="group-title">Title:</label>
-        <span id="group-title">{group.title}</span>
+      <div className="group-header-name">
+        <label htmlFor="group-name">Group:</label>
+        <span id="group-name">{group.title}</span>
       </div>
       <div className="group-header-description">
         <label htmlFor="group-description">Description:</label>
