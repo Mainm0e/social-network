@@ -84,19 +84,39 @@ func ReadEventOptions(eventId int) (map[string][]SmallProfile, error) {
 }
 
 /*
+eventUserStatus returns the option chosen by a user for an event, based on the map of the participants of the event and the user's id.
+it used in ReadGroupEvents function and returns a string of the option chosen by the user("going"/"not_going")or an empty string if the user didn't choose an option.
+*/
+func eventUserStatus(users map[string][]SmallProfile, userId int) string {
+	for _, u := range users["going"] {
+		if u.UserId == userId {
+			return "going"
+		}
+	}
+	for _, u := range users["not_going"] {
+		if u.UserId == userId {
+			return "not_going"
+		}
+	}
+	return ""
+}
+
+/*
 ReadGroupEvents reads the events of a group from the database and creates a slice of GroupEvent structs,
-which contain the event, the profile of the creator of the event, the participants of the event, and session id of the user,
-using the ReadEventOptions function and the fillSmallProfile function,
-and returns the slice and an error if it fails
+which contain the event, the profile of the creator of the event, the participants of the event, session id of the user,
+and the option chosen by the user for the event, using the ReadEventOptions function and the fillSmallProfile function, eventUserStatus function,
+and returns the slice and an error if it fails otherwise it returns nil.
 */
 func ReadGroupEvents(groupId int, userId int) ([]GroupEvent, error) {
 	events, err := db.FetchData("events", "groupId = ?", groupId)
 	if err != nil {
 		return nil, errors.New("Error fetching group events" + err.Error())
 	}
+
 	if len(events) == 0 {
 		return nil, errors.New("no events found")
 	}
+
 	result := make([]GroupEvent, len(events))
 	for i, e := range events {
 		if event, ok := e.(db.Event); ok {
@@ -105,28 +125,16 @@ func ReadGroupEvents(groupId int, userId int) ([]GroupEvent, error) {
 			if err != nil {
 				return nil, errors.New("Error fetching event creator profile" + err.Error())
 			}
+
 			result[i].CreatorProfile = creatorProfile
 			users, err := ReadEventOptions(event.EventId)
 			if err != nil {
 				return nil, errors.New("Error fetching event options" + err.Error())
 			}
+
 			result[i].Participants = users
 			// check this user's option
-			// TODO i don't think this is the best way to do this
-			for _, u := range users["going"] {
-				if u.UserId == userId {
-					result[i].Status = "going"
-					break
-				}
-			}
-			if result[i].Status == "" {
-				for _, u := range users["not_going"] {
-					if u.UserId == userId {
-						result[i].Status = "not_going"
-						break
-					}
-				}
-			}
+			result[i].Status = eventUserStatus(users, userId)
 		} else {
 			return nil, fmt.Errorf("invalid event type at index %d", i)
 		}
