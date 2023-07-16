@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getCookie } from "../../tools/cookie";
 import "./UserList.css";
 import { fetchData } from "../../tools/fetchData";
+import { profile } from "../../tools/link";
 
 const UserList = ({ title, id, clearBox }) => {
   const [profilename, setProfilename] = useState("");
@@ -23,7 +24,6 @@ const UserList = ({ title, id, clearBox }) => {
       userId: id,
       request: title,
     };
-    console.log("idont no",payload);
     fetchData(method, type, payload).then((data) => {
       setData(data);
     });
@@ -59,11 +59,11 @@ const UserList = ({ title, id, clearBox }) => {
             <ul>
               {data.map((user) => (
                 <li key={user.userId}>
-                  <div className="user-list-item">
+                  <div className="user-list-item" onClick={() => profile(user.userId)}>
                     <div className="user-list-item-left">
                       <img src={user.avatar} alt="user" />
                     </div>
-                    <div className="user-list-item-right">
+                    <div className="user-list-item-right" >
                       <span>{user.firstName}</span>
                       <span> </span>
                       <span>{user.lastName}</span>

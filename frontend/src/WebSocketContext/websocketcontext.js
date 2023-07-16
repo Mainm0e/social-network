@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
+import { logout } from '../tools/logout';
 
 // Create a context that will hold the websocket connection
 export const WebSocketContext = createContext(null);
@@ -20,6 +21,7 @@ export const WebSocketProvider = ({ children, isLoggedIn }) => {
 
     ws.onerror = (error) => {
       console.log('failed to connect to ws server:', error);
+      logout();
     };
 
     // On component unmount, close the websocket connection

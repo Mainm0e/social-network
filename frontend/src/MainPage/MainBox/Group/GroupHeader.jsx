@@ -1,12 +1,7 @@
 import { useEffect } from "react";
 import "./Group.css";
 const GroupHeader = ({ group, handleRefresh }) => {
-  
-  const test = () => {
-    console.log("test", group);
-  };
   useEffect(() => {
-    test();
   }, [group]);
 
   return (
