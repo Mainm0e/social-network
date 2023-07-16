@@ -136,10 +136,13 @@ const getChatContent = () => {
       const message = {
         sessionID: getCookie("sessionId"),
         senderID: getUserId("userId"),
-        receiverID: id,
+        receiverID: receiver.userId,
         message: messageInput,
         timeStamp: "",
       };
+      if (type === "group") {
+        message.receiverID = id;
+      }
       setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
       const messageEvent = {
         type: chatType,
