@@ -19,7 +19,8 @@ const Explore = ({type}) => {
         const type = "followRequest"
         const payload ={ sessionId: getCookie("sessionId"), senderId: getUserId("userId"), groupId:id}
         fetchData(method,type,payload).then((data) => {console.log(data)})
-       /*  navigateToProfile(type,id) */
+        /* refect */
+        window.location.reload();
       };
         
         const generateExploreList = () => {
