@@ -81,6 +81,12 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
         notifId: notifications.notificationId,
         content: value, // Use the value parameter here
       };
+      if (notifications.type === "group_request"){
+        payload.receiverId = 0;
+      }else if (notifications.type === "group_invitation"){
+        payload.senderId = 0;
+      }
+ 
       fetchData(method, type, payload).then((data) => {
         window.location.reload();
         handleAcceptDecline(); // Call the handler function to hide the notification

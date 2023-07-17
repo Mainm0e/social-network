@@ -3,6 +3,8 @@ import "./RightBox.css";
 import UserList from "../../Common/UserList/UserList";
 import Notification from "../../Common/Notification/Notification";
 import Invite from "../../Common/Invite/Invite";
+import EventList from "../../Common/Event/EventList"; 
+import Memberlist from "../../Common/UserList/MemberList";
 
 const RightBox = () => {
   const [box, setBox] = useState(null);
@@ -30,6 +32,10 @@ const RightBox = () => {
           setBox(<Notification clearBox={clearBox} />);
         } else if (hash === "invite_to_group") {
           setBox(<Invite clearBox={clearBox} />);
+        } else if (hash === "eventlist") {
+          setBox(<EventList clearBox={clearBox} />);
+        } else if (hash === "memberlist"){
+          setBox(<Memberlist id={parseInt(id)} clearBox={clearBox} />);
         } else {
           setBox(null);
         }
@@ -49,6 +55,7 @@ const RightBox = () => {
 
   const clearBox = () => {
     // delete # from url
+    
     setBox(null);
   };
   if (box === null) {

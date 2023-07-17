@@ -1,56 +1,123 @@
 .registerGroup {
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: red;
+    font-family: myFancyFont;
+    font-size: 24px;
+    background: #FFEA00;
+    border: 4px solid black;
+    border-radius: 10px;
+    padding: 20px;
 }
 
-.group-header {
-    background: red;
+@media screen and (max-width: 1400px) {
+    .registerGroup {
+        margin-top: 100px;
+    }
 }
 
-.group-header {
-    background-color: #f2f2f2;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.register-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-family: myFancyFont;
 }
 
-.group-header-title,
-.group-header-description,
-.group-header-followers,
-.group-header-creater,
-.group-header-date {
-    margin-bottom: 5px;
-}
-
-.group-header-label {
+.register-box label {
+    font-size: 20px;
     font-weight: bold;
+}
+
+.register-box input {
+    font-family: myFancyFont;
+    width: 300px;
+    height: 30px;
+    padding: 5px;
+    border: 4px solid black;
+    border-radius: 10px;
+    outline: none;
+}
+
+.register-box textarea {
+    font-family: myFancyFont;
+    width: 300px;
+    height: 100px;
+    padding: 5px;
+    border: 4px solid black;
+    border-radius: 10px;
+    outline: none;
+}
+
+.register-box .submit-register {
+    width: 100%;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
+}
+
+.register-box .submit-register:hover {
+    background: #ccc;
+}
+
+.form-group {
+    padding-top: 10px;
+}
+
+.group-header {
+    display: flex;
+    flex-direction: column;
+    background-color: #f9f9f9;
+    background-image: url("default.gif");
+    background-size: 8px;
+    padding: 10px;
+    border: 4px solid black;
+    border-radius: 10px;
+    font-family: Arial, sans-serif;
+    margin-bottom: 20px;
+}
+
+.group-header-name span,
+.group-header-description span,
+.group-header-followers span,
+.group-header-creater span,
+.group-header-date span {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+}
+
+.group-header-name label,
+.group-header-description label,
+.group-header-followers label,
+.group-header-creater label,
+.group-header-date label {
+    font-family: myFancyFont;
+    font-size: 18px;
+    margin-right: 10px;
 }
 
 .group-header-creater-info {
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 
 .group-header-creater-avatar img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    object-fit: cover;
 }
 
-.group-header-creater-name {
-    margin-left: 10px;
+.group-header-date {
+    margin-top: 10px;
 }
 
-.group-header-creater-name span:first-child {
-    font-weight: bold;
-}
-
+.group-header-date label,
 .group-header-date span {
-    font-style: italic;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
 }

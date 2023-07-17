@@ -4,6 +4,7 @@ import "./Post.css";
 import { getCookie, getUserId } from "../../tools/cookie";
 import { checkPostData } from "../../tools/checkdata";
 import { fetchData } from "../../tools/fetchData";
+import CreateEvent from "../Event/CreateEvent";
 
 const PostList = ({ profileId, groupId, from }) => {
   const [postData, setPostData] = useState(null);
@@ -22,11 +23,10 @@ const PostList = ({ profileId, groupId, from }) => {
     fetchData(method, type, payload).then((responseData) => {
       setPostData(responseData);
     });
-  }, []);
+  }, [profileId, groupId, from]);
 
   const createPost = () => {
     if (postData !== null) {
-      console.log("in createPost", postData.length);
       return postData.map((post) => (
         <Post
           key={post.postId}
@@ -49,8 +49,6 @@ const PostList = ({ profileId, groupId, from }) => {
   }
 };
 const Post = ({ id, title, content, image, time, user, comments }) => {
-  const postId = id;
-
   const checkImage = () => {
     if (image === "" || image === null || image === undefined) {
       return null;
@@ -106,7 +104,7 @@ const Post = ({ id, title, content, image, time, user, comments }) => {
   );
 };
 
-const CreatePost = ({ onSubmit }) => {
+const CreatePost = ({ onSubmit, type }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [privacy, setPrivacy] = useState("public");
@@ -209,19 +207,22 @@ const CreatePost = ({ onSubmit }) => {
             Submit
           </button>
         </div>
+        {type === "user" && (
         <div className="create_post_privacy">
           <select value={privacy} onChange={handlePrivacyChange}>
             <option value="public">Public</option>
             <option value="private">Private</option>
             <option value="semi-private">Semi-Private</option>
           </select>
-        </div>
-        {privacy === "semi-private" && (
-          <FollowerList
-            users={follower}
-            followers={followers}
-            handleFollowerChange={handleFollowerChange}
-          />
+            {/* Render the privacy option here */}
+            {privacy === "semi-private" && (
+              <FollowerList
+              users={follower}
+              followers={followers}
+              handleFollowerChange={handleFollowerChange}
+              />
+              )}
+              </div>
         )}
       </form>
     </div>
@@ -250,14 +251,22 @@ const FollowerList = ({ users, followers, handleFollowerChange }) => {
 
 // !! Main Component !!
 const PostBox = ({ id, from }) => {
-  console.log("PostBox", id, from);
   const [body, setBody] = useState("");
-  const [data, setData] = useState(null);
+  const [pageType, setPageType] = useState("");
+  const url = new URL(window.location.href);
+  const urlParams = new URLSearchParams(window.location.search);
+  const sendId = urlParams.get("id");
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1);
       setBody(hash);
     };
+
+    if (url.pathname === "/user") {
+      setPageType("user");
+    } else if (url.pathname === "/group") {
+      setPageType("group");
+    }
 
     // Listen for hash changes in the URL
     window.addEventListener("hashchange", handleHashChange);
@@ -274,15 +283,11 @@ const PostBox = ({ id, from }) => {
     // Logic to handle the submission of the post data
     //check url value
     let groupId = 0;
-    const url = new URL(window.location.href);
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
-    if (url.pathname ==="/user") {
-      groupId = 0
-    } else if (url.pathname ==="/group") {
-      groupId = parseInt(id);
+    if (url.pathname === "/user") {
+      groupId = 0;
+    } else if (url.pathname === "/group") {
+      groupId = parseInt(sendId);
     }
-
 
     const check = checkPostData(postData);
     if (check.status === true) {
@@ -316,7 +321,7 @@ const PostBox = ({ id, from }) => {
     <>
       {body === "createpost" && (
         <section id="createpost">
-          <CreatePost onSubmit={handleSubmitPost} />
+          <CreatePost onSubmit={handleSubmitPost} type={pageType} />
         </section>
       )}
 
@@ -326,6 +331,15 @@ const PostBox = ({ id, from }) => {
             profileId={from === "profile" ? id : 0}
             groupId={from === "group" ? id : 0}
             from={from}
+          />
+        </section>
+      )}
+
+      {body === "createevent" && (
+        <section id="createevent">
+          <CreateEvent
+            profileId={from === "profile" ? id : 0}
+            groupId={from === "group" ? id : 0}
           />
         </section>
       )}

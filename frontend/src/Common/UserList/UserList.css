@@ -31,6 +31,11 @@
     border-radius: 10px;
     padding: 5px 10px;
     border: 2px solid black;
+    cursor: pointer;
+}
+
+.user-list-item:hover {
+    background: #FFD600;
 }
 
 .user-list-item-left {
