@@ -5,6 +5,7 @@ import "./explore.css"
 ;
 
 const Explore = ({type}) => {
+    //asdf
     const [data, setData] = useState(null);
     useEffect(() => {
         const method = "POST"
