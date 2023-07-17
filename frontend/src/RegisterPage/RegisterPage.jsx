@@ -124,6 +124,7 @@ function RegisterPage() {
   };
 
   return (
+    <div className="main-container">
     <div className="register-page">
       <WelcomeBox />
       <div className="register-container">
@@ -175,6 +176,7 @@ function RegisterPage() {
           <a href="/login"> Login </a>{" "}
         </div>{" "}
       </div>{" "}
+    </div>
     </div>
   );
 }

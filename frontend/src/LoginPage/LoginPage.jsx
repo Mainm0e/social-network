@@ -72,6 +72,7 @@ function LoginPage() {
     }
   };
   return (
+    <div className="main-container">
     <div className='login-page'>
     <WelcomeBox />
     <div className="login-container">
@@ -105,6 +106,7 @@ function LoginPage() {
       <div className='links'>
         <a href='/register'>Register</a>
       </div>
+    </div>
     </div>
     </div>
   );
