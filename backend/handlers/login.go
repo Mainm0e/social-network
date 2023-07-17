@@ -55,7 +55,7 @@ func LoginPage(payload json.RawMessage) (Response, error) {
 			response := Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			return response, err
 		}
-		loginResponse := LoginResponse{sessionId, id}
+		loginResponse := UserCredential{sessionId, id}
 		payload, err = json.Marshal(loginResponse)
 		if err != nil {
 			response = Response{err.Error(), events.Event{}, http.StatusBadRequest}

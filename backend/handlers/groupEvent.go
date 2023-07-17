@@ -11,19 +11,39 @@ import (
 )
 
 /*
-InsertEvent inserts an given event into the database and returns an error if it fails
+InsertEvent inserts an given event into events table in the database
+and add a notification for each group member except the creator of the event,
+it returns an error if any occurs otherwise it returns nil.
 */
 func InsertEvent(event db.Event) error {
 	_, err := db.InsertData("events", event.CreatorId, event.GroupId, event.Title, event.Content, time.Now(), event.Date)
 	if err != nil {
 		return errors.New("Error inserting event" + err.Error())
 	}
+	// insert group invitation in notifications table
+	// get the group members
+	members, err := db.FetchData("group_member", "groupId = ?", event.GroupId)
+	if err != nil {
+		return errors.New("Error fetching group members" + err.Error())
+	}
+	// insert notification for each member
+	for _, m := range members {
+		member := m.(db.GroupMember)
+		if member.UserId != event.CreatorId {
+			_, err = db.InsertData("notifications", member.UserId, event.CreatorId, event.GroupId, "new_event", time.Now())
+			if err != nil {
+				return errors.New("Error inserting group invitation" + err.Error())
+			}
+		}
+	}
 	return nil
 
 }
 
 /*
-TODO : CreateEvent commenttts
+CreateEvent is a function that processes a creating group event request,
+it gets the group event data from the payload, use the InsertEvent function to insert the event into the database,
+and returns a response with a descriptive message and an event with the session id of the user. or an error if any occurred.
 */
 func CreateEvent(payload json.RawMessage) (Response, error) {
 	var event GroupEvent
@@ -84,19 +104,39 @@ func ReadEventOptions(eventId int) (map[string][]SmallProfile, error) {
 }
 
 /*
+eventUserStatus returns the option chosen by a user for an event, based on the map of the participants of the event and the user's id.
+it used in ReadGroupEvents function and returns a string of the option chosen by the user("going"/"not_going")or an empty string if the user didn't choose an option.
+*/
+func eventUserStatus(users map[string][]SmallProfile, userId int) string {
+	for _, u := range users["going"] {
+		if u.UserId == userId {
+			return "going"
+		}
+	}
+	for _, u := range users["not_going"] {
+		if u.UserId == userId {
+			return "not_going"
+		}
+	}
+	return ""
+}
+
+/*
 ReadGroupEvents reads the events of a group from the database and creates a slice of GroupEvent structs,
-which contain the event, the profile of the creator of the event, the participants of the event, and session id of the user,
-using the ReadEventOptions function and the fillSmallProfile function,
-and returns the slice and an error if it fails
+which contain the event, the profile of the creator of the event, the participants of the event, session id of the user,
+and the option chosen by the user for the event, using the ReadEventOptions function and the fillSmallProfile function, eventUserStatus function,
+and returns the slice and an error if it fails otherwise it returns nil.
 */
 func ReadGroupEvents(groupId int, userId int) ([]GroupEvent, error) {
 	events, err := db.FetchData("events", "groupId = ?", groupId)
 	if err != nil {
 		return nil, errors.New("Error fetching group events" + err.Error())
 	}
+
 	if len(events) == 0 {
 		return nil, errors.New("no events found")
 	}
+
 	result := make([]GroupEvent, len(events))
 	for i, e := range events {
 		if event, ok := e.(db.Event); ok {
@@ -105,28 +145,16 @@ func ReadGroupEvents(groupId int, userId int) ([]GroupEvent, error) {
 			if err != nil {
 				return nil, errors.New("Error fetching event creator profile" + err.Error())
 			}
+
 			result[i].CreatorProfile = creatorProfile
 			users, err := ReadEventOptions(event.EventId)
 			if err != nil {
 				return nil, errors.New("Error fetching event options" + err.Error())
 			}
+
 			result[i].Participants = users
 			// check this user's option
-			// TODO i don't think this is the best way to do this
-			for _, u := range users["going"] {
-				if u.UserId == userId {
-					result[i].Status = "going"
-					break
-				}
-			}
-			if result[i].Status == "" {
-				for _, u := range users["not_going"] {
-					if u.UserId == userId {
-						result[i].Status = "not_going"
-						break
-					}
-				}
-			}
+			result[i].Status = eventUserStatus(users, userId)
 		} else {
 			return nil, fmt.Errorf("invalid event type at index %d", i)
 		}
@@ -135,7 +163,9 @@ func ReadGroupEvents(groupId int, userId int) ([]GroupEvent, error) {
 }
 
 /*
-TODO GetGroupEvents commenttts
+GetGroupEvents is a function that processes sending group events to the frontend,
+it gets a payload containing the group id and the user id, use the ReadGroupEvents function to read the events of the group from the database,
+and returns a response with a descriptive message and an event with the events payload. or an error if any occurred.
 */
 func GetGroupEvents(payload json.RawMessage) (Response, error) {
 	var eventRequest Request
@@ -144,6 +174,7 @@ func GetGroupEvents(payload json.RawMessage) (Response, error) {
 	if err != nil {
 		return Response{}, errors.New("Error unmarshalling event" + err.Error())
 	}
+	// read group events from database
 	groupEvents, err := ReadGroupEvents(eventRequest.GroupId, eventRequest.SenderId)
 	if err != nil {
 		return Response{}, errors.New("Error reading group events" + err.Error())
