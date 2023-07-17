@@ -51,6 +51,25 @@ function RegisterPage() {
     }
   };
 
+  // button to navigate back through info pages 
+  const handleBack = () => {
+    if (selectedOption === "info2") {
+      setSelectedOption("info1");
+    } else if (selectedOption === "info3") {
+      setSelectedOption("info2");
+    }
+
+  };
+
+  // button to navigate forward through info pages
+  const handleNext = () => {
+    if (selectedOption === "info1") {
+      setSelectedOption("info2");
+    } else if (selectedOption === "info2") {
+      setSelectedOption("info3");
+    }
+  };
+
   // handleRegister function
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState([]);
@@ -148,35 +167,28 @@ function RegisterPage() {
           onChange={handleInfoChange}
           registerStatus={registerStatus}
         />{" "}
-        <div className="select-container">
-          <input
-            type="radio"
-            value="info1"
-            checked={selectedOption === "info1"}
-            onChange={handleOptionChange}
-          />{" "}
-          <input
-            type="radio"
-            value="info2"
-            checked={selectedOption === "info2"}
-            onChange={handleOptionChange}
-          />{" "}
-          <input
-            type="radio"
-            value="info3"
-            checked={selectedOption === "info3"}
-            onChange={handleOptionChange}
-          />{" "}
-        </div>{" "}
-        <button type="button" onClick={register}>
-          Register{" "}
-        </button>{" "}
+                        {selectedOption !== "info1" && (
+      <button type="button" onClick={handleBack}>
+        Back
+      </button>
+    )}
+        {selectedOption === "info3" && (
+      <button type="button" onClick={register}>
+        Register
+      </button>
+    )}
+        {selectedOption !== "info3" && (
+      <button type="next-btn" onClick={handleNext}>
+        Next
+      </button>
+    )}
         <div className="links">
           <a href="/login"> Login </a>{" "}
         </div>{" "}
       </div>{" "}
     </div>
   );
+
 }
 
 export default RegisterPage;
