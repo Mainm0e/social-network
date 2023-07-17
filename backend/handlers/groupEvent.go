@@ -30,7 +30,7 @@ func InsertEvent(event db.Event) error {
 	for _, m := range members {
 		member := m.(db.GroupMember)
 		if member.UserId != event.CreatorId {
-			_, err = db.InsertData("notifications", member.UserId, event.CreatorId, event.GroupId, "new_event", time.Now())
+			_, err = db.InsertData("notifications", member.UserId, event.CreatorId, event.GroupId, event.Title, "new_event", time.Now())
 			if err != nil {
 				return errors.New("Error inserting group invitation" + err.Error())
 			}
