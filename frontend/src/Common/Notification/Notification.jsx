@@ -119,7 +119,7 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
       </div>
     );
   }
-  if (notifications.type === "following") {
+  if (notifications.type === "following" || notifications.type === "new_event") {
     const handleDeleteNotif = () => {
       const method = "POST";
       const type = "followResponse";
@@ -145,7 +145,8 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
           </span>
         </div>
         <div className="notification-content">
-          <span>started following you</span>
+          {notifications.type === "following" && <span>started following you</span>}
+          {notifications.type === "new_event" && <span>created a new event</span>}
         </div>
         <div className="notification-btn">
           <span onClick={handleDeleteNotif}>x</span>
