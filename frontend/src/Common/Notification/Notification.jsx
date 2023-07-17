@@ -39,6 +39,7 @@ const Notification = ({ clearBox }) => {
     ));
   };
   if (notificationData.length  > 0) {
+    console.log(notificationData, "notificationData")
   return (
     <div className="notification-container">
       {showNotification && renderNotifications()}{" "}
@@ -102,7 +103,10 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
           </span>
         </div>
         <div className="notification-content">
-          <span>sent you a {notifications.type}</span>
+          {console.log(notifications, "notifications")} 
+          {notifications.type === "follow_request" && <span>sent you a follow request</span>}
+          {notifications.type === "group_request" && <span>sent you a group request</span>}
+          {notifications.type === "group_invitation" && <span>invited you to a group</span>}
         </div>
         <div className="notification-btn">
           <button value="accept" onClick={() => handleAccept("accept")}>
@@ -115,7 +119,7 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
       </div>
     );
   }
-  if (notifications.type === "following") {
+  if (notifications.type === "following" || notifications.type === "new_event") {
     const handleDeleteNotif = () => {
       const method = "POST";
       const type = "followResponse";
@@ -141,7 +145,8 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
           </span>
         </div>
         <div className="notification-content">
-          <span>started following you</span>
+          {notifications.type === "following" && <span>started following you</span>}
+          {notifications.type === "new_event" && <span>created a new event</span>}
         </div>
         <div className="notification-btn">
           <span onClick={handleDeleteNotif}>x</span>

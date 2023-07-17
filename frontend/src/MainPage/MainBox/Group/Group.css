@@ -72,13 +72,19 @@
     display: flex;
     flex-direction: column;
     background-color: #f9f9f9;
-    background-image: url("default.gif");
+    background-image: url("./default.gif");
     background-size: 8px;
     padding: 10px;
     border: 4px solid black;
     border-radius: 10px;
     font-family: Arial, sans-serif;
     margin-bottom: 20px;
+}
+
+@media screen and (max-width: 1400px) {
+    .group-header {
+        margin-top: 100px;
+    }
 }
 
 .group-header-name span,
@@ -98,6 +104,10 @@
     font-family: myFancyFont;
     font-size: 18px;
     margin-right: 10px;
+}
+
+.group-header-followers label:hover {
+    cursor: pointer;
 }
 
 .group-header-creater-info {

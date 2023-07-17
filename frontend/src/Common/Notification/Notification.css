@@ -59,3 +59,19 @@
     color: #FFEA00;
     transition: all 0.3s ease-in-out;
 }
+
+.notification-btn {
+    display: flex;
+    align-items: center;
+}
+
+.notification-btn button {
+    width: 100%;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
+    padding: 10px;
+}
