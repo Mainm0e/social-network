@@ -21,7 +21,6 @@ export const group_link ={
     "Explore user": "/user",
     "Explore groups": "/group",
     "Invite": "#invite_to_group",
-    "Memberlist": "#memberlist",
 }
 
 export const default_link ={

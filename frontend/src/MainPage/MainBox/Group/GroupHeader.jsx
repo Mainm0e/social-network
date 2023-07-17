@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import "./Group.css";
+import {memberlist} from "../../../tools/link"
 const GroupHeader = ({ group, handleRefresh }) => {
   useEffect(() => {
   }, [group]);
@@ -15,7 +16,7 @@ const GroupHeader = ({ group, handleRefresh }) => {
         <span id="group-description">{group.description}</span>
       </div>
       <div className="group-header-followers">
-        <label htmlFor="group-followers">Member:</label>
+        <label htmlFor="group-followers" onClick={()=> memberlist()}>Member:</label>
         <span id="group-followers">{group.noMembers}</span>
       </div>
       <div className="group-header-creater">
