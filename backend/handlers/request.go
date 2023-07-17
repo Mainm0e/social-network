@@ -166,7 +166,7 @@ func insertGroupInvitation(senderId int, groupId int, receiverId int) error {
 		return errors.New("Error fetching group title" + err.Error())
 	}
 	// insert group invitation in notifications table
-	_, err = db.InsertData("notifications", receiverId, senderId, groups[0].(db.Group).Title, "group_invitation", time.Now())
+	_, err = db.InsertData("notifications", receiverId, senderId, groupId, groups[0].(db.Group).Title, "group_invitation", time.Now())
 	if err != nil {
 		return errors.New("Error inserting group invitation" + err.Error())
 	}
