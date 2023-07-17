@@ -26,11 +26,19 @@ func readNotifications(userId int, sessionId string) ([]Notification, error) {
 			if err != nil {
 				return []Notification{}, errors.New("Error fetching profile" + err.Error())
 			}
+			// just for Adi
 
 			result[i] = Notification{
 				SessionId:    sessionId,
 				Notification: notification,
 				Profile:      profile,
+			}
+			if notification.GroupId != 0 {
+				group, err := db.FetchData("groups", "groupId = ?", notification.GroupId)
+				if err != nil {
+					return []Notification{}, errors.New("Error fetching group" + err.Error())
+				}
+				result[i].GroupName = group[0].(db.Group).Title
 			}
 		} else {
 			return nil, fmt.Errorf("invalid notification type at index %d", i)

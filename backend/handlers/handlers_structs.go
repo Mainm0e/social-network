@@ -14,7 +14,7 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
 	"createPost":     CreatePost,
-	"getPosts":       GetPosts, // TODO: Change spelling / syntax
+	"getPosts":       GetPosts,
 	"createComment":  CreateComment,
 	"exploreUsers":   ExploreUsers,
 	"followRequest":  FollowOrJoinRequest,
@@ -163,6 +163,7 @@ type GroupEvent struct {
 type Notification struct {
 	SessionId    string          `json:"sessionId"`
 	Profile      SmallProfile    `json:"profile"`
+	GroupName    string          `json:"groupName"`
 	Notification db.Notification `json:"notifications"`
 }
 type NonMembers struct {
