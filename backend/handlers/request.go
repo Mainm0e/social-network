@@ -41,7 +41,7 @@ func insertFollowRequest(senderId int, receiverId int, notifId int) error {
 	}
 	// if sender didn't request to follow the receiver before then insert the request in notifications and follow tables.
 	if relation == "follow" {
-		_, err := db.InsertData("notifications", receiverId, senderId, 0, reqType, time.Now())
+		_, err := db.InsertData("notifications", receiverId, senderId, 0, reqType, reqType, time.Now())
 		if err != nil {
 			return errors.New("Error inserting follow request" + err.Error())
 		}
@@ -108,7 +108,7 @@ func insertGroupRequest(senderId int, groupId int) error {
 
 	case "join":
 		//inserting group request in notifications table
-		_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_request", time.Now())
+		_, err := db.InsertData("notifications", receiverId, senderId, groupId, dbGroups[0].(db.Group).Title, "group_request", time.Now())
 		if err != nil {
 			return errors.New("Error inserting group request in notifications: " + err.Error())
 		}
@@ -161,8 +161,12 @@ func insertGroupInvitation(senderId int, groupId int, receiverId int) error {
 	if len(notif) != 0 {
 		return nil
 	}
+	groups, err := db.FetchData("groups", "groupId = ?", groupId)
+	if err != nil {
+		return errors.New("Error fetching group title" + err.Error())
+	}
 	// insert group invitation in notifications table
-	_, err = db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", time.Now())
+	_, err = db.InsertData("notifications", receiverId, senderId, groups[0].(db.Group).Title, "group_invitation", time.Now())
 	if err != nil {
 		return errors.New("Error inserting group invitation" + err.Error())
 	}
