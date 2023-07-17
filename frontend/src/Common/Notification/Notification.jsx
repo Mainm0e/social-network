@@ -39,6 +39,7 @@ const Notification = ({ clearBox }) => {
     ));
   };
   if (notificationData.length  > 0) {
+    console.log(notificationData, "notificationData")
   return (
     <div className="notification-container">
       {showNotification && renderNotifications()}{" "}
