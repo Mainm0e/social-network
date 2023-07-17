@@ -231,6 +231,44 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 
 }
 
+/********************** IS TYPING EVENT / LOGIC ******************************/
+
+func (m *Manager) HandleIsTypingEvent(event events.Event, client *Client) {
+	var isTyping IsTyping
+	if err := json.Unmarshal(event.Payload, &isTyping); err != nil {
+		log.Printf("HandleIsTypingEvent() - Error unmarshalling event payload: %v", err)
+		return
+	}
+
+	typingEvent := events.Event{
+		Type:    "isTyping",
+		Payload: event.Payload,
+	}
+
+	eventBytes, err := json.Marshal(typingEvent)
+	if err != nil {
+		log.Printf("HandleIsTypingEvent() - Error marshalling event: %v", err)
+		return
+	}
+
+	// Notify the relevant client(s) about the typing status.
+	m.Clients.Range(func(k, v interface{}) bool {
+		otherClient, ok := v.(*Client)
+		if !ok {
+			log.Printf("HandleIsTypingEvent() - Error casting client from client list: %v", v.(*Client))
+			return true // Continue iteration
+		}
+
+		if isTyping.ChatType == "private" && otherClient.ID == isTyping.TargetID {
+			otherClient.Egress <- eventBytes
+		} else if isTyping.ChatType == "group" {
+			// TODO: Handle group chat typing events
+		}
+
+		return true // Continue iteration
+	})
+}
+
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
 
 func UnmarshalEventToChatMsg(msgEvent events.Event) (ChatMsg, error) {
@@ -421,5 +459,3 @@ func (m *Manager) SendErrorMessageToClient(client *Client, message string, statu
 		return
 	}
 }
-
-// TODO: HandleIsTypingEvent(): Receive isTyping event and broadcast to all clients in chat
