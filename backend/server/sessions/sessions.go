@@ -1,13 +1,34 @@
 package sessions
 
 import (
+	"backend/db"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
 )
+
+/*
+getUserID is a helper function for the sessions package, which takes a user's email
+address as a string and returns the user's ID as an integer. It is used when a user
+logs in to generate a Session struct (which has a userID field). The function also
+returns an error value, which is non-nil if an error occurs during the database query.
+*/
+func getUserID(email string) (int, error) {
+	var userID int
+
+	user, err := db.FetchData("users", "email = ?", email)
+	userID = user[0].(db.User).UserId
+	if err != nil {
+		return 0, fmt.Errorf("sessions.getUserID() error: %v", err)
+	}
+
+	return userID, nil
+}
 
 /*
 Initialise is a method for the *SessionStore struct, which allows for initialisation of the
@@ -77,11 +98,16 @@ func (store *SessionStore) Create(username string, admin bool) (string, error) {
 
 	expires := time.Now().Add(time.Duration(SESSION_DURATION) * time.Second)
 
+	userID, err := getUserID(username)
+	if err != nil {
+		return "", errors.New("sessions.Create() error in retrieving userID: " + err.Error())
+	}
+
 	session := &Session{
-		ID:       sessionID,
-		Username: username,
-		Admin:    admin,
-		Expires:  expires,
+		SessionID: sessionID, // Possibly redundant as it is the key in the sync.Map
+		UserID:    userID,
+		Admin:     admin,
+		Expires:   expires,
 	}
 
 	store.Data.Store(sessionID, session)
@@ -137,14 +163,26 @@ func (store *SessionStore) Get(sessionID string) (*Session, bool, error) {
 }
 
 /*
-Check() checks if the user is authenticated by taking a session cookie
+CookieCheck() checks if the user is authenticated by taking a session cookie
 as input and checking if the session ID is present in the SessionStore sync.Map data
 structure by calling the *SessionStore Get() method. It returns a boolean indicating
 whether the user is authenticated or not, and an error, which is non-nil if an error
 occurs during the authentication check.
 */
-func Check(cookie *http.Cookie) (bool, error) {
+func CookieCheck(cookie *http.Cookie) (bool, error) {
 	_, isValidSession, err := Store.Get(cookie.Value)
+	return isValidSession, err
+}
+
+/*
+SessionCheck() checks if the user is authenticated by taking a session ID as input
+and checking if the session ID is present in the SessionStore sync.Map data structure
+by calling the *SessionStore Get() method. It returns a boolean indicating whether the
+user is authenticated or not, and an error, which is non-nil if an error occurs during
+the authentication check.
+*/
+func SessionCheck(sessionID string) (bool, error) {
+	_, isValidSession, err := Store.Get(sessionID)
 	return isValidSession, err
 }
 
@@ -160,6 +198,8 @@ func Login(userName string, admin bool) (string, error) {
 	if err != nil {
 		return "", errors.New("error in sessions.Login(): " + err.Error())
 	}
+	// Log session creation
+	log.Printf("Session created for user \" %s \", with sessionID: %v", userName, sessionID)
 	return sessionID, nil
 }
 

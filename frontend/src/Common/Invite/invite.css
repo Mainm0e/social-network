@@ -1,0 +1,26 @@
+.invite-container {
+    width: 300px;
+    border: 2px solid black;
+    padding: 10px;
+    background-color: #f9f9f9;
+    font-family: Arial, sans-serif;
+    border-radius: 10px;
+}
+
+.invite-container .invite-header h1 {
+    font-family: myFancyFont;
+    font-size: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+.invite-footer button {
+    width: 100%;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
+    padding: 10px;
+}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 	migrate "github.com/rubenv/sql-migrate"
@@ -19,38 +20,38 @@ directly into the specified database file. An error value is returned, which is
 non-nil in the event errors are encountered in opening / creating the database file
 or the sql file.
 */
-func initialise(databasePathAndName, sqlFilePathAndName string) error {
-	// Initialise specified database
-	database, err := sql.Open("sqlite3", databasePathAndName)
-	if err != nil {
-		return err
-	}
-	defer database.Close()
-	// Open sql database creation file
-	file, err := os.Open(sqlFilePathAndName)
-	if os.IsNotExist(err) {
-		return errors.New("database sql creation file ( " +
-			sqlFilePathAndName + " ) not found")
-	} else {
-		// Read the file into a buffer
-		buf := make([]byte, 1024)
-		var str string
-		for {
-			n, err := file.Read(buf)
-			if err != nil {
-				break
-			}
-			str += string(buf[:n])
-		}
+// func initialise(databasePathAndName, sqlFilePathAndName string) error {
+// 	// Initialise specified database
+// 	database, err := sql.Open("sqlite3", databasePathAndName)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer database.Close()
+// 	// Open sql database creation file
+// 	file, err := os.Open(sqlFilePathAndName)
+// 	if os.IsNotExist(err) {
+// 		return errors.New("database sql creation file ( " +
+// 			sqlFilePathAndName + " ) not found")
+// 	} else {
+// 		// Read the file into a buffer
+// 		buf := make([]byte, 1024)
+// 		var str string
+// 		for {
+// 			n, err := file.Read(buf)
+// 			if err != nil {
+// 				break
+// 			}
+// 			str += string(buf[:n])
+// 		}
 
-		// Execute the SQL
-		_, err = database.Exec(str)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+// 		// Execute the SQL
+// 		_, err = database.Exec(str)
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
+// 	return nil
+// }
 
 /*
 executeMigration is a function used to migrate the database to the latest version.
@@ -181,6 +182,7 @@ non-nil in the event that the data already exists in the table. It is called by 
 global InsertData() function.
 */
 func CheckDataDoesNotExist(table, column string, value any) error {
+
 	query := fmt.Sprintf("SELECT COUNT(1) FROM %s WHERE %s = ?", table, column)
 
 	// QueryRow executes a query that is expected to return at most one row.
@@ -224,8 +226,7 @@ Please note:
   - If the tableName is not defined in the InsertRules map, an error will be returned.
     (i.e. make sure database_variables.go is updated with the new table name!)
   - The args parameter should strictly follow the order and data type expectations of
-
-the corresponding table schema.
+    the corresponding table schema.
 */
 func InsertData(tableName string, args ...any) (int64, error) {
 	rule, ok := InsertRules[tableName]
@@ -241,6 +242,9 @@ func InsertData(tableName string, args ...any) (int64, error) {
 	}
 
 	for i := range rule.NotExistTables {
+		if tableName == "posts" || tableName == "notifications" && rule.NotExistFields[i] == "groupId" && args[i] == 0 {
+			continue
+		}
 		err := CheckDataDoesNotExist(rule.NotExistTables[i], rule.NotExistFields[i], args[i])
 		if err == nil {
 			return -1, fmt.Errorf(rule.NotExistErrors[i])
@@ -263,7 +267,7 @@ the table does not exist, or if the keyValue does not exist). If no rows are
 affected by the DELETE operation, it returns an "item not found" error. If the
 operation is successful, it returns nil.
 */
-func DeleteData(tableName string, keyValue any) error {
+func DeleteData(tableName string, keyValues ...any) error {
 	// Table validity check
 	key, ok := TableKeys[tableName]
 	if !ok {
@@ -271,19 +275,24 @@ func DeleteData(tableName string, keyValue any) error {
 	}
 
 	// keyValue validity check
-	if err := CheckDataDoesNotExist(tableName, key, keyValue); err == nil {
-		return errors.New("data does not exist")
+	for i, keyValue := range keyValues {
+		if err := CheckDataDoesNotExist(tableName, key[i], keyValue); err == nil {
+			return errors.New("data does not exist")
+		}
 	}
-
-	myQuery := fmt.Sprintf("DELETE FROM %s WHERE %s = ?", tableName, key)
-
+	var myQuery string
+	if len(keyValues) == 1 {
+		myQuery = fmt.Sprintf("DELETE FROM %s WHERE %s = ?", tableName, key[0])
+	} else {
+		myQuery = fmt.Sprintf("DELETE FROM %s WHERE %s = ? AND %s = ?", tableName, key[0], key[1])
+	}
 	statement, err := DB.Prepare(myQuery)
 	if err != nil {
 		return err
 	}
 	defer statement.Close()
 
-	result, err := statement.Exec(keyValue)
+	result, err := statement.Exec(keyValues...)
 	if err != nil {
 		return err
 	}
@@ -369,8 +378,20 @@ func FetchData(table string, condition string, args ...any) ([]any, error) {
 	if _, ok := FetchRules[table]; !ok {
 		return nil, fmt.Errorf("unknown table: %s", table)
 	}
+
 	// Prepare the SQL query
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s=? ", FetchRules[table].SelectFields, table, condition)
+	var query string
+	if condition == "" {
+		query = fmt.Sprintf("SELECT %s FROM %s", FetchRules[table].SelectFields, table)
+	} else {
+		// Count the number of placeholders needed
+		placeholders := strings.Count(condition, "?")
+		if placeholders != len(args) {
+			return nil, fmt.Errorf("the number of args does not match the number of placeholders in the condition")
+		}
+		query = fmt.Sprintf("SELECT %s FROM %s WHERE %s", FetchRules[table].SelectFields, table, condition)
+	}
+
 	// Execute the query
 	rows, err := DB.Query(query, args...)
 	if err != nil {

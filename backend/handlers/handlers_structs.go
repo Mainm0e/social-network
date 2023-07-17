@@ -1,22 +1,62 @@
 package handlers
 
-import "encoding/json"
-
-type Event struct {
-	Event_type string          `json:"event_type"`
-	Payload    json.RawMessage `json:"payload"` // change this to
-}
+import (
+	"backend/db"
+	"backend/events"
+	"encoding/json"
+)
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":    LoginPage,
-	"register": RegisterPage,
-	"profile":  ProfilePage,
-	//"createPost": CreatePost,
+	"login":          LoginPage,
+	"register":       RegisterPage,
+	"logout":         Logout,
+	"profile":        ProfilePage,
+	"updatePrivacy":  UpdatePrivacy,
+	"profileList":    ProfileList,
+	"createPost":     CreatePost,
+	"getPosts":       GetPosts,
+	"createComment":  CreateComment,
+	"exploreUsers":   ExploreUsers,
+	"followRequest":  FollowOrJoinRequest,
+	"followResponse": FollowOrJoinResponse,
+	"requestNotif":   RequestNotifications,
+	"createGroup":    CreateGroup,
+	"exploreGroups":  ExploreGroups,
+	"getNonMembers":  GetNonMembers,
+	"createEvent":    CreateEvent,
+	"getGroupEvents": GetGroupEvents,
+	"participate":    ParticipateInEvent,
 }
 
+type Response struct {
+	Message    string       `json:"message"`
+	Event      events.Event `json:"event"`
+	StatusCode int          `json:"statusCode"`
+}
 type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+type UserCredential struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+}
+
+type ProfileListRequest struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	Request   string `json:"request"`
+}
+
+type ProfileRequest struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	ProfileId int    `json:"profileId"`
+}
+type RequestPost struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	PostId    int    `json:"postId"`
 }
 type RegisterData struct {
 	NickName  string `json:"nickName,omitempty"` // optional
@@ -24,59 +64,111 @@ type RegisterData struct {
 	LastName  string `json:"lastName"`
 	BirthDate string `json:"birthdate"`
 	Email     string `json:"email"`
-	Password  string `json:"matchPassword"`
+	Password  string `json:"password"`
 	AboutMe   string `json:"aboutme,omitempty"` // optional
 	Avatar    string `json:"avatar,omitempty"`  // optional
 }
 
-// TODO: we could remove success and make message more general
-type Response struct {
-	//Success    bool   `json:"success"`
-	Message    string `json:"message"`
-	Event      Event  `json:"event"`
-	StatusCode int    `json:"statusCode"`
+type SmallProfile struct {
+	UserId    int     `json:"userId"`
+	FirstName string  `json:"firstName"`
+	LastName  string  `json:"lastName"`
+	Avatar    *string `json:"avatar"`
 }
+
 type Profile struct {
-	UserId       int            `json:"userId"` // become uuid later
+	SessionId    string         `json:"sessionId"`
+	UserId       int            `json:"userId"`
 	NickName     string         `json:"nickName"`
 	FirstName    string         `json:"firstName"`
 	LastName     string         `json:"lastName"`
 	Avatar       *string        `json:"avatar"` //
+	Relation     string         `json:"relation"`
+	Status       string         `json:"privacy"`
 	FollowerNum  int            `json:"followerNum"`
 	FollowingNum int            `json:"followingNum"`
 	PrivateData  PrivateProfile `json:"privateProfile"`
 }
+
 type PrivateProfile struct {
 	BirthDate string `json:"birthdate"`
 	Email     string `json:"email"`
 	AboutMe   string `json:"aboutme"`
-	Followers []int  `json:"followers"` // become array of uuid
-	Following []int  `json:"following"` // become array of uuid
+	Followers []int  `json:"followers"`
+	Following []int  `json:"following"`
 }
 
-// add post struct coming from frontend
-/* type Post struct {
-	UserId  int    `json:"userId"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	Status  string `json:"status"` ------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
-	followers []int `json:"followers"`---> this one related to status
-	Image   string `json:"image"`
-	GroupId int    `json:"groupId"` ---> if post is a group post
+type Comment struct {
+	SessionId      string       `json:"sessionId"`
+	CommentId      int          `json:"commentId"`
+	PostId         int          `json:"postId"`
+	UserId         int          `json:"userId"`
+	CreatorProfile SmallProfile `json:"creatorProfile"`
+	Content        string       `json:"content"`
+	Image          string       `json:"image,omitempty"`
+	Date           string       `json:"Date"`
 }
-	comment struct coming from frontend
-	type Comment struct {
-		PostId   int    `json:"postId"`
-		UserId   int    `json:"userId"`
-		Content  string `json:"content"`
-		ParentId int    `json:"parentId"`
-	}
 
-	send post struct to frontend
-	type SendPost struct {
-	PostId   int    `json:"postId"`
-	Post    Post   `json:"post"`
-	Comments []Comment `json:"comments"`
-	}
+type Post struct {
+	SessionId      string       `json:"sessionId"`
+	PostId         int          `json:"postId"`
+	UserId         int          `json:"userId"`
+	CreatorProfile SmallProfile `json:"creatorProfile"`
+	Title          string       `json:"title"`
+	Content        string       `json:"content"`
+	Status         string       `json:"status"`    //---> if the post is "public", "private" or "semi-private"s.
+	Followers      []int        `json:"followers"` //---> selected followers list, if its semi-private.
+	Image          string       `json:"image,omitempty"`
+	GroupId        int          `json:"groupId"` // ---> if post is a group post
+	Comments       []Comment    `json:"comments"`
+	Date           string       `json:"date"`
+}
 
-*/
+type ReqAllPosts struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	From      string `json:"from"` // from profile or from group
+	ProfileId int    `json:"profileId"`
+	GroupId   int    `json:"groupId"`
+}
+
+type Request struct {
+	SessionId  string `json:"sessionId"`
+	SenderId   int    `json:"senderId"`
+	ReceiverId int    `json:"receiverId"`
+	GroupId    int    `json:"groupId"`
+	NotifId    int    `json:"notifId"`
+	Content    string `json:"content"`
+}
+type Group struct {
+	SessionId      string         `json:"sessionId"`
+	CreatorProfile SmallProfile   `json:"creatorProfile"`
+	GroupId        int            `json:"groupId"`
+	Title          string         `json:"title"`
+	Description    string         `json:"description"`
+	Status         string         `json:"status"` // join, pending, waiting, member
+	NoMembers      int            `json:"noMembers"`
+	Members        []SmallProfile `json:"members"`
+	Date           string         `json:"date"`
+}
+
+type GroupEvent struct {
+	SessionId      string                    `json:"sessionId"`
+	CreatorProfile SmallProfile              `json:"creatorProfile"`
+	Event          db.Event                  `json:"event"`
+	Status         string                    `json:"status"` // going,not_going
+	Participants   map[string][]SmallProfile `json:"participants"`
+}
+
+type Notification struct {
+	SessionId    string          `json:"sessionId"`
+	Profile      SmallProfile    `json:"profile"`
+	GroupName    string          `json:"groupName"`
+	Notification db.Notification `json:"notifications"`
+}
+type NonMembers struct {
+	SessionId  string         `json:"sessionId"`
+	UserId     int            `json:"userId"`
+	GroupId    int            `json:"groupId"`
+	NonMembers []SmallProfile `json:"nonMembers"`
+}
