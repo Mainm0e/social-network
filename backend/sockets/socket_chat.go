@@ -234,17 +234,20 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 /********************** IS TYPING EVENT / LOGIC ******************************/
 
 func (m *Manager) HandleIsTypingEvent(event events.Event, client *Client) {
+	// Initialise an IsTyping struct and unmarshal the event payload into it
 	var isTyping IsTyping
 	if err := json.Unmarshal(event.Payload, &isTyping); err != nil {
 		log.Printf("HandleIsTypingEvent() - Error unmarshalling event payload: %v", err)
 		return
 	}
 
+	// Wrap the event in an events.Event struct
 	typingEvent := events.Event{
 		Type:    "isTyping",
 		Payload: event.Payload,
 	}
 
+	// Marshal the event into JSON bytes
 	eventBytes, err := json.Marshal(typingEvent)
 	if err != nil {
 		log.Printf("HandleIsTypingEvent() - Error marshalling event: %v", err)
@@ -262,9 +265,19 @@ func (m *Manager) HandleIsTypingEvent(event events.Event, client *Client) {
 		if isTyping.ChatType == "private" && otherClient.ID == isTyping.TargetID {
 			otherClient.Egress <- eventBytes
 		} else if isTyping.ChatType == "group" {
-			// TODO: Handle group chat typing events
+			memberUserIDs, err := handlers.GetAllGroupMemberIDs(isTyping.TargetID)
+			if err != nil {
+				log.Printf("HandleIsTypingEvent() - Error getting group member IDs: %v", err)
+				return true // Continue iteration
+			}
+			// Check if the otherClient.ID is in the list of member IDs
+			for _, id := range memberUserIDs {
+				if otherClient.ID == id {
+					otherClient.Egress <- eventBytes
+					break
+				}
+			}
 		}
-
 		return true // Continue iteration
 	})
 }
