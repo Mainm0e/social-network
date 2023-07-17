@@ -26,10 +26,10 @@ function RegisterPage() {
 
   // handleOptionChange function
   // This function is used to change the form state
-  const handleOptionChange = (event) => {
-    const selectedOption = event.target.value;
-    setSelectedOption(selectedOption);
-  };
+  // const handleOptionChange = (event) => {
+  //   const selectedOption = event.target.value;
+  //   setSelectedOption(selectedOption);
+  // };
 
   // handleInfoChange function
   // this function get the values from Info1 and Info2 components
@@ -167,7 +167,7 @@ function RegisterPage() {
           onChange={handleInfoChange}
           registerStatus={registerStatus}
         />{" "}
-                        {selectedOption !== "info1" && (
+        {selectedOption !== "info1" && (
       <button type="button" onClick={handleBack}>
         Back
       </button>

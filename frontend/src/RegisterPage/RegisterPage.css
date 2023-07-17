@@ -57,6 +57,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-family: myFancyFont;
+  align-items: center;
 }
 
 .register-container button:hover {
