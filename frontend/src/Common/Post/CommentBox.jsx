@@ -3,12 +3,12 @@ import { getCookie, getUserId } from "../../tools/cookie";
 import "./CommentBox.css";
 import { checkCommentData } from "../../tools/checkdata";
 import { fetchData } from "../../tools/fetchData";
+
 const CommentBox = ({ id, comments, activePost }) => {
   // return createcomment and commentlist button and default commentlist
   const [boxState, setBoxState] = useState(null);
   const [check, setCheck] = useState(null);
   const changeState = (e) => {
-    console.log(e.target.value)
     if (e.target.value === "Create Comment" && check !== "create") {
       activePost(id);
       setCheck("create");
@@ -106,7 +106,6 @@ const CreateComment = ({ id, showComment }) => {
       const payload = commentData;
       fetchData(method, type, payload).then((data) => {
         /* !!todo!! if comment is sended it will go too comment list */
-        console.log(data);
       });
     } else {
       alert(check.message);

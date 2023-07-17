@@ -20,7 +20,6 @@ const LeftBox = ({user,link}) => {
           sessionId: getCookie("sessionId"),
         };
         fetchData(method, type, payload).then((data) => {
-          console.log(data.length);
           setNotification(data.length);
         });
         }, []);
@@ -102,7 +101,11 @@ const LinkBox = ({type,show}) => {
                 setLink(profile_link)
             }
         } else if (url.pathname === "/group"){
+            if (id === null || id === undefined || id === ""){
+                setLink(default_link)
+            } else {
            setLink(group_link)
+            }
         }
     }, [])
     if (show === true) {

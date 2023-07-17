@@ -39,6 +39,7 @@ const Notification = ({ clearBox }) => {
     ));
   };
   if (notificationData.length  > 0) {
+    console.log(notificationData, "notificationData")
   return (
     <div className="notification-container">
       {showNotification && renderNotifications()}{" "}
@@ -68,7 +69,7 @@ else {
 export default Notification;
 
 const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
-  if (notifications.type === "follow_request" || notifications.type === "group_request" ) {
+  if (notifications.type === "follow_request" || notifications.type === "group_request" || notifications.type === "group_invitation") {
     const handleAccept = (value) => {
       console.log(notifications, "notifications in handleAccept")
       const method = "POST";
@@ -81,6 +82,12 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
         notifId: notifications.notificationId,
         content: value, // Use the value parameter here
       };
+      if (notifications.type === "group_request"){
+        payload.receiverId = 0;
+      }else if (notifications.type === "group_invitation"){
+        payload.senderId = 0;
+      }
+ 
       fetchData(method, type, payload).then((data) => {
         window.location.reload();
         handleAcceptDecline(); // Call the handler function to hide the notification
@@ -96,7 +103,10 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
           </span>
         </div>
         <div className="notification-content">
-          <span>sent you a {notifications.type}</span>
+          {console.log(notifications, "notifications")} 
+          {notifications.type === "follow_request" && <span>sent you a follow request</span>}
+          {notifications.type === "group_request" && <span>sent you a group request</span>}
+          {notifications.type === "group_invitation" && <span>invited you to a group</span>}
         </div>
         <div className="notification-btn">
           <button value="accept" onClick={() => handleAccept("accept")}>

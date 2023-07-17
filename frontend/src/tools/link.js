@@ -8,6 +8,9 @@ export const home = () => {
 export const profile = (id) => {
     window.location.href = "/user?id=" + id+"#postlist";
 };
+export const exploreGroup = () => {
+    window.location.href = "/group";
+  };
 export const link_following = () => {
     window.location.href = "#followings";
   }
@@ -17,3 +20,9 @@ export const link_followers = () => {
 export const link_notifications = () => {
     window.location.href = "#notifications";
   }
+  export const link_eventlist = () => {
+    window.location.href = "#eventlist";
+  }
+ export const memberlist = () => {
+   window.location.href = "#memberlist";
+ }

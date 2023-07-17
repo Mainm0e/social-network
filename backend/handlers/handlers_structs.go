@@ -7,9 +7,9 @@ import (
 )
 
 var Events = map[string]func(json.RawMessage) (Response, error){
-	"login":    LoginPage,
-	"register": RegisterPage,
-	//TODO: "logout":         LogoutPage,
+	"login":          LoginPage,
+	"register":       RegisterPage,
+	"logout":         Logout,
 	"profile":        ProfilePage,
 	"updatePrivacy":  UpdatePrivacy,
 	"profileList":    ProfileList,
@@ -22,17 +22,10 @@ var Events = map[string]func(json.RawMessage) (Response, error){
 	"requestNotif":   RequestNotifications,
 	"createGroup":    CreateGroup,
 	"exploreGroups":  ExploreGroups,
-	"sendInvetaion":  SendInvitation,
-
-	/*
-		TODO: im not saying that we should have these functions but we need the functionality of these functions:
-		"responseInvitation": AcceptInvitation,
-		"requestToJoin":      RequestToJoin,
-		"responseToJoin":     ResponseToJoin,
-		"getGroupEvents":     GetGroupEvents,
-		"responseEvent":      ResponseEvent,
-	*/
-
+	"getNonMembers":  GetNonMembers,
+	"createEvent":    CreateEvent,
+	"getGroupEvents": GetGroupEvents,
+	"participate":    ParticipateInEvent,
 }
 
 type Response struct {
@@ -44,7 +37,7 @@ type LoginData struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
-type LoginResponse struct {
+type UserCredential struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 }
@@ -59,6 +52,11 @@ type ProfileRequest struct {
 	SessionId string `json:"sessionId"`
 	UserId    int    `json:"userId"`
 	ProfileId int    `json:"profileId"`
+}
+type RequestPost struct {
+	SessionId string `json:"sessionId"`
+	UserId    int    `json:"userId"`
+	PostId    int    `json:"postId"`
 }
 type RegisterData struct {
 	NickName  string `json:"nickName,omitempty"` // optional
@@ -92,18 +90,12 @@ type Profile struct {
 	PrivateData  PrivateProfile `json:"privateProfile"`
 }
 
-type PrivacyData struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-	Privacy   string `json:"privacy"`
-}
-
 type PrivateProfile struct {
 	BirthDate string `json:"birthdate"`
 	Email     string `json:"email"`
 	AboutMe   string `json:"aboutme"`
-	Followers []int  `json:"followers"` // become array of uuid
-	Following []int  `json:"following"` // become array of uuid
+	Followers []int  `json:"followers"`
+	Following []int  `json:"following"`
 }
 
 type Comment struct {
@@ -124,18 +116,12 @@ type Post struct {
 	CreatorProfile SmallProfile `json:"creatorProfile"`
 	Title          string       `json:"title"`
 	Content        string       `json:"content"`
-	Status         string       `json:"status"`    //------> this one is important if its semi-private we need to get those followers id too and should handle in frontend that if its semi-private then user have to select followers.
-	Followers      []int        `json:"followers"` //---> this one related to status
+	Status         string       `json:"status"`    //---> if the post is "public", "private" or "semi-private"s.
+	Followers      []int        `json:"followers"` //---> selected followers list, if its semi-private.
 	Image          string       `json:"image,omitempty"`
 	GroupId        int          `json:"groupId"` // ---> if post is a group post
 	Comments       []Comment    `json:"comments"`
 	Date           string       `json:"date"`
-}
-
-type RequestPost struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-	PostId    int    `json:"postId"`
 }
 
 type ReqAllPosts struct {
@@ -146,10 +132,6 @@ type ReqAllPosts struct {
 	GroupId   int    `json:"groupId"`
 }
 
-type Explore struct {
-	SessionId string `json:"sessionId"`
-	UserId    int    `json:"userId"`
-}
 type Request struct {
 	SessionId  string `json:"sessionId"`
 	SenderId   int    `json:"senderId"`
@@ -171,13 +153,21 @@ type Group struct {
 }
 
 type GroupEvent struct {
-	SessionId    string                    `json:"sessionId"`
-	Event        db.Event                  `json:"event"`
-	Participants map[string][]SmallProfile `json:"participants"`
+	SessionId      string                    `json:"sessionId"`
+	CreatorProfile SmallProfile              `json:"creatorProfile"`
+	Event          db.Event                  `json:"event"`
+	Status         string                    `json:"status"` // going,not_going
+	Participants   map[string][]SmallProfile `json:"participants"`
 }
 
 type Notification struct {
 	SessionId    string          `json:"sessionId"`
 	Profile      SmallProfile    `json:"profile"`
 	Notification db.Notification `json:"notifications"`
+}
+type NonMembers struct {
+	SessionId  string         `json:"sessionId"`
+	UserId     int            `json:"userId"`
+	GroupId    int            `json:"groupId"`
+	NonMembers []SmallProfile `json:"nonMembers"`
 }

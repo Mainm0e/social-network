@@ -97,15 +97,6 @@ const CreateGroup = () => {
 
 const Group = ({ groupId, refreshComponent }) => {
   const [data, setData] = useState(null);
- /*  useEffect(() => {
-    const method = "POST"
-    const type = "group"
-    const payload = { 
-      sessionId: getCookie("sessionId"), 
-      userId: getUserId("userId"), 
-      groupId: groupId }
-    fetchData(method,type, payload).then((data) => setData(data) );
-  }, [groupId]); */
   useEffect(() => {
     const method = "POST"
    const type = "exploreGroups"

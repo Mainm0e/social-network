@@ -208,15 +208,21 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 
 	// Find the client with the matching ID and send the event
 	m.Clients.Range(func(key interface{}, value interface{}) bool {
-		client := value.(*Client)
+		client, ok := value.(*Client)
+		if !ok {
+			log.Printf("SendChatHistory() error - Could not cast value to *Client")
+			// Handle the error if need be... The value is not of type *Client.
+			return true
+		}
 		if client.ID == chatHistory.ClientID {
 			select {
 			case client.Egress <- eventJSON:
+				log.Printf("SendChatHistory() - Sent chat history to client %d\n", chatHistory.ClientID)
 			default:
 				// The Egress channel could be full or closed, or the client could be disconnected
 				log.Printf("SendChatHistory() error - Could not send message to client %d\n", chatHistory.ClientID)
 			}
-			return false // Stop ranging as we found the client
+			return false // Stop ranging as the client is found
 		}
 		return true // Continue ranging
 	})
@@ -275,6 +281,9 @@ GroupMsg, and broadcasts it to all clients in the chat. It returns an error valu
 which is non-nil if any of the broadcasting operations failed.
 */
 func (m *Manager) BroadcastMessage(msg ChatMsg) error {
+	// Log the broadcast attempt
+	log.Printf("BroadcastMessage() - Broadcasting message: %v\n", msg)
+
 	msgType := msg.GetMsgType()
 	receiverID := msg.GetReceiverID()
 	msgEvent := msg.WrapMsg()
@@ -309,29 +318,36 @@ func (m *Manager) BroadcastMessage(msg ChatMsg) error {
 /*
 HandleChatMessage() takes a ChatMsg interface, which is either a PrivateMsg or a
 GroupMsg, and handles it. This means that it records the message to the database
-and broadcasts it to all clients in the chat. It returns an error value, which
-is non-nil if any of the operations failed.
+and broadcasts it to all clients in the chat. It does not return anything, but
+logs errors if any are encountered.
 */
-func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) error {
+func (m *Manager) HandleChatEvent(chatEvent events.Event, client *Client) {
+	// Log the attempt to handle the event
+	log.Printf("HandleChatMessage() - Received event: %v\n", chatEvent)
+
 	// Unmarshal the event into a ChatMsg interface
 	msg, err := UnmarshalEventToChatMsg(chatEvent)
 	if err != nil {
-		return fmt.Errorf("HandleChatMessage() error - %v", err)
+		log.Printf("HandleChatMessage() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
 
 	// Store message in database
 	err = RecordMsgToDB(msg)
 	if err != nil {
-		return fmt.Errorf("HandleChatMessage() error - %v", err)
+		log.Printf("HandleChatMessage() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
 
 	// Broadcast message to clients
 	err = m.BroadcastMessage(msg)
 	if err != nil {
-		return fmt.Errorf("HandleChatMessage() error - %v", err)
+		log.Printf("HandleChatMessage() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
-
-	return nil
 }
 
 /*
@@ -339,28 +355,71 @@ HandleChatHistoryRequestEvent() takes a ChatHistoryRequest event as input, along
 with a pointer to the client that sent the request, and handles it. This means that
 it first unmashals the event into a ChatHistoryRequest struct, then fetches the
 chat history from the database, and finally sends the chat history to the client.
-It returns an error value, which is non-nil if any of the operations failed.
+It does not return anything, but logs errors if any are encountered.
 */
-func (m *Manager) HandleChatHistoryRequestEvent(chatHistoryRequestEvent events.Event, client *Client) error {
+func (m *Manager) HandleChatHistoryRequestEvent(chatHistoryRequestEvent events.Event, client *Client) {
+	// Log the attempt to handle the event
+	log.Printf("HandleChatHistoryRequestEvent() - Received event: %v\n", chatHistoryRequestEvent)
+
 	// Unmarshal the event into a ChatHistoryRequest struct
 	chatHistoryRequest, err := UnmarshalEventToChatHistoryRequest(chatHistoryRequestEvent)
 	if err != nil {
-		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+		log.Printf("HandleChatHistoryRequestEvent() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
 
 	// Get chat history from database, returned as a pointer to a ChatHistory struct
 	chatHistory, err := FetchChatHistory(chatHistoryRequest)
 	if err != nil {
-		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+		log.Printf("HandleChatHistoryRequestEvent() error - %v", err)
+		// TODO: Send error message to client
+		return
 	}
 
 	// Send chat history to client
 	err = m.SendChatHistory(chatHistory)
 	if err != nil {
-		return fmt.Errorf("HandleChatHistoryRequestEvent() error - %v", err)
+		log.Printf("HandleChatHistoryRequestEvent() error - %v", err)
+		// TODO: Send error message to client
+		return
+	}
+}
+
+/*
+SendErrorMessageToClient() is a method of the Manager struct. It takes a pointer
+to a client, an error message string and a status code integer as input, and sends
+the error message to the client. It returns nothing.
+*/
+func (m *Manager) SendErrorMessageToClient(client *Client, message string, statusCode int) {
+	// Create ErrorMessage
+	errMsg := events.ErrorMessage{
+		Message:    message,
+		StatusCode: statusCode,
 	}
 
-	return nil
+	// Package ErrorMessage into an Event
+	event, err := events.PackageErrorEvent(errMsg)
+	if err != nil {
+		log.Printf("SendErrorMessageToClient error packaging error: %v", err)
+		return
+	}
+
+	// Convert Event to JSON
+	eventJSON, err := json.Marshal(event)
+	if err != nil {
+		log.Printf("SendErrorMessageToClient error marshalling event: %v", err)
+		return
+	}
+
+	// Send the Event JSON to client
+	select {
+	case client.Egress <- eventJSON:
+	default:
+		// The Egress channel could be full or closed, or the client could be disconnected
+		log.Printf("SendErrorMessageToClient() error - Could not send error message to client %d\n", client.ID)
+		return
+	}
 }
 
 // TODO: HandleIsTypingEvent(): Receive isTyping event and broadcast to all clients in chat

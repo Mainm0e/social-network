@@ -24,7 +24,9 @@ const RegisterGroup = (user) => {
             description: e.target.description.value,
             date:null
         };
-       fetchData(method, type, payload).then((data) => console.log(data));
+       fetchData(method, type, payload).then((data) => {
+                window.location.href = "/group";
+       });
     }
 
     /* registerGroup form */
@@ -32,12 +34,12 @@ const RegisterGroup = (user) => {
     return (
         <div className="registerGroup">
             <h1>Register Group</h1>
-            <form onSubmit={sendRequest}>
+            <form onSubmit={sendRequest} className='register-box'>
                 <label htmlFor="name">Name</label>
                 <input type="text" name="name" id="name" />
                 <label htmlFor="description">Description</label>
                 <textarea name="description" id="description" />
-                <input type="submit" value="Register" />
+                <input  className="submit-register" type="submit" value="Register" />
             </form>
         </div>
     );

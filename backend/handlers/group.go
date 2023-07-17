@@ -85,7 +85,7 @@ base on "status" field in group_member table. if user does not have any relation
 if any error occurred it returns an error with a descriptive message.
 */
 func groupUserRelation(userId, groupId int) (string, error) {
-	groupMember, err := db.FetchData("group_member", "groupId", groupId)
+	groupMember, err := db.FetchData("group_member", "groupId = ?", groupId)
 	if err != nil {
 		return "", errors.New("Error fetching group member" + err.Error())
 	}
@@ -180,23 +180,23 @@ it returns a response with a descriptive message and an event with the groups pa
 */
 func ExploreGroups(payload json.RawMessage) (Response, error) {
 	var response Response
-	var explore Explore
-	err := json.Unmarshal(payload, &explore)
+	var credential UserCredential
+	err := json.Unmarshal(payload, &credential)
 	if err != nil {
 		// handle the error
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if explore.SessionId == "" {
+	if credential.SessionId == "" {
 		response = Response{"sessionId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
-	if explore.UserId == 0 {
+	if credential.UserId == 0 {
 		response = Response{"userId is required", events.Event{}, http.StatusBadRequest}
 		return response, err
 	}
 	//get groups from database
-	groups, err := ReadAllGroups(explore.SessionId, explore.UserId)
+	groups, err := ReadAllGroups(credential.SessionId, credential.UserId)
 	if err != nil {
 		response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
 		return response, err

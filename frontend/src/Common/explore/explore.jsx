@@ -11,15 +11,15 @@ const Explore = ({type}) => {
         const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId")}
         fetchData(method,type,payload).then((data)=>{
             setData(data)
-            console.log("is data ins explore",data)
         })
         }, []);  
         const followRequest = async (id) => {
         const method = "POST"
         const type = "followRequest"
         const payload ={ sessionId: getCookie("sessionId"), senderId: getUserId("userId"), groupId:id}
-        fetchData(method,type,payload).then((data) => {console.log(data)})
-       /*  navigateToProfile(type,id) */
+        fetchData(method,type,payload).then((data) => {})
+        /* refect */
+        window.location.reload();
       };
         
         const generateExploreList = () => {
@@ -56,7 +56,6 @@ const Explore = ({type}) => {
                         <div className="explore_list_item_create_time">
                             <p>{group.date}</p>
                         </div>
-                        // TODO: add a button to follow the group
                         {group.status !== "member" ? 
                         <div className="explore_list_item_follow_btn">
                         <button onClick={() => followRequest(group.groupId)}>{group.status}</button>

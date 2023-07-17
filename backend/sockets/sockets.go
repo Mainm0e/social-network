@@ -113,11 +113,11 @@ func (c *Client) ReadData() {
 			break
 		}
 
-		err = handler(event, c)
-		if err != nil {
-			log.Printf("sockets.ReadData() - Error handling event: %v", err)
-			break
-		}
+		handler(event, c)
+		// if err != nil {
+		// 	log.Printf("sockets.ReadData() - Error handling event: %v", err)
+		// 	break
+		// }
 	}
 }
 
@@ -192,8 +192,7 @@ func (m *Manager) Run() {
 		// A new client is registering: Store it in the clients map.
 		case client := <-m.Register:
 			log.Println("sockets.Run() - Registering new client")
-			// The true value is just a placeholder, since the map is used as a set.
-			m.Clients.Store(client, true)
+			m.Clients.Store(client.ID, client)
 
 		// A client is unregistering: If it exists in the clients map, remove it.
 		case client := <-m.Unregister:
@@ -233,12 +232,6 @@ reading and writing goroutines for that client. Parameters:
 func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	log.Println("Websocket initialisation started...")
 
-	conn, err := websocketUpgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Printf("Failed to set websocket upgrade: %+v", err)
-		return
-	}
-
 	// Perform validation checks on the session cookie.
 	cookie, err := r.Cookie(sessions.COOKIE_NAME)
 	if err != nil {
@@ -248,7 +241,7 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	} else {
 		isValid, err := sessions.CookieCheck(cookie)
 		if !isValid || err != nil {
-			log.Printf("sessions.ServeWS() error - Invalid sessionID cookie: %v", err)
+			log.Printf("sessions.ServeWS() error - Invalid sessionID cookie for session \" %v \": %v", cookie.Value, err)
 			http.Error(w, "Invalid session", http.StatusUnauthorized)
 			return
 		}
@@ -258,7 +251,14 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the associated UserID from the sessions Store.
 	userSession, sessionExists, err := sessions.Store.Get(sessionID)
 	if err != nil || !sessionExists {
-		log.Printf("sockets.ServeWS() error - Failed to retrieve UserID from sessions Store: %v", err)
+		log.Printf("sockets.ServeWS() error - Failed to retrieve UserID for session \" %v \" from sessions Store: %v", sessionID, err)
+		return
+	}
+
+	// Upgrade the HTTP connection to a WebSocket connection.
+	conn, err := websocketUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Printf("Failed to set websocket upgrade: %+v", err)
 		return
 	}
 

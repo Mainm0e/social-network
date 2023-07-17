@@ -1,69 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { getCookie } from "../../tools/cookie";
-import "./UserList.css";
+import { getCookie, getUserId } from "../../tools/cookie";
 import { fetchData } from "../../tools/fetchData";
 import { profile } from "../../tools/link";
-
-const UserList = ({ title, id, clearBox }) => {
-  const [profilename, setProfilename] = useState("");
-  const [data, setData] = useState(null);
+import "./UserList.css";
+const Memberlist = ({ id, clearBox }) => {
+  const [memberlist, setMemberlist] = useState(null);
   const closeBox = () => {
     window.location.hash = "";
     clearBox();
   };
-  const getProfileName = () => {
-    // get element by id profile-firstName
-    const firstName = document.getElementById("profile-firstName");
-    setProfilename(firstName.innerHTML);
-  }
   useEffect(() => {
     const method = "POST";
-    const type = "profileList";
+    const type = "exploreGroups";
     const payload = {
       sessionId: getCookie("sessionId"),
-      userId: id,
-      request: title,
+      userId: getUserId("userId"),
     };
     fetchData(method, type, payload).then((data) => {
-      setData(data);
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].groupId === id) {
+          setMemberlist(data[i].members);
+        }
+      }
     });
-    getProfileName();
   }, []);
-  if (data === null) {
-    //no follower or following
+  if (memberlist === null) {
     return (
-        <div className="notification-container">
-          <div className="notification">
-            <div className="notification-content">
-              <span>No {title}</span>
-            </div>
-          </div>
-          <div className="user-list-footer">
-            <button onClick={closeBox}>Close</button>
-          </div>
-        </div>
-      );
+      <div className="loading">
+        <div>Loading...</div>
+      </div>
+    );
   } else {
     return (
       <div className="user-list">
         <div className="user-list-container">
           <div className="user-list-header">
-            {title === "followers" ? (
-              <h2>{profilename} is being followed by:</h2>
-            ) : (<></>)}
-            {title === "followings" ? (
-              <h2>{profilename} is following</h2>
-            ) : (<></>)}
+            <h2>Members</h2>
           </div>
           <div className="user-list-body">
             <ul>
-              {data.map((user) => (
+              {memberlist.map((user) => (
                 <li key={user.userId}>
                   <div className="user-list-item" onClick={() => profile(user.userId)}>
                     <div className="user-list-item-left">
                       <img src={user.avatar} alt="user" />
                     </div>
-                    <div className="user-list-item-right" >
+                    <div className="user-list-item-right">
                       <span>{user.firstName}</span>
                       <span> </span>
                       <span>{user.lastName}</span>
@@ -82,4 +64,4 @@ const UserList = ({ title, id, clearBox }) => {
   }
 };
 
-export default UserList;
+export default Memberlist;

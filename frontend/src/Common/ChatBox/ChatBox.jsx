@@ -4,36 +4,8 @@ import ChatList from './ChatList/ChatList';
 import ChatRoom from './ChatRoom/ChatRoom';
 const ChatBox = () => {
 
-/*   //start socket connection
-  useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080.ws');
-
-    // Connection opened
-    socket.addEventListener('open', (event) => {
-      console.log('WebSocket connected');
-    });
-
-    // Listen for messages
-    socket.addEventListener('message', (event) => {
-      console.log('Received message:', event.data);
-    });
-
-    // Connection closed
-    socket.addEventListener('close', (event) => {
-      console.log('WebSocket disconnected');
-    });
-
-    // Clean up the WebSocket connection on component unmount
-    return () => {
-      socket.close();
-    };
-  }, []); // Empty dependency array to run the effect only once
- */
-  
-
     const [chat_list, setChatlist] = useState(false);
     const [room, setRoom] = useState(null);
-  
     const openChatList = () => {
       setChatlist(true);
     };
@@ -50,8 +22,14 @@ const ChatBox = () => {
       );
     };
   
-    const handleUserSelection = (selectedUser) => {
-      setRoom(selectedUser);
+    const handleUserSelection = (selectedUser,type,id) => {
+      setRoom(null);
+      const payload = {
+        type: type,
+        selectedUser: selectedUser,
+        id: id,
+      };
+      setRoom(payload);
     };
   
     const handleCloseChatRoom = (isClosed) => {
@@ -59,12 +37,12 @@ const ChatBox = () => {
         setRoom(null);
       }
     };
-  
+    
     return (
       <>
         <div className="chat-container">
           {room && (
-            <ChatRoom receiver={room} onClose={handleCloseChatRoom} />
+            <ChatRoom receiver={room.selectedUser} type={room.type} id={room.id} onClose={handleCloseChatRoom} />
           )}
           {chat_list ? (
             <>
