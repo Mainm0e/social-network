@@ -112,14 +112,22 @@ const getChatContent = () => {
 
   // send typing event to server when user is typing
   const typingMessage = (e) => {
-    if (receiver.status === "online") {
-      const message = {
-        sender: getUserId("userId"),
-        receiver: parseInt(receiver.userId),
-        message: "typing",
-      };
-      /* socket.send(JSON.stringify(message)); // Send the message as a string */
+
+    const payload = {
+      sessionID: getCookie("sessionId"),
+      chatType: type,
+      clientID: getUserId("userId"),
+      targetID: receiver.userId,
+    };
+    if (type === "group") {
+      payload.targetID = id;
     }
+    console.log("me typing",payload)
+    const chatHistoryRequest = {
+      type: "isTyping",
+      payload: payload,
+    };
+    socket.send(JSON.stringify(chatHistoryRequest)); // Send the message as a string 
     setMessageInput(e);
   };
 
@@ -186,9 +194,22 @@ const getChatContent = () => {
       };
 
       setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+    }/* else if (message.type === "PrivateMsg") {
+      // ! SAME HERE
+      // ! struct message that i got from server is different from getChatHistory 
+      const newMessage = {
+        senderId: message.payload.senderID,
+        receiverId: message.payload.receiverID,
+        messageContent: message.payload.message,
+        sendTime: message.payload.timeStamp,
+      };
+
+      setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+    } */ else if (message.type === "isTyping") {
+      console.log("typing", message);
     } else {
       console.log("message", message);
-    }
+    } 
   };
   
   if (isClosed) {
