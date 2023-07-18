@@ -21,27 +21,32 @@ value, which is non-nil if any of the broadcasting operations failed or if
 the receiver was not found.
 */
 func (m *Manager) BroadcastPrivateMsg(senderID int, receiverID int, msgEventJSON []byte) error {
-	var sent bool
-	// The range function on a sync.map accepts a function of the form
-	// func(key, value interface{}) bool, which it calls once for each
-	// item in the map. If the function returns false, the iteration stops.
+	// Flags to check if sender and receiver have been updated
+	senderUpdated := false
+	receiverUpdated := false
+
+	// Iterate through the map of clients
 	m.Clients.Range(func(key, client interface{}) bool {
-		if client.(*Client).ID == receiverID || client.(*Client).ID == senderID {
-			select {
-			case client.(*Client).Egress <- msgEventJSON:
-				sent = true
-			default:
-				close(client.(*Client).Egress)
-				m.Clients.Delete(key)
-				return false
+		// Check if the current client is the sender or the receiver
+		if client.(*Client).ID == senderID || client.(*Client).ID == receiverID {
+			// Send the message to the client
+			client.(*Client).Egress <- msgEventJSON
+			// Set the respective flag to true
+			if client.(*Client).ID == senderID {
+				log.Printf("BroadcastPrivateMsg() to sender with ID: \" %v \" ", senderID)
+				senderUpdated = true
+			} else if client.(*Client).ID == receiverID {
+				log.Printf("BroadcastPrivateMsg() to receiver with ID: \" %v \" ", receiverID)
+				receiverUpdated = true
 			}
-			return false // Stop iteration after the message has been sent to target client
+			// Do not stop iteration; there may be another client to send to
 		}
-		return true
+		return true // Continue iteration regardless
 	})
 
-	if !sent {
-		return errors.New("message could not be sent: receiver not found")
+	// Check if both the sender and receiver have received the message
+	if !senderUpdated || !receiverUpdated {
+		return errors.New("BroadcastPrivateMsg() notice - sender or receiver not updated as respective logged in client not found")
 	}
 
 	return nil
