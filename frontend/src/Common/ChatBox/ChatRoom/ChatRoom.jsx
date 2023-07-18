@@ -11,6 +11,24 @@ const ChatRoom = (props) => {
   const [messageInput, setMessageInput] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [isTyping, setIsTyping] = useState(false); // store isTyping event from server
+  const [currentReceiver, setCurrentReceiver] = useState(receiver);
+  const [startChat , setStartChat] = useState(false);
+
+  // start chat function for make sure chat history is up to date
+  // when user change chat
+  // chatbox will scroll to bottom when start chat
+  const chatState = () => {
+    if (startChat === false) {
+      setTimeout(() => {
+        const chatMessages = document.getElementById("chat-container");
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 100);
+      setStartChat(true);
+    } else if (currentReceiver !== receiver) {
+      setCurrentReceiver(receiver);
+      setStartChat(false);
+    }
+  };
   // for chat history
 
   // for sending message
@@ -24,8 +42,7 @@ const ChatRoom = (props) => {
     const payload = {
       sessionID: getCookie("sessionId"),
       chatType: type,
-      clientID: getUserId("userId"),
-      targetID: receiver.userId,
+      clientID: getUserId("userId"),      targetID: receiver.userId,
     };
     if (type === "group") {
       payload.targetID = id;
@@ -44,13 +61,17 @@ const ChatRoom = (props) => {
         // for sending message
         setChatType("groupMsg");
       }
+      if (type === "private"){
+        // for sending message
+        setChatType("privateMsg");
+      }
     };
 
     const getChatContentAsync = async () => {
       await updateChatSettings();
       getChatContent();
     };
-
+    chatState();
     getChatContentAsync();
   }, [receiver,chatHistory]);
 
@@ -162,7 +183,6 @@ const ChatRoom = (props) => {
 
   // onmessage event listener
   // for catching event from server
-
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
     if (message.type === "chatHistory") {

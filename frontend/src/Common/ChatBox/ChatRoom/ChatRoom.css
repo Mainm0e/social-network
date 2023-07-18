@@ -85,7 +85,6 @@
 
 .chat-room .chat-room-content {
     flex-grow: 1;
-    overflow: scroll;
     max-width: 300px;
 }
 
