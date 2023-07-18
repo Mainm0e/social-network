@@ -12,7 +12,7 @@ const PostList = ({ profileId, groupId, from }) => {
     const userId = getUserId("userId");
     const sessionId = getCookie("sessionId");
     const method = "POST";
-    const type = "GetPosts";
+    const type = "getPosts";
     const payload = {
       sessionId: sessionId,
       userId: parseInt(userId),
