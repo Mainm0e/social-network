@@ -49,8 +49,11 @@ allows the server to respond to HTTP upgrade requests from clients that want to
 initiate a WebSocket connection.
 */
 var websocketUpgrader = websocket.Upgrader{
-	// Allow connections from any origin
-	CheckOrigin:     func(r *http.Request) bool { return true },
+	// Only allow connections from localhost:3000
+	CheckOrigin: func(r *http.Request) bool {
+		origin := r.Header.Get("Origin")
+		return origin == "http://localhost:3000" // TODO: Import constant from server package not working
+	},
 	ReadBufferSize:  READ_BUFFER_SIZE,
 	WriteBufferSize: WRITE_BUFFER_SIZE,
 }

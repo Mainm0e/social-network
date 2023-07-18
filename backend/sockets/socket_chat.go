@@ -231,6 +231,57 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 
 }
 
+/********************** IS TYPING EVENT / LOGIC ******************************/
+
+/*
+HandleIsTypingEvent() is a method of the Manager struct that takes an events.Event
+and a pointer to a Client as input. It unmarshals the event payload into an
+IsTyping struct, wraps the event in a JSON payload, and sends it to the relevant
+client(s) (i.e. the client(s) in the same chat as the client that sent the event).
+*/
+func (m *Manager) HandleIsTypingEvent(typingEvent events.Event, client *Client) {
+	// Initialise an IsTyping struct and unmarshal the event payload into it
+	var isTyping IsTyping
+	if err := json.Unmarshal(typingEvent.Payload, &isTyping); err != nil {
+		log.Printf("HandleIsTypingEvent() - Error unmarshalling event payload: %v", err)
+		return
+	}
+
+	// Marshal the event into JSON bytes
+	eventBytes, err := json.Marshal(typingEvent)
+	if err != nil {
+		log.Printf("HandleIsTypingEvent() - Error marshalling event: %v", err)
+		return
+	}
+
+	// Notify the relevant client(s) about the typing status.
+	m.Clients.Range(func(k, v interface{}) bool {
+		otherClient, ok := v.(*Client)
+		if !ok {
+			log.Printf("HandleIsTypingEvent() - Error casting client from client list: %v", v.(*Client))
+			return true // Continue iteration
+		}
+
+		if isTyping.ChatType == "private" && otherClient.ID == isTyping.TargetID {
+			otherClient.Egress <- eventBytes
+		} else if isTyping.ChatType == "group" {
+			memberUserIDs, err := handlers.GetAllGroupMemberIDs(isTyping.TargetID)
+			if err != nil {
+				log.Printf("HandleIsTypingEvent() - Error getting group member IDs: %v", err)
+				return true // Continue iteration
+			}
+			// Check if the otherClient.ID is in the list of member IDs
+			for _, id := range memberUserIDs {
+				if otherClient.ID == id {
+					otherClient.Egress <- eventBytes
+					break
+				}
+			}
+		}
+		return true // Continue iteration
+	})
+}
+
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
 
 func UnmarshalEventToChatMsg(msgEvent events.Event) (ChatMsg, error) {
@@ -421,5 +472,3 @@ func (m *Manager) SendErrorMessageToClient(client *Client, message string, statu
 		return
 	}
 }
-
-// TODO: HandleIsTypingEvent(): Receive isTyping event and broadcast to all clients in chat
