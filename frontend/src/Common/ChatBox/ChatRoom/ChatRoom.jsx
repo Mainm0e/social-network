@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 import "./ChatRoom.css";
-import { dummyMessages } from "../DummyData";
 import { WebSocketContext } from "../../../WebSocketContext/websocketcontext";
 import { getCookie, getUserId } from "../../../tools/cookie";
 
@@ -11,8 +10,25 @@ const ChatRoom = (props) => {
   const socket = useContext(WebSocketContext);
   const [messageInput, setMessageInput] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
-  const [newChatContent, setNewChatContent] = useState(null); // store new chat content from server
   const [isTyping, setIsTyping] = useState(false); // store isTyping event from server
+  const [currentReceiver, setCurrentReceiver] = useState(receiver);
+  const [startChat , setStartChat] = useState(false);
+
+  // start chat function for make sure chat history is up to date
+  // when user change chat
+  // chatbox will scroll to bottom when start chat
+  const chatState = () => {
+    if (startChat === false) {
+      setTimeout(() => {
+        const chatMessages = document.getElementById("chat-container");
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 100);
+      setStartChat(true);
+    } else if (currentReceiver !== receiver) {
+      setCurrentReceiver(receiver);
+      setStartChat(false);
+    }
+  };
   // for chat history
 
   // for sending message
@@ -26,8 +42,7 @@ const ChatRoom = (props) => {
     const payload = {
       sessionID: getCookie("sessionId"),
       chatType: type,
-      clientID: getUserId("userId"),
-      targetID: receiver.userId,
+      clientID: getUserId("userId"),      targetID: receiver.userId,
     };
     if (type === "group") {
       payload.targetID = id;
@@ -41,11 +56,14 @@ const ChatRoom = (props) => {
 
   // get chat content from server
   useEffect(() => {
-    console.log(receiver, "chat");
     const updateChatSettings = async () => {
       if (type === "group") {
         // for sending message
         setChatType("groupMsg");
+      }
+      if (type === "private"){
+        // for sending message
+        setChatType("privateMsg");
       }
     };
 
@@ -53,9 +71,9 @@ const ChatRoom = (props) => {
       await updateChatSettings();
       getChatContent();
     };
-
+    chatState();
     getChatContentAsync();
-  }, [receiver]);
+  }, [receiver,chatHistory]);
 
   const getSenderName = (senderId) => {
     if (type === "group") {
@@ -120,7 +138,6 @@ const ChatRoom = (props) => {
     if (type === "group") {
       payload.targetID = id;
     }
-    console.log("me typing", payload);
     const chatHistoryRequest = {
       type: "isTyping",
       payload: payload,
@@ -134,11 +151,6 @@ const ChatRoom = (props) => {
     if (messageInput.trim() !== "") {
       // ! struct message that need to send to server is different from message that need to display on client
       // ! that why we have message and newMessage
-      const newMessage = {
-        senderId: getUserId("userId"),
-        receiverId: parseInt(receiver.userId),
-        messageContent: messageInput,
-      };
       const message = {
         sessionID: getCookie("sessionId"),
         senderID: getUserId("userId"),
@@ -148,9 +160,6 @@ const ChatRoom = (props) => {
       };
       if (type === "group") {
         message.receiverID = id;
-      }
-      if (type === "private") {
-        setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
       }
       const messageEvent = {
         type: chatType,
@@ -174,10 +183,8 @@ const ChatRoom = (props) => {
 
   // onmessage event listener
   // for catching event from server
-
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
-    console.log(message);
     if (message.type === "chatHistory") {
       setChatHistory(message.payload.chatHistory);
     } else if (message.type === "PrivateMsg") {

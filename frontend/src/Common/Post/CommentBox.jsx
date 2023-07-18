@@ -30,6 +30,7 @@ const CommentBox = ({ id, comments, activePost }) => {
   
   const showComment = () => {
     activePost(id);
+    window.location.reload();
     setBoxState(<CommentList comments={comments} />);
   };
 
