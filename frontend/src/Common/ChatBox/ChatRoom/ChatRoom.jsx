@@ -14,11 +14,33 @@ const ChatRoom = (props) => {
   const [currentReceiver, setCurrentReceiver] = useState(receiver);
   const [startChat , setStartChat] = useState(false);
 
+  /* for testing */
+  const [test, setTest] = useState(null);
+
+
+  const getChatContent = () => {
+    const payload = {
+      sessionID: getCookie("sessionId"),
+      chatType: type,
+      clientID: getUserId("userId"),      
+      targetID: receiver.userId,
+    };
+    if (type === "group") {
+      payload.targetID = id;
+    }
+    const chatHistoryRequest = {
+      type: "chatHistoryRequest",
+      payload: payload,
+    };
+    socket.send(JSON.stringify(chatHistoryRequest)); // Send the message as a string
+  };
+
   // start chat function for make sure chat history is up to date
   // when user change chat
   // chatbox will scroll to bottom when start chat
   const chatState = () => {
     if (startChat === false) {
+      getChatContent()
       setTimeout(() => {
         const chatMessages = document.getElementById("chat-container");
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -38,22 +60,7 @@ const ChatRoom = (props) => {
 
   // !! how to get chat history from server is confusing right now  in GroupChat
 
-  const getChatContent = () => {
-    const payload = {
-      sessionID: getCookie("sessionId"),
-      chatType: type,
-      clientID: getUserId("userId"),      
-      targetID: receiver.userId,
-    };
-    if (type === "group") {
-      payload.targetID = id;
-    }
-    const chatHistoryRequest = {
-      type: "chatHistoryRequest",
-      payload: payload,
-    };
-    socket.send(JSON.stringify(chatHistoryRequest)); // Send the message as a string
-  };
+
 
   // get chat content from server
   useEffect(() => {
@@ -70,7 +77,6 @@ const ChatRoom = (props) => {
 
     const getChatContentAsync = async () => {
       await updateChatSettings();
-      getChatContent();
     };
     chatState();
     getChatContentAsync();
@@ -85,48 +91,51 @@ const ChatRoom = (props) => {
       }
     }
   };
-  const chatContent = chatHistory.map((message, index) => {
-    if (type === "private" && message.msgType === "PrivateMsg") {
-      const isSender = message.senderId === sender;
-      const isReceiver = message.receiverId === sender;
-      if (!isSender && !isReceiver) {
-        return null;
-      }
-      return (
-        <div
-          className={`${
-            isSender ? "sender" : isReceiver ? "receiver" : ""
-          }-message`}
-          key={index}
-        >
-          <div className="chat-message">{message.messageContent}</div>
-        </div>
-      );
-    } else if (type === "group" && message.msgType === "GroupMsg") {
-      const isSender = message.senderId === sender;
-      const otherMember = message.senderId !== sender;
-      if (!isSender && !otherMember) {
-        return null;
-      }
-      return (
-        <div
-          className={`${
-            isSender ? "sender" : otherMember ? "receiver" : ""
-          }-message`}
-          key={index}
-        >
-          <div className="chat-message">
-            {message.messageContent}
-            {otherMember && (
-              <div className="chat-message-sender">
-                {getSenderName(message.senderId)}
-              </div>
-            )}
+  const chatContent = ()=>{
+    chatHistory.map((message, index) => {
+      if (type === "private" && message.msgType === "PrivateMsg") {
+        const isSender = message.senderId === sender;
+        const isReceiver = message.receiverId === sender;
+        if (!isSender && !isReceiver) {
+          return null;
+        }
+        return (
+          <div
+            className={`${
+              isSender ? "sender" : isReceiver ? "receiver" : ""
+            }-message`}
+            key={index}
+          >
+            <div className="chat-message">{message.messageContent}</div>
           </div>
-        </div>
-      );
-    }
-  });
+        );
+      } else if (type === "group" && message.msgType === "GroupMsg") {
+        const isSender = message.senderId === sender;
+        const otherMember = message.senderId !== sender;
+        if (!isSender && !otherMember) {
+          return null;
+        }
+        return (
+          <div
+            className={`${
+              isSender ? "sender" : otherMember ? "receiver" : ""
+            }-message`}
+            key={index}
+          >
+            <div className="chat-message">
+              {message.messageContent}
+              {otherMember && (
+                <div className="chat-message-sender">
+                  {getSenderName(message.senderId)}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+    });
+  } 
+    
 
   // send typing event to server when user is typing
   const typingMessage = (e) => {
@@ -199,6 +208,7 @@ const ChatRoom = (props) => {
       };
 
       setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+      setTest(chatContent)
     } else if (message.type === "GroupMsg") {
       // ! SAME HERE
       // ! struct message that i got from server is different from getChatHistory
@@ -251,7 +261,7 @@ const ChatRoom = (props) => {
       </div>
       <div className="chat-room-content">
         <div id="chat-container" className="chat-messages">
-          {chatContent}
+          {test}
         </div>
       </div>
       <div className="chat-room-input">
