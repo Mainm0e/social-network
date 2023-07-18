@@ -8,6 +8,9 @@ function AlertBox(props) {
   const boxclose = () => {
    document.querySelector(".alert-box").style.display = "none";
   }
+  if (title === undefined || message === undefined || status === undefined) {
+    return null;
+  } else {
   return (
         <div 
         className="alert-box" 
@@ -25,6 +28,7 @@ function AlertBox(props) {
          
         </div>
   );
+          }
 }
 
 export default AlertBox;
