@@ -37,6 +37,45 @@
 
 .chat-room .chat-room-name {
     font-weight: bold;
+    margin-right: 4px;
+}
+
+.typing-indicator {
+    display: flex;
+}
+
+.dot-1,
+.dot-2,
+.dot-3 {
+    width: 4px;
+    height: 4px;
+    background-color: #ddd;
+    border-radius: 50%;
+    margin: 0 4px;
+    animation: typing-animation 1s infinite;
+}
+
+.dot-1 {
+    animation-delay: 0s;
+}
+
+.dot-2 {
+    animation-delay: 0.2s;
+}
+
+.dot-3 {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing-animation {
+    0%,
+    40%,
+    100% {
+        opacity: 0.3;
+    }
+    20% {
+        opacity: 1;
+    }
 }
 
 .chat-room .close-button {
