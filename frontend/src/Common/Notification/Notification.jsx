@@ -15,7 +15,6 @@ const Notification = ({ clearBox }) => {
       sessionId: getCookie("sessionId"),
     };
     fetchData(method, type, payload).then((data) => {
-      console.log(data);
       setNotificationData(data);
     });
   }, []);
@@ -33,6 +32,7 @@ const Notification = ({ clearBox }) => {
       <DisplayNotification
         key={index}
         notifications={notification.notifications}
+        groupName={notification.groupName}
         user={notification.profile}
         handleAcceptDecline={handleAcceptDecline}
       />
@@ -67,10 +67,9 @@ else {
 
 export default Notification;
 
-const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
+const DisplayNotification = ({ notifications,groupName ,user, handleAcceptDecline }) => {
   if (notifications.type === "follow_request" || notifications.type === "group_request" || notifications.type === "group_invitation") {
     const handleAccept = (value) => {
-      console.log(notifications, "notifications in handleAccept")
       const method = "POST";
       const type = "followResponse";
       const payload = {
@@ -102,7 +101,9 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
           </span>
         </div>
         <div className="notification-content">
-          <span>sent you a {notifications.type}</span>
+          {notifications.type === "follow_request" && <span>sent you a follow request</span>}
+          {notifications.type === "group_request" && <span>sent you a group request to join {groupName}</span>}
+          {notifications.type === "group_invitation" && <span>invited you to {groupName}</span>}
         </div>
         <div className="notification-btn">
           <button value="accept" onClick={() => handleAccept("accept")}>
@@ -115,7 +116,7 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
       </div>
     );
   }
-  if (notifications.type === "following") {
+  if (notifications.type === "following" || notifications.type === "new_event") {
     const handleDeleteNotif = () => {
       const method = "POST";
       const type = "followResponse";
@@ -141,7 +142,8 @@ const DisplayNotification = ({ notifications, user, handleAcceptDecline }) => {
           </span>
         </div>
         <div className="notification-content">
-          <span>started following you</span>
+          {notifications.type === "following" && <span>started following you</span>}
+          {notifications.type === "new_event" && <span>created a new event in {groupName}</span>}
         </div>
         <div className="notification-btn">
           <span onClick={handleDeleteNotif}>x</span>

@@ -23,3 +23,6 @@ export const link_notifications = () => {
   export const link_eventlist = () => {
     window.location.href = "#eventlist";
   }
+ export const memberlist = () => {
+   window.location.href = "#memberlist";
+ }

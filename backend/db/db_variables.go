@@ -67,7 +67,7 @@ var InsertRules = map[string]InsertRule{
 		NotExistErrors: []string{"post does not exist", "user does not exist"},
 	},
 	"notifications": {
-		Query:          "INSERT INTO notifications(receiverId, senderId, groupId, type,creationTime) VALUES(?,?,?,?,?)",
+		Query:          "INSERT INTO notifications(receiverId, senderId, groupId,content, type, creationTime) VALUES(?,?,?,?,?,?)",
 		NotExistTables: []string{"users", "users", "groups"},
 		NotExistFields: []string{"receiverId", "senderId", "groupId"},
 		NotExistErrors: []string{"receiver does not exist", "sender does not exist", "group does not exist"},
@@ -215,10 +215,10 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"notifications": {
-		SelectFields: "notificationId, receiverId, senderId,groupId, type, creationTime",
+		SelectFields: "notificationId, receiverId, senderId,groupId,content, type, creationTime",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var notification Notification
-			err := rows.Scan(&notification.NotificationId, &notification.ReceiverId, &notification.SenderId, &notification.GroupId, &notification.Type, &notification.CreationTime)
+			err := rows.Scan(&notification.NotificationId, &notification.ReceiverId, &notification.SenderId, &notification.GroupId, &notification.Content, &notification.Type, &notification.CreationTime)
 			return notification, err
 		},
 	},

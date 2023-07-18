@@ -41,7 +41,7 @@ func insertFollowRequest(senderId int, receiverId int, notifId int) error {
 	}
 	// if sender didn't request to follow the receiver before then insert the request in notifications and follow tables.
 	if relation == "follow" {
-		_, err := db.InsertData("notifications", receiverId, senderId, 0, reqType, time.Now())
+		_, err := db.InsertData("notifications", receiverId, senderId, 0, reqType, reqType, time.Now())
 		if err != nil {
 			return errors.New("Error inserting follow request" + err.Error())
 		}
@@ -108,7 +108,7 @@ func insertGroupRequest(senderId int, groupId int) error {
 
 	case "join":
 		//inserting group request in notifications table
-		_, err := db.InsertData("notifications", receiverId, senderId, groupId, "group_request", time.Now())
+		_, err := db.InsertData("notifications", receiverId, senderId, groupId, dbGroups[0].(db.Group).Title, "group_request", time.Now())
 		if err != nil {
 			return errors.New("Error inserting group request in notifications: " + err.Error())
 		}
@@ -125,24 +125,18 @@ func insertGroupRequest(senderId int, groupId int) error {
 		}
 	case "pending":
 		//delete group request from notifications table
-		Notifications, err := db.FetchData("notifications", "groupId = ?", groupId)
+		notifications, err := db.FetchData("notifications", "groupId = ? AND senderId = ? AND type = ?", groupId, senderId, "group_request")
 		if err != nil {
 			return errors.New("Error fetching notifications" + err.Error())
 		}
-		for _, n := range Notifications {
-			if notification, ok := n.(db.Notification); ok {
-				if notification.SenderId == senderId && notification.Type == "group_request" {
-					err = db.DeleteData("notifications", notification.NotificationId)
-					if err != nil {
-						return errors.New("Error deleting notification" + err.Error())
-					}
-					err = db.DeleteData("group_member", groupId, senderId)
-					if err != nil {
-						return errors.New("Error deleting group member" + err.Error())
-					}
-					break
-				}
-			}
+		err = db.DeleteData("notifications", notifications[0].(db.Notification).NotificationId)
+		if err != nil {
+			return errors.New("Error deleting notification" + err.Error())
+		}
+		//delete user from group_members table
+		err = db.DeleteData("group_member", groupId, senderId)
+		if err != nil {
+			return errors.New("Error deleting group member" + err.Error())
 		}
 	case "waiting":
 		fmt.Println("waiting")
@@ -167,8 +161,12 @@ func insertGroupInvitation(senderId int, groupId int, receiverId int) error {
 	if len(notif) != 0 {
 		return nil
 	}
+	groups, err := db.FetchData("groups", "groupId = ?", groupId)
+	if err != nil {
+		return errors.New("Error fetching group title" + err.Error())
+	}
 	// insert group invitation in notifications table
-	_, err = db.InsertData("notifications", receiverId, senderId, groupId, "group_invitation", time.Now())
+	_, err = db.InsertData("notifications", receiverId, senderId, groupId, groups[0].(db.Group).Title, "group_invitation", time.Now())
 	if err != nil {
 		return errors.New("Error inserting group invitation" + err.Error())
 	}
@@ -235,7 +233,6 @@ func FollowOrJoinRequest(payload json.RawMessage) (Response, error) {
 }
 
 /*
-TODO: Not Used for group invitation yet
 DeleteRequest function delete the follow/join-group request from notification table and update the follow/group_member table base on user decision
 if error occur then it return error
 */
@@ -266,7 +263,6 @@ func deleteRequest(tableName string, userId int, receiverId int, notifId int, re
 }
 
 /*
-TODO: Not Used for group response yet
 FollowResponse is a function that processes a response to follow request/following notification by unmarshaling the payload,
 validating the required fields, and calling deleteFollowRequest function to handle response and delete the notification.
 It returns a response with success/failure status and an event containing sessionId.

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCookie, getUserId } from "../../tools/cookie";
 import { fetchData } from "../../tools/fetchData";
+import "./invite.css";
 
 const Invite = ({ clearBox }) => {
   const [data, setData] = useState(null);
@@ -30,15 +31,19 @@ const Invite = ({ clearBox }) => {
           data.map((u, index) => (
             <DisplayInvite groupId={id} key={index} user={u} />
           ))}
+          {data === null && <div>No users to invite</div>}
       </div>
+      <div className="invite-footer">
+        <button onClick={clearBox}>Close</button>
+        </div>
     </div>
   );
 };
 
 export default Invite;
 
-const DisplayInvite = ({ groupId, user, status }) => {
-  const sentInv = (e) => {
+const DisplayInvite = ({ groupId, user }) => {
+  const sentInv = () => {
     const method = "POST";
     const type = "followRequest";
     const payload = {
@@ -50,8 +55,9 @@ const DisplayInvite = ({ groupId, user, status }) => {
     console.log("test case", payload);
 
     fetchData(method, type, payload).then((data) => {
-        console.log(data);
-    });
+       // refecth page
+      });
+      window.location.reload()
   };
   return (
     <div className="notification">
@@ -62,7 +68,7 @@ const DisplayInvite = ({ groupId, user, status }) => {
         </span>
       </div>
       <div className="notification-btn">
-        <button value="Invite" onClick={() => sentInv(9)}>
+        <button value="Invite" onClick={() => sentInv()}>
           Invite
         </button>
       </div>
