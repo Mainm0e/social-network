@@ -90,15 +90,6 @@ var InsertRules = map[string]InsertRule{
 Global database table keys for ease of maintenance, and simplifying of the DeleteData function.
 */
 var TableKeys = map[string][]string{
-	/*
-		these table data are not included because they are not going to be deleted from the database
-		"users":         {"userId"},
-		"posts":         {"postId"},
-		"comments":      {"commentId"},
-		"groups":        {"groupId"},
-		"messages":      {"messageId"},
-		"events":        {"eventId"},
-	*/
 	"follow":        {"followerId", "followeeId"},
 	"group_member":  {"userId", "groupId"},
 	"semiPrivate":   {"postId"},
