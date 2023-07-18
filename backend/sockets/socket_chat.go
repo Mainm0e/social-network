@@ -93,6 +93,7 @@ func (m *Manager) BroadcastGroupMsg(groupID int, payloadJSON []byte) error {
 				default:
 					close(client.(*Client).Egress)
 					m.Clients.Delete(key)
+					log.Printf("BroadcastGroupMsg() - deleting client with ID: \" %v \" ", userID)
 				}
 				// Stop iteration for this client as the message has been sent (or attempted)
 				return false
