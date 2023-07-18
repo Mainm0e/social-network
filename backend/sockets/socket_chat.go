@@ -20,13 +20,13 @@ byte array to the the client with the given receiver ID. It returns an error
 value, which is non-nil if any of the broadcasting operations failed or if
 the receiver was not found.
 */
-func (m *Manager) BroadcastPrivateMsg(receiverID int, msgEventJSON []byte) error {
+func (m *Manager) BroadcastPrivateMsg(senderID int, receiverID int, msgEventJSON []byte) error {
 	var sent bool
 	// The range function on a sync.map accepts a function of the form
 	// func(key, value interface{}) bool, which it calls once for each
 	// item in the map. If the function returns false, the iteration stops.
 	m.Clients.Range(func(key, client interface{}) bool {
-		if client.(*Client).ID == receiverID {
+		if client.(*Client).ID == receiverID || client.(*Client).ID == senderID {
 			select {
 			case client.(*Client).Egress <- msgEventJSON:
 				sent = true
@@ -336,6 +336,7 @@ func (m *Manager) BroadcastMessage(msg ChatMsg) error {
 	log.Printf("BroadcastMessage() - Broadcasting message: %v\n", msg)
 
 	msgType := msg.GetMsgType()
+	senderID := msg.GetSenderID()
 	receiverID := msg.GetReceiverID()
 	msgEvent := msg.WrapMsg()
 
@@ -350,7 +351,7 @@ func (m *Manager) BroadcastMessage(msg ChatMsg) error {
 
 	// For private messages, only broadcast to the receiver
 	case "PrivateMsg":
-		err = m.BroadcastPrivateMsg(receiverID, msgEventJSON)
+		err = m.BroadcastPrivateMsg(senderID, receiverID, msgEventJSON)
 		if err != nil {
 			return fmt.Errorf("BroadcastMessage() error - %v", err)
 		}
