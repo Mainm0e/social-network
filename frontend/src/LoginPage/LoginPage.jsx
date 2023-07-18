@@ -12,6 +12,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState([]);
+  const [alertStatus, setAlertStatus] = useState(true);
   // is part is for the color changing text animation
   /*
   // import useEffect from react befor using this
@@ -39,18 +40,21 @@ function LoginPage() {
   };
   let msg = [];
   const checkemail = (email, password) => {
-    console.log("checkEmail",email, password);
+    setAlertStatus(undefined);
     const method = "POST"
     const type = "login"
     const payload = {email: email, password: password}
     fetchData(method,type,payload).then((data) => {
-      console.log("data",data);
-      if (data.statusCode === 200) {
-        window.location.href = "/";
-      } else {
+      if (data === undefined || data !== null) {
+        setAlertStatus(false);
         setAlertTitle("Login Failed");
         msg.push(data.message);
         setAlertMessage(msg);
+      } else {
+        setAlertTitle(null);
+        msg.push(null);
+        setAlertMessage(msg);
+        return true;
       }
     }
     );
@@ -63,20 +67,20 @@ function LoginPage() {
   const handleLogin = () => {
     // Perform login logic here
     if (checkemail(email, password)) {
-      console.log("do login",email, password)
       setLoginStatus(true);
       document.querySelector(".alert-box").style.display = "none";
     } else {
       setLoginStatus(false);
       document.querySelector(".alert-box").style.display = "block";
     }
+    
   };
   return (
     <div className="main-container">
     <div className='login-page'>
     <WelcomeBox />
     <div className="login-container">
-    <AlertBox title={alertTitle} message={alertMessage} status={true} />
+    <AlertBox title={alertTitle} message={alertMessage} status={alertStatus} />
       <h1 >Login Page</h1>
       <form>
         <div>
