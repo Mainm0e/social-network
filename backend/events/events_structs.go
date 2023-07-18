@@ -11,6 +11,8 @@ type Event struct {
 	Payload json.RawMessage `json:"payload"`
 }
 
+/***************************** EVENT PAYLOAD STRUCTS *****************************/
+
 /*
 ErrorMessage struct represents an error message that can be sent to the
 frontend / client. It includes a message and a status code.

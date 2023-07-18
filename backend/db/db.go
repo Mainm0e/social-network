@@ -60,16 +60,16 @@ It takes in a database connection and applies all the migrations in the
 encountered in applying the migrations.
 */
 func executeMigration(DB *sql.DB) error {
-	fmt.Println("migrating...")
+	log.Println("Migrating...")
 	migrations := &migrate.FileMigrationSource{
 		Dir: "./db/migrations",
 	}
-	fmt.Println("migration:", migrations)
+	log.Println("Migration:", migrations)
 	n, err := migrate.Exec(DB, "sqlite3", migrations, migrate.Up)
 	if err != nil {
-		return errors.New("error applying migrations: " + err.Error())
+		return errors.New("executeMigration() - error in applying migrations: " + err.Error())
 	}
-	fmt.Println("applied migrations!\n", n)
+	log.Printf("Complete! Number of migrations applied: %v", n)
 	return nil
 }
 
@@ -125,6 +125,7 @@ func Check(dbFile, sqlFile string) error {
 	_, err := os.Stat(dbFile)
 	if os.IsNotExist(err) {
 		// Initialise database if specified input does not already exist
+		log.Println("Database not found, initialising...")
 		fmt.Print(Colour.Yellow + "\ndatabase not found, initialising...\n\n" + Colour.Reset)
 		/* err = initialise(dbFile, sqlFile)
 		if err != nil {
