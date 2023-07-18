@@ -85,23 +85,20 @@ user session. It then creates a new Session struct with the generated session ID
 boolena and expiry date / time, and stores it in the SessionStore. It returns the session ID as well
 as an error, which is non-nil if an error occurs during the session creation.
 */
-func (store *SessionStore) Create(username string, admin bool) (string, error) {
+func (store *SessionStore) Create(userID int, admin bool) (string, error) {
 	// SessionsStore integrity check
 	if err := store.Exists(); err != nil {
 		return "", errors.New("error in sessions.<store>.Create(): " + err.Error())
 	}
 
+	// Generate a unique session ID
 	sessionID, err := store.GenerateSessionID()
 	if err != nil {
 		return "", errors.New("error in sessions.<store>.Create(): " + err.Error())
 	}
 
+	// Create a new session and store it in the sessions map
 	expires := time.Now().Add(time.Duration(SESSION_DURATION) * time.Second)
-
-	userID, err := getUserID(username)
-	if err != nil {
-		return "", errors.New("sessions.Create() error in retrieving userID: " + err.Error())
-	}
 
 	session := &Session{
 		SessionID: sessionID, // Possibly redundant as it is the key in the sync.Map
@@ -163,6 +160,42 @@ func (store *SessionStore) Get(sessionID string) (*Session, bool, error) {
 }
 
 /*
+cleanExistingUserSessions() is a local helper function which loops through the sessions map
+and deletes any sessions which have expired or are associated with the user ID passed as an
+argument. It is used when a user logs in to delete any existing sessions associated with the
+user ID. It returns an error value, which is non-nil if an error occurs during the session
+cleaning.
+*/
+func cleanExistingUserSessions(userID int) error {
+	// SessionsStore integrity check
+	if err := Store.Exists(); err != nil {
+		return errors.New("error in sessions.<store>.checkForExistingUserSession(): " +
+			err.Error())
+	}
+
+	// Loop through the sessions map
+	Store.Data.Range(func(key, value interface{}) bool {
+		session, ok := value.(*Session)
+		if !ok {
+			return false
+		}
+		// If the session has expired, delete it
+		if session.Expires.Before(time.Now()) {
+			Store.Data.Delete(key)
+		}
+
+		// If there is an existing session for the user, delete it
+		if session.UserID == userID {
+			Store.Data.Delete(key)
+		}
+
+		return true
+	})
+
+	return nil
+}
+
+/*
 CookieCheck() checks if the user is authenticated by taking a session cookie
 as input and checking if the session ID is present in the SessionStore sync.Map data
 structure by calling the *SessionStore Get() method. It returns a boolean indicating
@@ -189,12 +222,27 @@ func SessionCheck(sessionID string) (bool, error) {
 /*
 Login() is a global function in the sessions package, which is used to create a new user
 session when a frontend login event has been authenticated. It takes the username and
-admin boolean as arguments and calls the *SessionStore Create() method to create a new
-user session. It returns the session ID as well as an error, which is non-nil if an error
-occurs during the session creation.
+admin boolean as arguments and retrieves the associated userID by calling the local
+getUserID() function. It then performs a cleanup of existing user sessions by calling the
+local cleanExistingUserSessions() function, which both removes expired sessions and any
+existing sessions for the user. It then calls the *SessionStore Create() method to create
+a new user session. It returns the session ID as well as an error, which is non-nil if
+an error occurs during any of the aforementioned steps.
 */
 func Login(userName string, admin bool) (string, error) {
-	sessionID, err := Store.Create(userName, admin)
+	// Get associated userID
+	userID, err := getUserID(userName)
+	if err != nil {
+		return "", errors.New("sessions.Login() error in retrieving userID: " + err.Error())
+	}
+
+	// Clean existing user sessions
+	err = cleanExistingUserSessions(userID)
+	if err != nil {
+		return "", errors.New("sessions.Login() error in cleaning existing user sessions: " + err.Error())
+	}
+
+	sessionID, err := Store.Create(userID, admin)
 	if err != nil {
 		return "", errors.New("error in sessions.Login(): " + err.Error())
 	}
