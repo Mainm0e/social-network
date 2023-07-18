@@ -100,7 +100,7 @@ var TableKeys = map[string][]string{
 		"events":        {"eventId"},
 	*/
 	"follow":        {"followerId", "followeeId"},
-	"group_member":  {"groupId", "userId"},
+	"group_member":  {"userId", "groupId"},
 	"semiPrivate":   {"postId"},
 	"notifications": {"notificationId"},
 	"event_member":  {"eventId", "memberId"},
