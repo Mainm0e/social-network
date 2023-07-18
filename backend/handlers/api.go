@@ -35,7 +35,7 @@ func HTTPEventRouter(w http.ResponseWriter, r *http.Request) {
 		response, err := handlerFunc(event.Payload)
 		if err != nil {
 			log.Println("Error handling event:", err)
-			response := Response{"Error handling event:" + err.Error(), events.Event{}, http.StatusBadRequest}
+			response := Response{err.Error(), events.Event{}, http.StatusBadRequest}
 			json.NewEncoder(w).Encode(response)
 			return
 		}
