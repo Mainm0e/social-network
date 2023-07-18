@@ -173,24 +173,27 @@ func cleanExistingUserSessions(userID int) error {
 			err.Error())
 	}
 
+	var keysToDelete []interface{}
+
 	// Loop through the sessions map
 	Store.Data.Range(func(key, value interface{}) bool {
 		session, ok := value.(*Session)
 		if !ok {
 			return false
 		}
-		// If the session has expired, delete it
-		if session.Expires.Before(time.Now()) {
-			Store.Data.Delete(key)
+		// If the session has expired, or if there is an existing session for the user,
+		// mark it for deletion
+		// TODO: This would be better to separate into a separate function which runs at regular intervals
+		if session.Expires.Before(time.Now()) || session.UserID == userID {
+			keysToDelete = append(keysToDelete, key)
 		}
-
-		// If there is an existing session for the user, delete it
-		if session.UserID == userID {
-			Store.Data.Delete(key)
-		}
-
 		return true
 	})
+
+	// Delete the marked sessions
+	for _, key := range keysToDelete {
+		Store.Data.Delete(key)
+	}
 
 	return nil
 }
