@@ -42,7 +42,8 @@ const ChatRoom = (props) => {
     const payload = {
       sessionID: getCookie("sessionId"),
       chatType: type,
-      clientID: getUserId("userId"),      targetID: receiver.userId,
+      clientID: getUserId("userId"),      
+      targetID: receiver.userId,
     };
     if (type === "group") {
       payload.targetID = id;
