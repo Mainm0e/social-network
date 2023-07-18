@@ -41,7 +41,6 @@ const ChatRoom = (props) => {
 
   // get chat content from server
   useEffect(() => {
-    console.log(receiver, "chat");
     const updateChatSettings = async () => {
       if (type === "group") {
         // for sending message
@@ -55,7 +54,7 @@ const ChatRoom = (props) => {
     };
 
     getChatContentAsync();
-  }, [receiver]);
+  }, [receiver,chatHistory]);
 
   const getSenderName = (senderId) => {
     if (type === "group") {
@@ -120,7 +119,6 @@ const ChatRoom = (props) => {
     if (type === "group") {
       payload.targetID = id;
     }
-    console.log("me typing", payload);
     const chatHistoryRequest = {
       type: "isTyping",
       payload: payload,
@@ -134,11 +132,6 @@ const ChatRoom = (props) => {
     if (messageInput.trim() !== "") {
       // ! struct message that need to send to server is different from message that need to display on client
       // ! that why we have message and newMessage
-      const newMessage = {
-        senderId: getUserId("userId"),
-        receiverId: parseInt(receiver.userId),
-        messageContent: messageInput,
-      };
       const message = {
         sessionID: getCookie("sessionId"),
         senderID: getUserId("userId"),
@@ -148,9 +141,6 @@ const ChatRoom = (props) => {
       };
       if (type === "group") {
         message.receiverID = id;
-      }
-      if (type === "private") {
-        setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
       }
       const messageEvent = {
         type: chatType,
@@ -177,7 +167,6 @@ const ChatRoom = (props) => {
 
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
-    console.log(message);
     if (message.type === "chatHistory") {
       setChatHistory(message.payload.chatHistory);
     } else if (message.type === "PrivateMsg") {
