@@ -26,7 +26,7 @@ func (m *Manager) BroadcastPrivateMsg(senderID int, receiverID int, msgEventJSON
 	// func(key, value interface{}) bool, which it calls once for each
 	// item in the map. If the function returns false, the iteration stops.
 	m.Clients.Range(func(key, client interface{}) bool {
-		if client.(*Client).ID == receiverID {
+		if client.(*Client).ID == receiverID || client.(*Client).ID == senderID {
 			select {
 			case client.(*Client).Egress <- msgEventJSON:
 				sent = true
