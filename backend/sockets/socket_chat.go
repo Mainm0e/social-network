@@ -233,18 +233,18 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 
 /********************** IS TYPING EVENT / LOGIC ******************************/
 
-func (m *Manager) HandleIsTypingEvent(event events.Event, client *Client) {
+/*
+HandleIsTypingEvent() is a method of the Manager struct that takes an events.Event
+and a pointer to a Client as input. It unmarshals the event payload into an
+IsTyping struct, wraps the event in a JSON payload, and sends it to the relevant
+client(s) (i.e. the client(s) in the same chat as the client that sent the event).
+*/
+func (m *Manager) HandleIsTypingEvent(typingEvent events.Event, client *Client) {
 	// Initialise an IsTyping struct and unmarshal the event payload into it
 	var isTyping IsTyping
-	if err := json.Unmarshal(event.Payload, &isTyping); err != nil {
+	if err := json.Unmarshal(typingEvent.Payload, &isTyping); err != nil {
 		log.Printf("HandleIsTypingEvent() - Error unmarshalling event payload: %v", err)
 		return
-	}
-
-	// Wrap the event in an events.Event struct
-	typingEvent := events.Event{
-		Type:    "isTyping",
-		Payload: event.Payload,
 	}
 
 	// Marshal the event into JSON bytes
