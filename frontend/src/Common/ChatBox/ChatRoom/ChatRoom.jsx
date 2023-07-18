@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 import "./ChatRoom.css";
-import { dummyMessages } from "../DummyData";
 import { WebSocketContext } from "../../../WebSocketContext/websocketcontext";
 import { getCookie, getUserId } from "../../../tools/cookie";
 
@@ -11,7 +10,6 @@ const ChatRoom = (props) => {
   const socket = useContext(WebSocketContext);
   const [messageInput, setMessageInput] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
-  const [newChatContent, setNewChatContent] = useState(null); // store new chat content from server
   const [isTyping, setIsTyping] = useState(false); // store isTyping event from server
   // for chat history
 
