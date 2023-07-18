@@ -88,6 +88,7 @@ func (m *Manager) BroadcastGroupMsg(groupID int, payloadJSON []byte) error {
 				// Attempt to send the message to this client
 				select {
 				case client.(*Client).Egress <- payloadJSON:
+					log.Printf("BroadcastGroupMsg() to sender with ID: \" %v \" ", userID)
 					sent = true
 				default:
 					close(client.(*Client).Egress)
