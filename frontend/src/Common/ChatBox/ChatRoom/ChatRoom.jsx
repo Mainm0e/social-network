@@ -181,6 +181,7 @@ const getChatContent = () => {
 
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
+    console.log(message)
     if (message.type === "chatHistory") {
       setChatHistory(message.payload.chatHistory);
     } else if (message.type === "PrivateMsg") {
@@ -194,7 +195,7 @@ const getChatContent = () => {
       };
 
       setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
-    }/* else if (message.type === "PrivateMsg") {
+    }else if (message.type === "GroupMsg") {
       // ! SAME HERE
       // ! struct message that i got from server is different from getChatHistory 
       const newMessage = {
@@ -205,7 +206,7 @@ const getChatContent = () => {
       };
 
       setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
-    } */ else if (message.type === "isTyping") {
+    } else if (message.type === "isTyping") {
       console.log("typing", message);
     } else {
       console.log("message", message);
