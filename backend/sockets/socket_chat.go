@@ -217,6 +217,7 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 	}
 
 	// Find the client with the matching ID and send the event
+	clientUpdated := false
 	m.Clients.Range(func(key interface{}, value interface{}) bool {
 		client, ok := value.(*Client)
 		if !ok {
@@ -225,20 +226,19 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 			return true
 		}
 		if client.ID == chatHistory.ClientID {
-			select {
-			case client.Egress <- eventJSON:
-				log.Printf("SendChatHistory() - Sent chat history to client %d\n", chatHistory.ClientID)
-			default:
-				// The Egress channel could be full or closed, or the client could be disconnected
-				log.Printf("SendChatHistory() error - Could not send message to client %d\n", chatHistory.ClientID)
-			}
+			client.Egress <- eventJSON
+			log.Printf("SendChatHistory() - Sent chat history to client %d\n", chatHistory.ClientID)
+			clientUpdated = true
 			return false // Stop ranging as the client is found
 		}
 		return true // Continue ranging
 	})
 
-	return nil
+	if !clientUpdated {
+		return fmt.Errorf("SendChatHistory() error - client with ID: \" %v \" not found", chatHistory.ClientID)
+	}
 
+	return nil
 }
 
 /********************** IS TYPING EVENT / LOGIC ******************************/
