@@ -182,10 +182,10 @@ var FetchRules = map[string]struct {
 		},
 	},
 	"group_member": {
-		SelectFields: "userId, groupId, status",
+		SelectFields: "id, userId, groupId, status",
 		ScanFields: func(rows *sql.Rows) (interface{}, error) {
 			var groupMember GroupMember
-			err := rows.Scan(&groupMember.UserId, &groupMember.GroupId, &groupMember.Status)
+			err := rows.Scan(&groupMember.Id, &groupMember.UserId, &groupMember.GroupId, &groupMember.Status)
 			return groupMember, err
 		},
 	},

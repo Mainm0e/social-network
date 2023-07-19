@@ -62,7 +62,7 @@ func nonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 
 	memberIds := make(map[int]struct{})
 	for _, member := range members {
-		if member.(db.GroupMember).Status == "member" {
+		if member.(db.GroupMember).Status == "member" || member.(db.GroupMember).Status == "pending" {
 			memberIds[member.(db.GroupMember).UserId] = struct{}{}
 		}
 	}
@@ -80,6 +80,8 @@ func nonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 				if err != nil {
 					return nil, errors.New("Error fetching user" + err.Error())
 				}
+
+				// append the user to the list of non-members
 				nonMembers = append(nonMembers, user)
 			}
 		}

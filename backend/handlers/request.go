@@ -295,6 +295,7 @@ func FollowOrJoinResponse(payload json.RawMessage) (Response, error) {
 				return response, err
 			}
 		} else if follow.SenderId != 0 {
+
 			err = deleteRequest("group_member", follow.SenderId, follow.GroupId, follow.NotifId, follow.Content)
 			if err != nil {
 				response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
