@@ -5,7 +5,6 @@ import (
 	"backend/events"
 	"backend/handlers"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -45,8 +44,12 @@ func (m *Manager) BroadcastPrivateMsg(senderID int, receiverID int, msgEventJSON
 	})
 
 	// Check if both the sender and receiver have received the message
-	if !senderUpdated || !receiverUpdated {
-		return errors.New("BroadcastPrivateMsg() notice - sender or receiver not updated as respective logged in client not found")
+	if !senderUpdated && !receiverUpdated {
+		return fmt.Errorf("BroadcastPrivateMsg() error - sender \" %v \" and receiver \" %v \" not updated as BOTH respective live socket connections not found", senderID, receiverID)
+	} else if !senderUpdated {
+		log.Printf("BroadcastPrivateMsg() notice - sender with ID: \" %v \" not updated in private chat with client \" %v \" as live socket connection not found", senderID, receiverID)
+	} else if !receiverUpdated {
+		log.Printf("BroadcastPrivateMsg() notice - receiver with ID: \" %v \" not updated in private chat with client \" %v \" as live socket connection not found", receiverID, senderID)
 	}
 
 	return nil
