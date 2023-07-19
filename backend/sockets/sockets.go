@@ -65,7 +65,10 @@ ReadData() is a method for a *Client struct, and starts a loop to continuously
 read data from the client's websocket connection and react to that data.
 */
 func (c *Client) ReadData() {
+	// Defer the closing of the client's websocket connection, which gets called
+	// when the function returns
 	defer func() {
+		log.Printf("sockets.ReadData() - Closing websocket connection for client \" %v \"", c.ID)
 		c.Manager.Unregister <- c
 		c.Connection.Close()
 	}()
@@ -133,7 +136,10 @@ func (c *Client) WriteData() {
 	// Ticker is a timer that goes off (ticks) at regular intervals.
 	ticker := time.NewTicker(PING_INTERVAL)
 
+	// Defer the stopping of the ticker and closing of the client's websocket connection,
+	// which gets called when the function returns.
 	defer func() {
+		log.Printf("sockets.WriteData() - Closing websocket connection for client \" %v \"", c.ID)
 		ticker.Stop()
 		c.Connection.Close()
 	}()
@@ -147,7 +153,9 @@ func (c *Client) WriteData() {
 
 		// This case handles outgoing messages from the client to the websocket connection.
 		case data, ok := <-c.Egress:
+			// If the channel is closed, the ok variable will be set to false.
 			if !ok {
+				log.Printf("sockets.WriteData() - Egress channel unavailable for client \" %v \", websocket closed", c.ID)
 				c.Connection.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
@@ -194,12 +202,12 @@ func (m *Manager) Run() {
 		select {
 		// A new client is registering: Store it in the clients map.
 		case client := <-m.Register:
-			log.Println("sockets.Run() - Registering new client")
+			log.Printf("sockets.Run() - Registering new client with ID: %v", client.ID)
 			m.Clients.Store(client.ID, client)
 
 		// A client is unregistering: If it exists in the clients map, remove it.
 		case client := <-m.Unregister:
-			log.Println("sockets.Run() - Deregistering new client")
+			log.Printf("sockets.Run() - Deregistering client with ID: %v", client.ID)
 			if _, ok := m.Clients.Load(client); ok {
 				m.Clients.Delete(client)
 				close(client.Egress)
@@ -218,6 +226,7 @@ func (m *Manager) Run() {
 					// The client's send channel is unavailable. Remove it.
 					close(client.Egress)
 					m.Clients.Delete(client)
+					log.Printf("sockets.Run() - Deregistering client with ID \" %v \" due to socket manager broadcast irregularity", client.ID)
 					return false // Stop iteration.
 				}
 			})
@@ -238,13 +247,13 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	// Perform validation checks on the session cookie.
 	cookie, err := r.Cookie(sessions.COOKIE_NAME)
 	if err != nil {
-		log.Printf("sessions.ServeWS() error - No sessionID cookie found: %v", err)
+		log.Printf("sockets.ServeWS() error - No sessionID cookie found: %v", err)
 		http.Error(w, "Invalid session", http.StatusUnauthorized)
 		return
 	} else {
 		isValid, err := sessions.CookieCheck(cookie)
 		if !isValid || err != nil {
-			log.Printf("sessions.ServeWS() error - Invalid sessionID cookie for session \" %v \": %v", cookie.Value, err)
+			log.Printf("sockets.ServeWS() error - Invalid sessionID cookie for session \" %v \": %v", cookie.Value, err)
 			http.Error(w, "Invalid session", http.StatusUnauthorized)
 			return
 		}
