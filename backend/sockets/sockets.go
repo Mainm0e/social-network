@@ -208,7 +208,7 @@ func (m *Manager) Run() {
 		// A client is unregistering: If it exists in the clients map, remove it.
 		case client := <-m.Unregister:
 			log.Printf("sockets.Run() - Deregistering client with ID: %v", client.ID)
-			if _, ok := m.Clients.Load(client); ok {
+			if _, ok := m.Clients.Load(client.ID); ok {
 				m.Clients.Delete(client)
 				close(client.Egress)
 			}
