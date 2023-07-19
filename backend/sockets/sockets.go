@@ -36,6 +36,9 @@ func NewManager() *Manager {
 	// Add the chat history handler to the Handlers map
 	m.Handlers["chatHistoryRequest"] = m.HandleChatHistoryRequestEvent
 
+	// Add the isTyping handler to the Handlers map
+	m.Handlers["isTyping"] = m.HandleIsTypingEvent
+
 	return m
 }
 

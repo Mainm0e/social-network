@@ -72,8 +72,8 @@
     display: flex;
     flex-direction: column;
     background-color: #f9f9f9;
-    background-image: url("./default.gif");
-    background-size: 8px;
+    background-image: url("./pineapple.gif");
+    background-size: 20px;
     padding: 10px;
     border: 4px solid black;
     border-radius: 10px;

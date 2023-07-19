@@ -151,15 +151,12 @@ function RegisterPage() {
     }
 
     // if the registerStatus is true, send the data to the backend
-    console.log("check when send data", response.status);
     if (response.status) {
       setRegisterStatus(false);
       const method = "POST";
       const type = "register";
       const payload = data;
-      fetchData(method, type, payload)
-        .then((response) => response.json())
-        .then((data) => {
+      fetchData(method, type, payload).then((data) => {
           if (data.statusCode === 200) {
             setRegisterStatus(true);
             // Wait for the current execution cycle to finish
@@ -167,18 +164,16 @@ function RegisterPage() {
               window.location.href = "/login";
             }, 0);
           } else {
-            setAlertTitle(data.message);
-            setAlertMessage(["Email already exists"]);
+            setAlertTitle("Error");
+            setAlertMessage([data.message]);
             setRegisterStatus(false);
           }
         })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
     }
   };
 
   return (
+    <div className="main-container">
     <div className="register-page">
       <WelcomeBox />
       <div className="register-container">
@@ -222,6 +217,7 @@ function RegisterPage() {
           <a href="/login"> Login </a>{" "}
         </div>{" "}
       </div>{" "}
+    </div>
     </div>
   );
 

@@ -20,28 +20,33 @@ byte array to the the client with the given receiver ID. It returns an error
 value, which is non-nil if any of the broadcasting operations failed or if
 the receiver was not found.
 */
-func (m *Manager) BroadcastPrivateMsg(receiverID int, msgEventJSON []byte) error {
-	var sent bool
-	// The range function on a sync.map accepts a function of the form
-	// func(key, value interface{}) bool, which it calls once for each
-	// item in the map. If the function returns false, the iteration stops.
+func (m *Manager) BroadcastPrivateMsg(senderID int, receiverID int, msgEventJSON []byte) error {
+	// Flags to check if sender and receiver have been updated
+	senderUpdated := false
+	receiverUpdated := false
+
+	// Iterate through the map of clients
 	m.Clients.Range(func(key, client interface{}) bool {
-		if client.(*Client).ID == receiverID {
-			select {
-			case client.(*Client).Egress <- msgEventJSON:
-				sent = true
-			default:
-				close(client.(*Client).Egress)
-				m.Clients.Delete(key)
-				return false
+		// Check if the current client is the sender or the receiver
+		if client.(*Client).ID == senderID || client.(*Client).ID == receiverID {
+			// Send the message to the client
+			client.(*Client).Egress <- msgEventJSON
+			// Set the respective flag to true
+			if client.(*Client).ID == senderID {
+				log.Printf("BroadcastPrivateMsg() to sender with ID: \" %v \" ", senderID)
+				senderUpdated = true
+			} else if client.(*Client).ID == receiverID {
+				log.Printf("BroadcastPrivateMsg() to receiver with ID: \" %v \" ", receiverID)
+				receiverUpdated = true
 			}
-			return false // Stop iteration after the message has been sent to target client
+			// Do not stop iteration; there may be another client to send to
 		}
-		return true
+		return true // Continue iteration regardless
 	})
 
-	if !sent {
-		return errors.New("message could not be sent: receiver not found")
+	// Check if both the sender and receiver have received the message
+	if !senderUpdated || !receiverUpdated {
+		return errors.New("BroadcastPrivateMsg() notice - sender or receiver not updated as respective logged in client not found")
 	}
 
 	return nil
@@ -231,6 +236,57 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 
 }
 
+/********************** IS TYPING EVENT / LOGIC ******************************/
+
+/*
+HandleIsTypingEvent() is a method of the Manager struct that takes an events.Event
+and a pointer to a Client as input. It unmarshals the event payload into an
+IsTyping struct, wraps the event in a JSON payload, and sends it to the relevant
+client(s) (i.e. the client(s) in the same chat as the client that sent the event).
+*/
+func (m *Manager) HandleIsTypingEvent(typingEvent events.Event, client *Client) {
+	// Initialise an IsTyping struct and unmarshal the event payload into it
+	var isTyping IsTyping
+	if err := json.Unmarshal(typingEvent.Payload, &isTyping); err != nil {
+		log.Printf("HandleIsTypingEvent() - Error unmarshalling event payload: %v", err)
+		return
+	}
+
+	// Marshal the event into JSON bytes
+	eventBytes, err := json.Marshal(typingEvent)
+	if err != nil {
+		log.Printf("HandleIsTypingEvent() - Error marshalling event: %v", err)
+		return
+	}
+
+	// Notify the relevant client(s) about the typing status.
+	m.Clients.Range(func(k, v interface{}) bool {
+		otherClient, ok := v.(*Client)
+		if !ok {
+			log.Printf("HandleIsTypingEvent() - Error casting client from client list: %v", v.(*Client))
+			return true // Continue iteration
+		}
+
+		if isTyping.ChatType == "private" && otherClient.ID == isTyping.TargetID {
+			otherClient.Egress <- eventBytes
+		} else if isTyping.ChatType == "group" {
+			memberUserIDs, err := handlers.GetAllGroupMemberIDs(isTyping.TargetID)
+			if err != nil {
+				log.Printf("HandleIsTypingEvent() - Error getting group member IDs: %v", err)
+				return true // Continue iteration
+			}
+			// Check if the otherClient.ID is in the list of member IDs
+			for _, id := range memberUserIDs {
+				if otherClient.ID == id {
+					otherClient.Egress <- eventBytes
+					break
+				}
+			}
+		}
+		return true // Continue iteration
+	})
+}
+
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
 
 func UnmarshalEventToChatMsg(msgEvent events.Event) (ChatMsg, error) {
@@ -285,6 +341,7 @@ func (m *Manager) BroadcastMessage(msg ChatMsg) error {
 	log.Printf("BroadcastMessage() - Broadcasting message: %v\n", msg)
 
 	msgType := msg.GetMsgType()
+	senderID := msg.GetSenderID()
 	receiverID := msg.GetReceiverID()
 	msgEvent := msg.WrapMsg()
 
@@ -299,7 +356,7 @@ func (m *Manager) BroadcastMessage(msg ChatMsg) error {
 
 	// For private messages, only broadcast to the receiver
 	case "PrivateMsg":
-		err = m.BroadcastPrivateMsg(receiverID, msgEventJSON)
+		err = m.BroadcastPrivateMsg(senderID, receiverID, msgEventJSON)
 		if err != nil {
 			return fmt.Errorf("BroadcastMessage() error - %v", err)
 		}
@@ -421,5 +478,3 @@ func (m *Manager) SendErrorMessageToClient(client *Client, message string, statu
 		return
 	}
 }
-
-// TODO: HandleIsTypingEvent(): Receive isTyping event and broadcast to all clients in chat

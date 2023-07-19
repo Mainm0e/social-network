@@ -31,7 +31,7 @@ if (!response.ok) {
       document.cookie = "sessionId=" + responseData.event.payload.sessionId;
       localStorage.setItem("userId", responseData.event.payload.userId);
       window.location.href = "/";
-      return responseData.event.payload;
+      return null
     } else {
       return responseData;
     }
@@ -40,7 +40,7 @@ if (!response.ok) {
     if (responseData.statusCode === 200) {
       window.location.href = "/login";
       return responseData.event.payload;
-    } else {
+    } else if (responseData.statusCode === 400) {
       return responseData;
     }
   }

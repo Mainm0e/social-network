@@ -4,6 +4,7 @@ import (
 	"backend/db"
 	"backend/events"
 	"backend/handlers"
+	"backend/server/sessions"
 	"backend/sockets"
 	"backend/utils"
 	"bytes"
@@ -27,6 +28,12 @@ handlers. This function takes a pointer to an http.Request and returns a pointer
 to an http.Request. It is also used for debugging purposes.
 */
 func logAndResetRequest(r *http.Request) *http.Request {
+	// If this is a WebSocket handshake request, don't try to read the body
+	if r.Header.Get("Upgrade") == "websocket" {
+		log.Println("logAndResetRequest() -- WebSocket handshake")
+		return r
+	}
+
 	// Read the request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -83,20 +90,6 @@ func initiateLogging(logPath string) error {
 }
 
 /*
-extractCookie is a function which takes an http.Request as an input and returns a pointer
-to an http.Cookie and an error. It is used to extract the session cookie from the request
-header. It returns an error which is non-nil if a cookie with the sessions.COOKIE_NAME is
-not present in the request header.
-*/
-// func extractCookie(r *http.Request) (*http.Cookie, error) {
-// 	cookie, err := r.Cookie(sessions.COOKIE_NAME)
-// 	if err != nil {
-// 		return nil, errors.New("error in server.extractCookie(): " + err.Error())
-// 	}
-// 	return cookie, nil
-// }
-
-/*
 loggerMiddleware is a middleware function which logs the URL path of each request to the
 server. It takes an input of an http.Handler and returns an http.Handler. It can be coupled
 with various other middleware functions to create a middleware chain. This pattern is used
@@ -110,8 +103,8 @@ This pattern facilitates ease of maintenance should additional middleware functi
 */
 func loggerMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// // Print out entire request body for debugging purposes
-		// r = logAndResetRequest(r)
+		// Print out entire request body for debugging purposes
+		r = logAndResetRequest(r)
 
 		handler.ServeHTTP(w, r)
 	})
@@ -165,54 +158,61 @@ middleware chain implemented by the loggerMiddleware() function.
 */
 func authenticationMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// // Read the request body
-		// body, err := io.ReadAll(r.Body)
-		// if err != nil {
-		// 	log.Println("Error reading request body", http.StatusBadRequest)
-		// 	http.Error(w, "Invalid request", http.StatusBadRequest)
-		// 	return
-		// }
-		// // Always close the request body after reading it to free up resources
-		// defer r.Body.Close()
+		// If this is a WebSocket handshake request, don't try to read the body
+		if r.Header.Get("Upgrade") == "websocket" {
+			// TODO: maybe implement websocket authentication here (?)
+			handler.ServeHTTP(w, r)
+			return
+		}
 
-		// // Create a new reader with the body for JSON decoding
-		// reader1 := io.NopCloser(bytes.NewReader(body))
-		// // Initialise  event struct
-		// var event events.Event
+		// Read the request body
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Println("Error reading request body", http.StatusBadRequest)
+			http.Error(w, "Invalid request", http.StatusBadRequest)
+			return
+		}
+		// Always close the request body after reading it to free up resources
+		defer r.Body.Close()
 
-		// err = json.NewDecoder(reader1).Decode(&event)
-		// if err != nil {
-		// 	log.Println("Error decoding JSON", http.StatusBadRequest)
-		// 	http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		// 	return
-		// }
+		// Create a new reader with the body for JSON decoding
+		reader1 := io.NopCloser(bytes.NewReader(body))
+		// Initialise  event struct
+		var event events.Event
 
-		// // Refer to events catalogue in handlers package (handlers_structs.go)
-		// if _, ok := handlers.Events[event.Type]; ok {
-		// 	// Check that event type is not login or register (these events do not require authentication)
-		// 	if event.Type != "login" && event.Type != "register" {
-		// 		// Check if the request contains a sessionID cookie
-		// 		cookie, err := r.Cookie(sessions.COOKIE_NAME)
-		// 		if err != nil {
-		// 			// Handle error: No sessionID cookie found.
-		// 			log.Printf("authenticationWiddleware() error - No sessionID cookie found: %v", err)
-		// 			http.Error(w, "Invalid session", http.StatusUnauthorized)
-		// 			return
-		// 		}
+		err = json.NewDecoder(reader1).Decode(&event)
+		if err != nil {
+			log.Println("Error decoding JSON", http.StatusBadRequest)
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
+		}
 
-		// 		// Validate the sessionID cookie
-		// 		isValid, err := sessions.CookieCheck(cookie)
-		// 		if !isValid || err != nil {
-		// 			// Handle error: Invalid sessionID cookie.
-		// 			log.Printf("authenticationWiddleware() error - Invalid sessionID cookie: %v", err)
-		// 			http.Error(w, "Invalid session", http.StatusUnauthorized)
-		// 			return
-		// 		}
-		// 	}
-		// }
+		// Refer to events catalogue in handlers package (handlers_structs.go)
+		if _, ok := handlers.Events[event.Type]; ok {
+			// Check that event type is not login or register (these events do not require authentication)
+			if event.Type != "login" && event.Type != "register" {
+				// Check if the request contains a sessionID cookie
+				cookie, err := r.Cookie(sessions.COOKIE_NAME)
+				if err != nil {
+					// Handle error: No sessionID cookie found.
+					log.Printf("authenticationWiddleware() error - No sessionID cookie found: %v", err)
+					http.Error(w, "Invalid session", http.StatusUnauthorized)
+					return
+				}
 
-		// // Create a new reader with the body for the next handler
-		// r.Body = io.NopCloser(bytes.NewReader(body))
+				// Validate the sessionID cookie
+				isValid, err := sessions.CookieCheck(cookie)
+				if !isValid || err != nil {
+					// Handle error: Invalid sessionID cookie.
+					log.Printf("authenticationWiddleware() error - Invalid sessionID cookie: %v", err)
+					http.Error(w, "Invalid session", http.StatusUnauthorized)
+					return
+				}
+			}
+		}
+
+		// Create a new reader with the body for the next handler
+		r.Body = io.NopCloser(bytes.NewReader(body))
 		handler.ServeHTTP(w, r)
 	})
 }
@@ -381,3 +381,19 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	return nil
 }
+
+/*********************** DEPRECATED CODE BELOW ************************/
+
+/*
+extractCookie is a function which takes an http.Request as an input and returns a pointer
+to an http.Cookie and an error. It is used to extract the session cookie from the request
+header. It returns an error which is non-nil if a cookie with the sessions.COOKIE_NAME is
+not present in the request header.
+*/
+// func extractCookie(r *http.Request) (*http.Cookie, error) {
+// 	cookie, err := r.Cookie(sessions.COOKIE_NAME)
+// 	if err != nil {
+// 		return nil, errors.New("error in server.extractCookie(): " + err.Error())
+// 	}
+// 	return cookie, nil
+// }
