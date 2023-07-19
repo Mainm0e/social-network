@@ -4,6 +4,7 @@ import (
 	"backend/db"
 	"backend/events"
 	"backend/handlers"
+	"backend/server/sessions"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -290,6 +291,35 @@ func (m *Manager) HandleIsTypingEvent(typingEvent events.Event, client *Client) 
 		}
 		return true // Continue iteration
 	})
+}
+
+/********************** LOGOUT EVENT / LOGIC *********************************/
+
+/*
+HandleLogoutEvent() documentation...
+*/
+func (m *Manager) HandleLogoutEvent(logoutEvent events.Event, client *Client) {
+	// Initialise a LogoutWS struct and unmarshal the event payload into it
+	var logoutData handlers.UserCredential // TODO may need to change this to socket-specific struct
+	if err := json.Unmarshal(logoutEvent.Payload, &logoutData); err != nil {
+		log.Printf("HandleLogoutEvent() - Error unmarshalling event payload: %v", err)
+		return
+	}
+
+	// Log the client out of their session
+	err := sessions.Logout(logoutData.SessionId)
+	if err != nil {
+		log.Println("Error logging out:", err)
+		return
+	}
+
+	// Send a logout confirmation to the client
+	// TODO: This is not working for some reason (tried various versions)
+
+	// Close the client's Egress channel and remove them from the active clients
+	close(client.Egress)
+	m.Clients.Delete(client.ID)
+	log.Printf("HandleLogoutEvent() - Removed client %d from active clients\n", client.ID)
 }
 
 /********************** COMMON LOGIC / FUNCTIONS *****************************/
