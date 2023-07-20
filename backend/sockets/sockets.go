@@ -71,7 +71,7 @@ multiple times.
 */
 func (c *Client) Cleanup() {
 	c.Once.Do(func() {
-		log.Printf("Closing websocket connection for client \" %v \"", c.ID)
+		log.Printf("sockets.Cleanup() - closing websocket connection for client \" %v \"", c.ID)
 		c.Manager.Unregister <- c
 		c.Connection.Close()
 	})
@@ -85,9 +85,8 @@ func (c *Client) ReadData() {
 	// Defer the closing of the client's websocket connection, which gets called
 	// when the function returns
 	defer func() {
-		log.Printf("sockets.ReadData() - Closing websocket connection for client \" %v \"", c.ID)
-		c.Manager.Unregister <- c
-		c.Connection.Close()
+		log.Println("sockets.ReadData() go-routine returning...")
+		c.Cleanup()
 	}()
 
 	c.Connection.SetReadLimit(MAX_DATA_SIZE)
@@ -152,9 +151,9 @@ func (c *Client) WriteData() {
 	// Defer the stopping of the ticker and closing of the client's websocket connection,
 	// which gets called when the function returns.
 	defer func() {
-		log.Printf("sockets.WriteData() - Closing websocket connection for client \" %v \"", c.ID)
+		log.Println("sockets.WriteData() go-routine returning...")
 		ticker.Stop()
-		c.Connection.Close()
+		c.Cleanup()
 	}()
 
 	// Infinite loop to continuously write data to the websocket connection.
