@@ -92,6 +92,7 @@ const DisplayNotification = ({ notifications,groupName ,user, handleAcceptDeclin
       });
     };
 
+    
     return (
       <div className="notification">
         <div className="notification-user">
