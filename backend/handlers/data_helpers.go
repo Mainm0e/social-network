@@ -4,20 +4,16 @@ import (
 	"backend/db"
 	"backend/utils"
 	"errors"
-	"fmt"
-	"log"
-	"strconv"
-	"time"
 )
 
 /*
 fetchUser get a user from the database using the userId.
 It returns the user and any error encountered during the process.
 */
-func fetchUser(userId int) (db.User, error) {
-	users, err := db.FetchData("users", "userId", userId)
+func fetchUser(key string, value any) (db.User, error) {
+	users, err := db.FetchData("users", key+" = ?", value)
 	if err != nil {
-		return db.User{}, errors.New("Error fetching user data" + err.Error())
+		return db.User{}, errors.New("Error fetching user data: " + err.Error())
 	}
 	if len(users) == 0 {
 		return db.User{}, errors.New("user not found")
@@ -26,7 +22,7 @@ func fetchUser(userId int) (db.User, error) {
 }
 
 /*
-smallProfiles use for followers and followings list in profile page and maybe explore page in future
+smallProfiles use for followers, followings list in profile page and explore page
 */
 
 /*
@@ -34,7 +30,7 @@ fillSmallProfile fills a SmallProfile struct with data from a db.User struct.
 It returns the filled SmallProfile struct and any error encountered during the process.
 */
 func fillSmallProfile(userId int) (SmallProfile, error) {
-	user, err := fetchUser(userId)
+	user, err := fetchUser("userId", userId)
 	if err != nil {
 		return SmallProfile{}, errors.New("Error fetchingUser:" + err.Error())
 	}
@@ -44,13 +40,18 @@ func fillSmallProfile(userId int) (SmallProfile, error) {
 		LastName:  user.LastName,
 		Avatar:    user.Avatar,
 	}
-	if user.Avatar != nil {
-		avatar, err := utils.RetrieveImage(*user.Avatar)
-		if err != nil {
-			return SmallProfile{}, errors.New("Error retrieving avatar image: " + err.Error())
-		}
-		smallProfile.Avatar = &avatar
+	var imageUrl string
+	if user.Avatar != nil && *user.Avatar != "" {
+		imageUrl = *user.Avatar
+	} else {
+		imageUrl = "./images/avatars/default.gif"
 	}
+	avatar, err := utils.RetrieveImage(imageUrl)
+	if err != nil {
+		return SmallProfile{}, errors.New("Error retrieving avatar image: " + err.Error())
+	}
+
+	smallProfile.Avatar = &avatar
 	return smallProfile, nil
 }
 
@@ -87,7 +88,7 @@ findFollowers and findFollowings function return the list of followers and follo
 if error occur then it return error
 */
 func findFollowers(userId int) ([]int, error) {
-	followers, err := db.FetchData("follow", "followeeId", userId)
+	followers, err := db.FetchData("follow", "followeeId = ?", userId)
 	if len(followers) == 0 {
 		return nil, nil
 	}
@@ -96,12 +97,19 @@ func findFollowers(userId int) ([]int, error) {
 	}
 	var followerIds []int
 	for _, follower := range followers {
-		followerIds = append(followerIds, follower.(db.Follow).FollowerId)
+		if follower.(db.Follow).Status == "following" {
+			followerIds = append(followerIds, follower.(db.Follow).FollowerId)
+		}
 	}
 	return followerIds, nil
 }
+
+/*
+findFollowings() takes a userID integer and returns a slice of integers containing the IDs of the users that the user with the given ID is following.
+It also returns an error value, which is non-nil if an error occurred during the process.
+*/
 func findFollowings(userId int) ([]int, error) {
-	followings, err := db.FetchData("follow", "followerId", userId)
+	followings, err := db.FetchData("follow", "followerId = ?", userId)
 	if len(followings) == 0 {
 		return nil, nil
 	}
@@ -110,7 +118,9 @@ func findFollowings(userId int) ([]int, error) {
 	}
 	var followingIds []int
 	for _, following := range followings {
-		followingIds = append(followingIds, following.(db.Follow).FolloweeId)
+		if following.(db.Follow).Status == "following" {
+			followingIds = append(followingIds, following.(db.Follow).FolloweeId)
+		}
 	}
 	return followingIds, nil
 }
@@ -121,7 +131,7 @@ if current user follow requested user then it return 'following' if they already
 if error occur then it return error
 */
 func checkUserRelation(userId int, profileId int) (string, error) {
-	followings, err := db.FetchData("follow", "followerId", userId)
+	followings, err := db.FetchData("follow", "followerId = ?", userId)
 	if err != nil {
 		return "", errors.New("Error fetching follow data" + err.Error())
 	}
@@ -141,15 +151,10 @@ FillProfile function fill the profile struct with the data base on the relation 
 if error occur then it return error else it return profile struct and nil.
 */
 func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
-
-	users, err := db.FetchData("users", "userId", profileId)
+	user, err := fetchUser("userId", profileId)
 	if err != nil {
-		return Profile{}, errors.New("Error fetching user data" + err.Error())
+		return Profile{}, errors.New("Error fetchingUser:" + err.Error())
 	}
-	if len(users) == 0 {
-		return Profile{}, errors.New("user not found")
-	}
-	user := users[0].(db.User)
 	// check relation between current user and requested user
 	status, err := checkUserRelation(userId, profileId)
 	if err != nil {
@@ -161,18 +166,22 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		return Profile{}, errors.New("Error findFollowers: " + err.Error())
 	}
 	followings, err := findFollowings(profileId)
-	log.Println("followings", followings, "followers", followers)
 	if err != nil {
 		return Profile{}, errors.New("Error findFollowings: " + err.Error())
 	}
-	if user.Avatar != nil {
 
-		avatar, err := utils.RetrieveImage(*user.Avatar)
-		if err != nil {
-			return Profile{}, errors.New("Error retrieving avatar image: " + err.Error())
-		}
-		user.Avatar = &avatar
+	var imageUrl string
+	if user.Avatar != nil && *user.Avatar != "" {
+		imageUrl = *user.Avatar
+	} else {
+		imageUrl = "./images/avatars/default.gif"
 	}
+	avatar, err := utils.RetrieveImage(imageUrl)
+	if err != nil {
+		return Profile{}, errors.New("Error retrieving avatar image: " + err.Error())
+	}
+	user.Avatar = &avatar
+
 	profile := Profile{
 		sessionId,
 		user.UserId,
@@ -180,6 +189,8 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 		user.FirstName,
 		user.LastName,
 		user.Avatar,
+		"",
+		user.Privacy,
 		len(followers),
 		len(followings),
 		PrivateProfile{},
@@ -192,11 +203,12 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 			followers,
 			followings,
 		}
+		profile.Relation = "you"
 		return profile, nil
 
 	}
-	if status == "following" || userId == profileId {
-		log.Println("yay user is user", profile.PrivateData)
+	profile.Relation = status
+	if status == "following" || user.Privacy == "public" {
 		profile.PrivateData = PrivateProfile{
 			user.BirthDate,
 			user.Email,
@@ -204,364 +216,67 @@ func FillProfile(userId int, profileId int, sessionId string) (Profile, error) {
 			followers,
 			followings,
 		}
-	} else if status == "follow" || status == "pending" {
+		return profile, nil
+	} else if status == "pending" || status == "follow" {
 		return profile, nil
 	} else {
-		return Profile{}, errors.New("error checkUserRelation: wtf")
-	}
-	return profile, nil
-}
-
-/*
-login is a function that attempts to log in a user based on the provided data.
-It takes in a byte slice `data` containing the login information.
-It returns a boolean value indicating whether the login was successful, and an error if any occurred.
-*/
-func (lg *LoginData) login() (int, error) {
-
-	// Fetch user data from the database based on the provided email.
-	user, err := db.FetchData("users", "email", lg.Email)
-	if err != nil {
-		return 0, errors.New("Error fetching data" + err.Error())
-	}
-
-	// Check if a user with the specified email was found.
-	if len(user) == 0 {
-		return 0, errors.New("user not found")
-	}
-
-	// Compare the provided password with the password stored in the database.
-	if user[0].(db.User).Password == lg.Password {
-		return user[0].(db.User).UserId, nil
-	} else {
-		return 0, errors.New("password incorrect")
+		return Profile{}, errors.New("error checkUserRelation: wtf:" + status)
 	}
 }
 
 /*
-register is a function that attempts to register a new user based on the provided data.
-It takes in a byte slice `data` containing the registration information.
-It returns a boolean value indicating whether the registration was successful, and an error if any occurred.
+ReadAllUsers function return all users in database except current user
+for each user it call FillProfile function to fill the profile struct
+base on the relation between current user and requested user profile
+if error occur then it return error else it returns profile struct and nil.
 */
-func (regData *RegisterData) register() error {
-	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "public", time.Now())
+func ReadAllUsers(userId int, sessionId string) ([]Profile, error) {
+	dbUsers, err := db.FetchData("users", "")
 	if err != nil {
-		return errors.New("Error inserting user" + err.Error())
+		return []Profile{}, errors.New("Error fetching users" + err.Error())
 	}
-	return nil
-}
-
-/*
-IsNotUser is a function that checks if a user with the specified email already exists.
-It takes in a string `email` containing the email of the user to check.
-It returns a boolean value indicating whether the user exists, and an error if any occurred.
-*/
-func IsNotUser(email string) (bool, error) {
-	// Fetch user data from the database based on the provided email.
-	user, err := db.FetchData("users", "email", email)
-	if err != nil {
-		return false, errors.New("Error fetching data" + err.Error())
+	if len(dbUsers) == 0 {
+		return []Profile{}, errors.New("no user found")
 	}
-	// Check if a user with the specified email already exists.
-	if len(user) == 0 {
-		// Insert the new user data into the database.
-		return true, nil
-	} else {
-		return false, nil
-	}
-}
-
-/*
-UpdateProfile is a function that updates the privacy of a user with the specified email.
-returns error if any occurred.
-*/
-func UpdateProfile(email string, privacy string) error {
-	users, err := db.FetchData("users", "email", email)
-	if err != nil {
-		return errors.New("Error fetching user " + err.Error())
-	}
-	if len(users) == 0 {
-		return errors.New("user not found")
-	}
-	user := users[0].(db.User)
-	// if frontend guys were too lazy to check if privacy changed really or same thing is sent again check it here before updating
-
-	err = db.UpdateData("users", privacy, user.UserId)
-	if err != nil {
-		return errors.New("Error updating user " + err.Error())
-	}
-	return nil
-}
-
-/*
-InsertPost function insert the post into database and check if it is semi-private then it insert the followers that user selected to semiPrivate table
-if error occur then it return error
-*/
-func InsertPost(post Post) error {
-
-	id, err := db.InsertData("posts", post.UserId, post.GroupId, post.Title, post.Content, time.Now(), post.Status, "")
-	if err != nil {
-		return errors.New("Error inserting post " + err.Error())
-	}
-	if id == 0 {
-		return errors.New("error inserting post ")
-	}
-	fmt.Println("post image", post.Image)
-	if post.Image != "" {
-		// Process the image and save it to the local storage
-		str := strconv.Itoa(int(id))
-		url := "./images/posts/" + str
-		url, err := utils.ProcessImage(post.Image, url)
+	var users []Profile
+	for _, dbUser := range dbUsers {
+		dbUser := dbUser.(db.User)
+		user, err := FillProfile(userId, dbUser.UserId, sessionId)
 		if err != nil {
-			log.Println("Error processing post image:", err)
-			//response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-			return err
+			return []Profile{}, errors.New("Error fetching user" + err.Error())
 		}
-		post.Image = url
-	} else {
-		post.Image = ""
-	}
-	err = db.UpdateData("posts", post.Image, id)
-	if err != nil {
-		return errors.New("Error updating post " + err.Error())
-	}
-	if post.Status == "semi-private" {
-		for _, followerId := range post.Followers {
-			_, err := db.InsertData("semiPrivate", id, followerId)
-			if err != nil {
-				return errors.New("Error inserting semiPrivate" + err.Error())
-			}
+		if user.UserId != userId {
+			users = append(users, user)
 		}
 	}
-	return nil
-}
-func InsertComment(comment Comment) error {
-	id, err := db.InsertData("comments", comment.UserId, comment.PostId, comment.Content, "", time.Now())
-	if err != nil {
-		return errors.New("Error inserting comment " + err.Error())
-	}
-	if id == 0 {
-		return errors.New("error inserting comment ")
-	}
-	if comment.Image != "" {
-		// Process the image and save it to the local storage
-		str := strconv.Itoa(int(id))
-		url := "./images/comments/" + str
-		url, err := utils.ProcessImage(comment.Image, url)
-		if err != nil {
-			log.Println("Error processing comment image:", err)
-			//response = Response{err.Error(), events.Event{}, http.StatusBadRequest}
-			return err
-		}
-		comment.Image = url
-	} else {
-		comment.Image = ""
-	}
-	err = db.UpdateData("comments", comment.Image, id)
-	if err != nil {
-		return errors.New("Error updating comment image" + err.Error())
-	}
-	return nil
-}
-func readComments(currentUserId, postId int) ([]Comment, error) {
-	/* 	// check if user has permission to see this post
-	   	posts, err := db.FetchData("posts", "postId", postId)
-	   	if err != nil {
-	   		return []Comment{}, errors.New("Error fetching post" + err.Error())
-	   	}
-	   	if len(posts) == 0 {
-	   		return []Comment{}, errors.New("post not found")
-	   	}
-	   	post := posts[0].(db.Post)
-	   	ok, err := checkPost(post, currentUserId)
-	   	if err != nil {
-	   		return []Comment{}, errors.New("Error checking post" + err.Error())
-	   	}
-	   	if !ok {
-	   		return []Comment{}, errors.New("you don't have permission to see this post")
-	   	} */
-	// now that we know user has permission to see this post we can fetch comments
-	comments, err := db.FetchData("comments", "postId", postId)
-	if err != nil {
-		return []Comment{}, errors.New("Error fetching comments" + err.Error())
-	}
-	if len(comments) == 0 {
-		return []Comment{}, nil
-	}
-	var commentsList []Comment
-	for _, comment := range comments {
-		dbComment := comment.(db.Comment)
-		commentsList = append(commentsList, Comment{
-			CommentId: dbComment.CommentId,
-			PostId:    dbComment.PostId,
-			UserId:    dbComment.UserId,
-			Content:   dbComment.Content,
-			Date:      dbComment.CreationTime,
-		})
-	}
-	return commentsList, nil
-
+	return users, nil
 }
 
 /*
-checkPost function check if user has permission to see the post that pass to it base on post status.
-it used in readPost and readComments functions.
-it return true if user has permission and false if not. if error occur it return error.
+GetAllGroupMemberIDs returns all the user ids of the members of a group.
+It takes a groupID integer as an argument and returns a slice of integers
+and an error value, which is non-nil if any of the database operations
+failed.
 */
-func checkPost(dbPost db.Post, userId int) (bool, error) {
+func GetAllGroupMemberIDs(groupId int) ([]int, error) {
+	var userIds []int
 
-	if dbPost.UserId == userId {
-		return true, nil
-	}
-	switch dbPost.Status {
-	case "semi-private":
-		{
-			semiPrivates, err := db.FetchData("semiPrivate", "postId", dbPost.PostId)
-			if err != nil {
-				return false, errors.New("Error fetching semiPrivate" + err.Error())
-			}
-			if len(semiPrivates) == 0 {
-				return false, errors.New("no followers found")
-			}
-			for _, semiPrivate := range semiPrivates {
-				if semiPrivate.(db.SemiPrivate).UserId == userId {
-					return true, nil
-				}
-			}
-		}
-	case "private":
-		{
-			//check if userId is in followers of the post creator
-			followers, err := findFollowers(dbPost.UserId)
-			if err != nil {
-				return false, errors.New("Error fetching followers data" + err.Error())
-			}
-			for _, follower := range followers {
-				if follower == userId {
-					return true, nil
-				}
-			}
-		}
-	case "group":
-		{
-			groups, err := db.FetchData("group_memeber", "userId", userId)
-			if err != nil {
-				return false, errors.New("Error fetching group" + err.Error())
-			}
-			if len(groups) == 0 {
-				return false, errors.New("user is not a memeber of group")
-			}
-			for _, group := range groups {
-				if group.(db.GroupMember).GroupId == dbPost.GroupId {
-					return true, nil
-				}
-			}
-		}
-	case "public":
-		{
-			return true, nil
-		}
-	}
-	return false, errors.New("user doesn't have permission to this post")
-
-}
-
-/*
-ReadPost function read post from database and check if current user has permission to see it, using checkPost function.
-it return post if user has permission, error if error occur or post not found.
-*/
-func ReadPost(postId int, userId int) (Post, error) {
-	dbPosts, err := db.FetchData("posts", "postId", postId)
+	// Fetch all group members from the database
+	dbGroupMembers, err := db.FetchData("group_member", "groupId = ?", groupId)
 	if err != nil {
-		return Post{}, errors.New("Error fetching post" + err.Error())
+		return userIds, errors.New("Error fetching group members" + err.Error())
 	}
-	if len(dbPosts) == 0 {
-		return Post{}, errors.New("post not found")
-	}
-	dbPost := dbPosts[0].(db.Post)
-	creator, err := fillSmallProfile(dbPost.UserId)
-	if err != nil {
-		return Post{}, errors.New("Error fetching post creator" + err.Error())
-	}
-	post := Post{
-		PostId:         dbPost.PostId,
-		UserId:         dbPost.UserId,
-		CreatorProfile: creator,
-		Title:          dbPost.Title,
-		Content:        dbPost.Content,
-		Status:         dbPost.Status,
-		GroupId:        dbPost.GroupId,
-		Date:           dbPost.CreationTime,
-	}
-	comments, err := readComments(userId, postId)
-	if err != nil {
-		return Post{}, errors.New("Error reading comments" + err.Error())
-	}
-	post.Comments = comments
-	post.Followers = []int{}
-	if dbPost.Image != "" {
-		image, err := utils.RetrieveImage(dbPost.Image)
-		if err != nil {
-			return Post{}, errors.New("Error retrieving post image: " + err.Error())
-		}
-		post.Image = image
-	}
-	ok, err := checkPost(dbPosts[0].(db.Post), userId)
 
-	if err != nil {
-		return Post{}, errors.New("Error checking post" + err.Error())
+	// If no group members were found, return an error
+	if len(dbGroupMembers) == 0 {
+		return userIds, errors.New("no group member found")
 	}
-	if !ok {
-		return Post{}, errors.New("user doesn't have permission to this post")
-	}
-	return post, nil
 
-}
+	// Iterate over all group members and append their user ids to the slice
+	for _, dbGroupMember := range dbGroupMembers {
+		dbGroupMember := dbGroupMember.(db.GroupMember)
+		userIds = append(userIds, dbGroupMember.UserId)
+	}
 
-/*
-ReadPostsByProfile function read all posts of a profile from database
-and returns it if user have permission to see it base on post status and user relation to the post creator.
-if error occur then it return error.
-*/
-func ReadPostsByProfile(currentUserId int, userId int) ([]Post, error) {
-	var posts []Post
-	dbPosts, err := db.FetchData("posts", "userId", userId)
-	if err != nil {
-		return []Post{}, errors.New("Error fetching posts" + err.Error())
-	}
-	if len(dbPosts) == 0 {
-		return []Post{}, errors.New("posts not found")
-	}
-	for _, dbPost := range dbPosts {
-		post, err := ReadPost(dbPost.(db.Post).PostId, currentUserId)
-		if err != nil {
-			return []Post{}, errors.New("Error checking post" + err.Error())
-		}
-		posts = append(posts, post)
-	}
-	return posts, nil
-}
-
-/*
-ReadPostsByGroup function read all posts of a group from database
-and returns it if user have permission to see it if user is a member of the group
-if error occur then it return error.
-*/
-func ReadPostsByGroup(currentUserId int, groupId int) ([]Post, error) {
-	var posts []Post
-	dbPosts, err := db.FetchData("posts", "groupId", groupId)
-	if err != nil {
-		return []Post{}, errors.New("Error fetching posts" + err.Error())
-	}
-	if len(dbPosts) == 0 {
-		return []Post{}, errors.New("posts not found")
-	}
-	for _, dbPost := range dbPosts {
-		post, err := ReadPost(dbPost.(db.Post).PostId, currentUserId)
-		if err != nil {
-			return []Post{}, errors.New("Error checking post" + err.Error())
-		}
-		posts = append(posts, post)
-	}
-	return posts, nil
+	return userIds, nil
 }

@@ -63,13 +63,21 @@ export const dummyUsers = [
         status: "online",
         unseemessage: 0,
     },
-    {
+    {     
+        chattype: "group",
         id: 10,
         name: "Dora",
         avatar: "https://i.pravatar.cc/150?img=10",
         status: "offline",
         unseemessage: 0,
-    },
+    },{
+        chattype: "group",
+        id: 11,
+        name: "Group 1",
+        avatar: "https://i.pravatar.cc/150?img=11",
+        status:"offline",
+        unseemessage: 0,
+    }
     
 ];
 

@@ -1,0 +1,181 @@
+.container {
+    display: flex;
+    background: #FFEA00;
+    padding: 10px;
+    border-radius: 10px;
+    border: 4px solid black;
+    width: 100%;
+    justify-content: center;
+}
+
+.container .row {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container .header {
+    display: flex;
+    font-family: myFancyFont;
+    font-size: 24px;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.container .header h1 {
+    margin: 0;
+}
+
+.container .header .form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* style input box */
+
+.container .header .form-group input {
+    font-family: myFancyFont;
+    width: 300px;
+    height: 30px;
+    padding: 5px;
+    border: 4px solid black;
+    border-radius: 10px;
+    outline: none;
+}
+
+
+/* style text area */
+
+.container .header .form-group textarea {
+    font-family: myFancyFont;
+    width: 300px;
+    height: 100px;
+    padding: 5px;
+    border: 4px solid black;
+    border-radius: 10px;
+    outline: none;
+}
+
+.container .header .submit-event {
+    width: 100%;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 18px;
+}
+
+.container .header .submit-event:hover {
+    background-color: #ccc;
+}
+
+.event-list {
+    width: 300px;
+    border: 2px solid black;
+    padding: 10px;
+    background-color: #f9f9f9;
+    font-family: Arial, sans-serif;
+    border-radius: 10px;
+}
+
+.event-list h1 {
+    font-family: myFancyFont;
+    font-size: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+.event-list-item {
+    display: flex;
+    margin-bottom: 5px;
+    background: #FFEA00;
+    border-radius: 10px;
+    padding: 5px 10px;
+    border: 2px solid black;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.event-list-item-body {
+    display: flex;
+    border: 2px solid black;
+    padding: 10px;
+    background-color: #f9f9f9;
+    font-family: Arial, sans-serif;
+    border-radius: 10px;
+    flex-direction: column;
+}
+
+.event-list-item-body p {
+    font-family: myFancyFont;
+    font-size: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+.event-creater {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.event-creater p {
+    font-size: 10px;
+}
+
+.event-list-item-footer {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+}
+
+.event-list-item-footer p {
+    font-size: 10px;
+    font-family: myFancyFont;
+}
+
+.event-list-footer button {
+    width: 100%;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
+    padding: 10px;
+}
+
+.event-list-footer button:hover {
+    background-color: #ccc;
+}
+
+.default {
+    width: 100%;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
+    padding: 10px;
+}
+
+.default:hover {
+    background-color: #ccc;
+}
+
+.highlight {
+    width: 100%;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
+    padding: 10px;
+    background-color: #ccc;
+    /* Add any other styling you want for the highlighted button */
+}

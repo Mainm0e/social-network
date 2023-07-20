@@ -2,6 +2,7 @@ package sockets
 
 import (
 	"backend/events"
+	"context"
 	"net/http"
 	"sync"
 	"time"
@@ -49,8 +50,11 @@ allows the server to respond to HTTP upgrade requests from clients that want to
 initiate a WebSocket connection.
 */
 var websocketUpgrader = websocket.Upgrader{
-	// Allow connections from any origin
-	CheckOrigin:     func(r *http.Request) bool { return true },
+	// Only allow connections from localhost:3000
+	CheckOrigin: func(r *http.Request) bool {
+		origin := r.Header.Get("Origin")
+		return origin == "http://localhost:3000" // TODO: Import constant from server package not working
+	},
 	ReadBufferSize:  READ_BUFFER_SIZE,
 	WriteBufferSize: WRITE_BUFFER_SIZE,
 }
@@ -68,7 +72,7 @@ var websocketUpgrader = websocket.Upgrader{
 EventHandler type is a function that handles an event. It takes an Event and a Client
 as parameters and returns an error if the event cannot be handled successfully.
 */
-type EventHandler func(event events.Event, client *Client) error
+type EventHandler func(event events.Event, client *Client)
 
 /*
 ClientList is a struct that represents a map of connected clients. It is a wrapper
@@ -87,7 +91,11 @@ WebSocket connection. It includes the client's WebSocket connection, the Manager
 that manages the client, and a channel for outgoing messages (egress).
 */
 type Client struct {
+	Context    context.Context
+	CancelFunc context.CancelFunc
 	Connection *websocket.Conn
 	Manager    *Manager
 	Egress     chan []byte // A channel for outgoing messages
+	ID         int         // UserID of client
+	Once       sync.Once   // To ensure connection closure happens only once
 }

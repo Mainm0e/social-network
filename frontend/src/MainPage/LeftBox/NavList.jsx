@@ -5,7 +5,7 @@ const NavList = ({ type,links }) => {
     const toggleList = () => {
         setShowList(!showList);
         };
-    const list = () => {
+    const List = () => {
         return (
             <>
             {Object.entries(links).map(([key, value]) => (
@@ -20,8 +20,7 @@ const NavList = ({ type,links }) => {
 
     return (
         <div className="nav-list">
-            <span onClick={toggleList}>{type}</span>
-            {showList && <>{list()}</>}
+           <List />
         </div>
     );
 }

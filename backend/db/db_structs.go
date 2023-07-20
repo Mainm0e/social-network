@@ -51,7 +51,7 @@ type Message struct {
 	ReceiverId     int    `json:"receiverId"`
 	MessageContent string `json:"messageContent"`
 	SendTime       string `json:"sendTime"`
-	Seen           int    `json:"seen"`
+	MsgType        string `json:"msgType"`
 }
 
 type Follow struct {
@@ -61,10 +61,11 @@ type Follow struct {
 }
 
 type Group struct {
-	GroupId     int    `json:"groupId"`
-	CreatorId   int    `json:"creatorId"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
+	GroupId      int    `json:"groupId"`
+	CreatorId    int    `json:"creatorId"`
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	CreationTime string `json:"creationTime"`
 }
 
 type GroupMember struct {
@@ -82,6 +83,7 @@ type Notification struct {
 	NotificationId int    `json:"notificationId"`
 	ReceiverId     int    `json:"receiverId"`
 	SenderId       int    `json:"senderId"`
+	GroupId        int    `json:"groupId"`
 	Type           string `json:"type"`
 	Content        string `json:"content"`
 	CreationTime   string `json:"creationTime"`
@@ -90,12 +92,17 @@ type Notification struct {
 type Event struct {
 	EventId      int    `json:"eventId"`
 	CreatorId    int    `json:"creatorId"`
-	ReceiverId   int    `json:"receiverId"`
 	GroupId      int    `json:"groupId"`
 	Title        string `json:"title"`
 	Content      string `json:"content"`
+	Date         string `json:"date"`
 	CreationTime string `json:"creationTime"`
-	Option       string `json:"option"`
+}
+type EventMember struct {
+	SessionId string `json:"sessionId"`
+	EventId   int    `json:"eventId"`
+	MemberId  int    `json:"memberId"`
+	Option    string `json:"option"` // going, not_going
 }
 
 type InsertRule struct {

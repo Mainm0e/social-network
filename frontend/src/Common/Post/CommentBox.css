@@ -5,6 +5,16 @@
     align-items: center;
     margin: 0 0 10px 0;
 }
+
+.create_comment_top {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-direction: column;
+}
+
 .comment .comment-button {
     display: flex;
     justify-content: space-between;
@@ -13,14 +23,21 @@
     height: 30px;
     margin: 0 0 10px 0;
 }
+
 .comment .comment-button button {
     width: 100%;
-    height: 30px;
-    border: none;
-    border-radius: 5px;
-    background-color: #ccc;
-    color: #fff;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
     cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
+    padding: 10px;
+}
+
+.comment-button button.active {
+    background-color: #aaa;
+    /* Add any other styling properties for the active button */
 }
 
 .comment .comment-button button:hover {
@@ -33,27 +50,29 @@
     justify-content: space-between;
     align-items: center;
     margin: 0 0 10px 0;
-    
 }
 
 .create_comment textarea {
     width: 100%;
     height: 100px;
     resize: none;
-    border: 1px solid #ccc;
-    border-radius: 5px;
     padding: 5px;
     margin: 0 0 10px 0;
+    border: 2px solid black;
+    border-radius: 5px;
+    font-family: myFancyFont;
+    outline: none;
 }
 
 .create_comment button {
-    width: 100px;
-    height: 30px;
-    border: none;
-    border-radius: 5px;
-    background-color: #ccc;
-    color: #fff;
+    width: 100%;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
     cursor: pointer;
+    font-family: myFancyFont;
+    font-size: 15px;
+    padding: 10px
 }
 
 .create_comment button:hover {
@@ -92,52 +111,94 @@
     border: 1px solid #ccc;
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .comment_list_item_header {
+    background: white;
+}
+
+.comment_list_item_header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     width: 100%;
     margin-bottom: 10px;
-  }
-  
-  .comment_list_item_header_left {
+    flex-direction: column;
+}
+
+.comment_list_item_header_left {
     display: flex;
     align-items: center;
-  }
-  
-  .comment_list_item_header_info p {
+    font-family: myFancyFont;
+}
+
+.comment_list_item_header_info p {
     margin: 0;
     font-size: 12px;
     color: #666;
-  }
-  
-  .comment_list_item_header_right {
+}
+
+.comment_list_item_header_right {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.comment_list_item_header_user {
     display: flex;
     align-items: center;
-  }
-  
-  .comment_list_item_header_user p {
+    width: 100px;
+    /* Adjust this value to fit your layout */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: myFancyFont;
+}
+
+.comment_list_item_header_user img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 1px solid black;
+    background: #FFFFFF;
+}
+
+.comment_list_item_body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+}
+
+.comment_list_item_header_user p {
     margin: 0;
     font-size: 14px;
     font-weight: bold;
     color: #333;
-  }
-  
-  .comment_list_item_body p.content {
+}
+
+.comment_list_item_header_user img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.comment_list_item_body textarea.content {
+    width: 100%;
     margin: 0;
-    font-size: 14px;
+    font-size: 24px;
     color: #333;
-  }
-  
-  .comment_list_item_image {
+    background-color: white;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: none;
+    resize: none;
+    outline: none;
+    font-family: myFancyFont;
+}
+
+.comment_list_item_image {
     width: 100%;
     margin-top: 10px;
-  }
-  
-  .comment_list_item_image img {
+}
+
+.comment_list_item_image img {
     max-width: 100%;
     height: auto;
-  }
-  
+}

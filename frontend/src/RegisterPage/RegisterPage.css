@@ -1,95 +1,166 @@
+:root {
+    --color-1: #FF0000;
+    --color-2: #FF7F00;
+    --color-3: #FFFF00;
+    --color-4: #00FF00;
+    --color-5: #00FFFF;
+    --color-6: #0000FF;
+    --color-7: #8B00FF;
+    --color-8: #FF00FF;
+    --color-9: #FF1493;
+    --color-10: #FF4500;
+}
+
 .register-page {
-  display: grid;
-  grid-template-columns: 1.3fr 0.7fr;
-  grid-template-rows: 1fr;
-  gap: 0px 0px;
-  grid-template-areas: "text register";
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    grid-template-rows: 1fr;
+    gap: 0px 0px;
+    grid-template-areas: "text register";
 }
 
 .register-container {
-  width: 400px;
-  height: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  border-radius: 4px;
-  grid-area: register;
-  font-family: myFancyFont;
+    width: 400px;
+    height: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 4px;
+    grid-area: register;
+    font-family: myFancyFont;
 }
 
 .register-container a {
-  text-decoration: none;
-  color: black;
+    text-decoration: none;
+    color: black;
 }
 
 .register-container a:hover {
-  color: #FFEA00;
+    color: #FFEA00;
 }
 
 .register-container h1 {
-  text-align: center;
-  margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .register-container label {
-  display: block;
-  margin-bottom: 10px;
+    display: block;
+    margin-bottom: 10px;
 }
 
 .register-container input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  outline: none;
-  font-family: myFancyFont;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    outline: none;
+    font-family: myFancyFont;
+    /* additional properties */
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    align-items: center;
 }
 
 .select-container {
-  display: inline-flex;
+    display: inline-flex;
 }
 
 .register-container button {
-  width: 100%;
-  padding: 10px;
-  background-color: #ddd;
-  color: black;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: myFancyFont;
+    flex: 1;
+    margin: 0 5px;
+    padding: 10px;
+    background-color: #ddd;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: myFancyFont;
+    align-items: center;
 }
 
 .register-container button:hover {
-  background-color: #a2a0a0;
+    background-color: #a2a0a0;
 }
 
 .register-container .links {
-  text-align: center;
-  margin-top: 10px;
+    text-align: center;
+    margin-top: 10px;
 }
 
 @media only screen and (min-width: 768px) {
-  /* Tablet Styles */
-  .register-page {
-    grid-template-columns: 1fr;
-    grid-template-areas: "register";
-  }
-
-  .register-container {
-    max-width: 400px;
-  }
+    /* Tablet Styles */
+    .register-page {
+        grid-template-columns: 1fr;
+        grid-template-areas: "register";
+    }
+    .register-container {
+        max-width: 400px;
+    }
 }
 
 @media only screen and (min-width: 992px) {
-  /* PC Full Screen Styles */
-  .register-page {
-    grid-template-columns: 1.3fr 0.7fr;
-    grid-template-areas: "text register";
-  }
+    /* PC Full Screen Styles */
+    .register-page {
+        grid-template-columns: 1.3fr 0.7fr;
+        grid-template-areas: "text register";
+    }
 }
 
 @media screen and (max-width: 768px) {
-  .register-page {
-    grid-template-columns: 1fr;
-    grid-template-areas: "register";
-  }
+    .register-page {
+        grid-template-columns: 1fr;
+        grid-template-areas: "register";
+    }
+}
+
+.shake {
+    width: 100%;
+    transition: width 0.5s ease-in-out;
+    background: var(--color-1);
+    animation: shake 0.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+        background: var(--color-1);
+    }
+    10% {
+        transform: translateX(-5px);
+        background: var(--color-2);
+    }
+    20% {
+        transform: translateX(5px);
+        background: var(--color-3);
+    }
+    30% {
+        transform: translateX(-5px);
+        background: var(--color-4);
+    }
+    40% {
+        transform: translateX(5px);
+        background: var(--color-5);
+    }
+    50% {
+        transform: translateX(-5px);
+        background: var(--color-6);
+    }
+    60% {
+        transform: translateX(5px);
+        background: var(--color-7);
+    }
+    70% {
+        transform: translateX(-5px);
+        background: var(--color-8);
+    }
+    80% {
+        transform: translateX(5px);
+        background: var(--color-9);
+    }
+    90% {
+        transform: translateX(-5px);
+        background: var(--color-10);
+    }
 }

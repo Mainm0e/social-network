@@ -1,45 +1,128 @@
 import React, { useState, useEffect } from "react";
 import Header from "./User/Header";
+import GroupHeader from "./Group/GroupHeader";
+import GroupBody from "./Group/GroupBody";
 import Body from "./User/Body";
+import Explore from "../../Common/explore/explore";
+import RegisterGroup from "./Group/RegisterGroup";
 import "./MainBox.css";
-import { getCookie } from "../../tools/cookie";
-const MainBox = ({ user }) => {
-  const [data, setData] = useState(null);
-  const sessionId = getCookie("sessionId");
+import { getCookie, getUserId } from "../../tools/cookie";
+import { fetchData } from "../../tools/fetchData";
 
+
+
+const MainBox = ({ profileId,groupId, type ,state}) => {
+  const [refreshKey, setRefreshKey] = useState(0);
+  // refreshKey is used to refresh component
+  const refreshComponent = () => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
+
+  if (state === "explore"){
+    if (type ==="user"){
+      return (
+        <Explore type={"exploreUsers"}/> 
+        )
+      } else if (type === "group"){
+        return (
+          <Explore type={"exploreGroups"}/>
+        )
+      } else {
+        return (
+          <Explore type={"exploreUsers"}/> 
+          )
+      }
+  } else if (state === "profile"){
+    if (type === "user"){
+      return(
+        <Profile   key={refreshKey} profileId={profileId}   refreshComponent={refreshComponent}/>
+        )
+      } else if (type === "group"){
+        return (
+          <Group key={refreshKey} groupId={groupId} refreshComponent={refreshComponent} />
+        )
+      }
+} else if (state === "create_group"){
+  if (type === "group"){
+    return(
+      <CreateGroup/>
+    )
+  }
+};
+}
+export default MainBox;
+
+const Profile = ({profileId,refreshComponent}) =>{
+   const [data, setData] = useState(null);
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://localhost:8080/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: "profile",
-          payload: { sessionId: sessionId, userId: user, profileId: user },
-        }),
-      });
-      const responseData = await response.json();
-      setData(responseData.event.payload);
-    };
-    fetchData();
-  }, []);
+    const method = "POST"
+    const type = "profile"
+    const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId"), profileId: profileId }
 
-  useEffect(() => {
-    console.log("in header", data);
-  }, [data]);
+    fetchData(method,type, payload).then((data) => setData(data) );
+  }, [ profileId]);
 
+  const handleRefresh = () => {
+    refreshComponent(); // Call the refresh function from the parent component
+  };
+
+  
   if (data === null) {
-    return <div>Loading...</div>;
+    return <div className="loading"><div>Loading...</div></div>;
   } else {
-    console.log("in mainbox", data)
     return (
       <div className="main-box">
-        <Header profile={data} />
-        <Body user={user} />
+        <Header profile={data} handleRefresh={handleRefresh} />
+        <Body id={profileId}/>
       </div>
     );
   }
-};
+}
 
-export default MainBox;
+const CreateGroup = () => {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    const method = "POST"
+    const type = "profile"
+    const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId"), profileId: getUserId("userId") }
+
+    fetchData(method,type, payload).then((data) => setData(data) );
+  }, []);
+  return (
+    <div className="main-box">
+     <RegisterGroup user={data}/>
+    </div>
+  );
+}
+
+const Group = ({ groupId, refreshComponent }) => {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    const method = "POST"
+   const type = "exploreGroups"
+    const payload = { sessionId: getCookie("sessionId"), userId: getUserId("userId")}
+    fetchData(method,type,payload).then((data)=>{
+        setData(data)
+    })
+    }, []);
+  const handleRefresh = () => {
+    refreshComponent(); // Call the refresh function from the parent component
+  };
+  if (data === null) {
+    return <div className="loading"><div>Loading...</div></div>;
+  }
+  else {
+    let group = null
+    for (let i = 0; i < data.length; i++) {
+      if (parseInt(data[i].groupId) === parseInt(groupId)) {
+        group = data[i]
+      }
+    }
+    return (
+      <div className="main-box">
+        <GroupHeader group={group} handleRefresh={handleRefresh} />
+        <GroupBody id={groupId}/>
+      </div>
+    );
+  }
+}

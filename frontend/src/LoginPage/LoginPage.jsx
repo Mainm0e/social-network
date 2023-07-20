@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import WelcomeBox from '../Common/WelcomeBox/WelcomeBox';
 import AlertBox from '../Common/AlertBox/AlertBox';
+import { fetchData } from '../tools/fetchData';
 
 // LoginPage component
 // This component is used to render the login page
@@ -11,6 +12,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState([]);
+  const [alertStatus, setAlertStatus] = useState(true);
   // is part is for the color changing text animation
   /*
   // import useEffect from react befor using this
@@ -38,41 +40,24 @@ function LoginPage() {
   };
   let msg = [];
   const checkemail = (email, password) => {
-    console.log("checkEmail",email, password);
-    fetch('http://localhost:8080/api', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({type:"login","payload":{email: email, password: password}}),
-
-    }).then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
-      if (data.statusCode === 200){
-        // set cookie
-        document.cookie = "sessionId=" + data.event.payload.sessionId;
-        document.cookie = "userId=" + data.event.payload.userId;
-        window.location.href = '/';
-        return true;
-      }
-      else {
-        setAlertTitle("Error");
+    setAlertStatus(undefined);
+    const method = "POST"
+    const type = "login"
+    const payload = {email: email, password: password}
+    fetchData(method,type,payload).then((data) => {
+      if (data === undefined || data !== null) {
+        setAlertStatus(false);
+        setAlertTitle("Login Failed");
         msg.push(data.message);
         setAlertMessage(msg);
-        return false;
+      } else {
+        setAlertTitle(null);
+        msg.push(null);
+        setAlertMessage(msg);
+        return true;
       }
-    })
-
-/* 
-    if (email === "admin" && password === "admin") {
-      return true;
-    } else {
-      setAlertTitle("Error");
-      msg.push("email or password is incorrect");
-      setAlertMessage(msg);
-      return false;
-    } */
+    }
+    );
   }
 
   const [loginStatus, setLoginStatus] = useState(true);
@@ -82,19 +67,20 @@ function LoginPage() {
   const handleLogin = () => {
     // Perform login logic here
     if (checkemail(email, password)) {
-      console.log("do login",email, password)
       setLoginStatus(true);
       document.querySelector(".alert-box").style.display = "none";
     } else {
       setLoginStatus(false);
       document.querySelector(".alert-box").style.display = "block";
     }
+    
   };
   return (
+    <div className="main-container">
     <div className='login-page'>
     <WelcomeBox />
     <div className="login-container">
-    <AlertBox title={alertTitle} message={alertMessage} status={true} />
+    <AlertBox title={alertTitle} message={alertMessage} status={alertStatus} />
       <h1 >Login Page</h1>
       <form>
         <div>
@@ -124,6 +110,7 @@ function LoginPage() {
       <div className='links'>
         <a href='/register'>Register</a>
       </div>
+    </div>
     </div>
     </div>
   );

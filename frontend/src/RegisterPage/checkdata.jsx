@@ -11,16 +11,10 @@ export function checkData(data){
     message: [],
     status: true
  }
- console.log("check alert", alert,data)
     let msg = [];
     for (let key in data) {
     if (data.hasOwnProperty(key)) {
         const value = data[key];
-        // check if the input is empty
-        if (value === ""&& key !== "avatar"&& key !== "password") {
-        msg.push(key + " is empty");
-        alert.status = false;
-        }
 
         if (key === "password" && value === "") {
         msg.push("Password is empty");
@@ -28,10 +22,6 @@ export function checkData(data){
         }
          if (key === "password" && value.length < 8) {
          msg.push("Password is too short");
-         alert.status = false;
-         }
-         if (key === "password" && value.length > 20) {
-         msg.push("Password is too long");
          alert.status = false;
          }
          if (key === "email" && checkEmail(value) === false) {

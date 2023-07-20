@@ -1,6 +1,7 @@
 <mxfile host="65bd71144e">
     <diagram id="CZNAJhLUVzWs3cOI69Ys" name="Page-1">
 <<<<<<< HEAD
+<<<<<<< HEAD
         <mxGraphModel dx="670" dy="522" grid="1" gridSize="10" guides="0" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" background="#ffffff" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
@@ -52,6 +53,8 @@
                 <mxCell id="25" value="Private" style="rounded=1;whiteSpace=wrap;html=1;hachureGap=4;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;fontSize=20;fillColor=default;glass=0;shadow=0;sketch=1;curveFitting=1;jiggle=2;align=left;" vertex="1" parent="1">
                     <mxGeometry x="660" y="280" width="70" height="20" as="geometry"/>
 =======
+=======
+>>>>>>> soma
         <mxGraphModel dx="1094" dy="417" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
@@ -76,7 +79,10 @@
                 </mxCell>
                 <mxCell id="8" value="where im gona go" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;sketch=1;hachureGap=4;jiggle=2;curveFitting=1;fontFamily=Architects Daughter;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DArchitects%2BDaughter;fontSize=20;" vertex="1" parent="1">
                     <mxGeometry x="840" y="30" width="120" height="80" as="geometry"/>
+<<<<<<< HEAD
 >>>>>>> maryam
+=======
+>>>>>>> soma
                 </mxCell>
             </root>
         </mxGraphModel>

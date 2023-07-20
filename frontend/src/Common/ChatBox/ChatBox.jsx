@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import './ChatBox.css';
 import ChatList from './ChatList/ChatList';
 import ChatRoom from './ChatRoom/ChatRoom';
 const ChatBox = () => {
+
     const [chat_list, setChatlist] = useState(false);
     const [room, setRoom] = useState(null);
-  
     const openChatList = () => {
       setChatlist(true);
     };
@@ -22,8 +22,14 @@ const ChatBox = () => {
       );
     };
   
-    const handleUserSelection = (selectedUser) => {
-      setRoom(selectedUser);
+    const handleUserSelection = (selectedUser,type,id) => {
+      setRoom(null);
+      const payload = {
+        type: type,
+        selectedUser: selectedUser,
+        id: id,
+      };
+      setRoom(payload);
     };
   
     const handleCloseChatRoom = (isClosed) => {
@@ -31,12 +37,12 @@ const ChatBox = () => {
         setRoom(null);
       }
     };
-  
+    
     return (
       <>
         <div className="chat-container">
           {room && (
-            <ChatRoom receiver={room} onClose={handleCloseChatRoom} />
+            <ChatRoom receiver={room.selectedUser} type={room.type} id={room.id} onClose={handleCloseChatRoom} />
           )}
           {chat_list ? (
             <>
