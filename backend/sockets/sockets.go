@@ -114,8 +114,11 @@ func (c *Client) ReadData() {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("sockets.ReadData() - Unexpected close error: %v", err)
 			}
+			log.Printf("sockets.ReadData() - Error reading message: %v", err)
 			break
 		}
+
+		log.Printf("Client \" %v \" received message: %s", c.ID, message) // Log the message
 
 		// Check if context has been cancelled
 		select {
