@@ -6,6 +6,7 @@ import MainPage from "./MainPage/MainPage";
 import { WebSocketProvider } from "./WebSocketContext/websocketcontext"; // import WebSocketProvider
 import "./App.css";
 import { getCookie } from "./tools/cookie";
+import ErrorPage from "./ErrorPage/ErrorPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -17,17 +18,17 @@ function App() {
 
   const getPage = () => {
     const page = window.location.pathname;
+    if (isLoggedIn){
+      return <MainPage />
+    }
     if (!isLoggedIn){
       if (page === "/"||page ==="/login"){
         return <LoginPage />
       } else if (page === "/register"){
         return <RegisterPage />
+      } else {
+        return <ErrorPage />
       }
-    }
-    if ((isLoggedIn && page === "/") || (isLoggedIn && page === "/register") || (isLoggedIn && page === "/login")){
-      return <MainPage />
-    } else {
-      return  <MainPage />
     }
   };
 

@@ -5,6 +5,8 @@
     background-color: #f9f9f9;
     font-family: Arial, sans-serif;
     border-radius: 10px;
+    overflow-y: auto;
+    max-height: 400px;
 }
 
 .invite-container .invite-header h1 {
