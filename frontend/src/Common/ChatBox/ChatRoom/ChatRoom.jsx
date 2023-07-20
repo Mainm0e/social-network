@@ -204,10 +204,11 @@ const ChatRoom = (props) => {
         sendTime: message.payload.timeStamp,
         msgType: message.type,
       };
-
-      setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
-      if (newMessage.senderId === receiver.userId)
-       addNewMessage(newMessage);
+       if (newMessage.senderId === receiver.userId || newMessage.receiverId === receiver.userId ){
+         setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+       }
+   /*    if (newMessage.senderId === receiver.userId)
+       addNewMessage(newMessage); */
     } else if (message.type === "GroupMsg") {
       const newMessage = {
         senderId: message.payload.senderID,
@@ -216,8 +217,9 @@ const ChatRoom = (props) => {
         sendTime: message.payload.timeStamp,
         msgType: message.type,
       };
-
-      setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+      if (newMessage.receiverId === id){
+        setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+      }
     } else if (message.type === "isTyping") {
       setIsTyping(true);
       setTimeout(() => {

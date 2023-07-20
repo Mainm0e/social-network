@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-
+import './ErrorPage.css';
 function ErrorPage() {
   const [colorIndex, setColorIndex] = useState(0);
   const errorMessage = '404 Not Found';
@@ -24,6 +24,7 @@ function ErrorPage() {
     return () => clearInterval(interval);
   }, [colors]);
   return (
+    <div className="main-container">
     <div className="error-page">
       <h1 className="error-heading">
         {textColors.map(({ char }, index) => (
@@ -35,6 +36,7 @@ function ErrorPage() {
       <p className="back-link">
         Back to <a href="/">Home</a>
       </p>
+    </div>
     </div>
   );
 };

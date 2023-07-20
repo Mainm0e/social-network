@@ -7,6 +7,7 @@ import ChatBox from "../Common/ChatBox/ChatBox";
 import { getCookie, getUserId} from "../tools/cookie";
 import { fetchData } from "../tools/fetchData";
 import { home } from "../tools/link";
+import ErrorPage from "../ErrorPage/ErrorPage";
 function MainPage() {
 
   // !!TODO!! how to get profile id that can send to mainbox that show user that we want ???
@@ -59,6 +60,8 @@ const BoxState = ({userData}) => {
     return <CreateGroup userData={userData} />
   }else if  (url.pathname === "/"){
     home();
+  } else {
+    return <ErrorPage />
   }
 }
 

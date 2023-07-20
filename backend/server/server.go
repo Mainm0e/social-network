@@ -53,7 +53,7 @@ func logAndResetRequest(r *http.Request) *http.Request {
 	}
 
 	// Print the event type
-	log.Println("logAndResetRequest() -- Event:", event.Type)
+	log.Printf("logAndResetRequest() -- Event: %v ; Payload: %v", event.Type, string(event.Payload))
 
 	// Reset the request body
 	r.Body = io.NopCloser(bytes.NewBuffer(body))

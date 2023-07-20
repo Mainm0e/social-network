@@ -65,7 +65,10 @@ ReadData() is a method for a *Client struct, and starts a loop to continuously
 read data from the client's websocket connection and react to that data.
 */
 func (c *Client) ReadData() {
+	// Defer the closing of the client's websocket connection, which gets called
+	// when the function returns
 	defer func() {
+		log.Printf("sockets.ReadData() - Closing websocket connection for client \" %v \"", c.ID)
 		c.Manager.Unregister <- c
 		c.Connection.Close()
 	}()
@@ -129,7 +132,10 @@ func (c *Client) WriteData() {
 	// Ticker is a timer that goes off (ticks) at regular intervals.
 	ticker := time.NewTicker(PING_INTERVAL)
 
+	// Defer the stopping of the ticker and closing of the client's websocket connection,
+	// which gets called when the function returns.
 	defer func() {
+		log.Printf("sockets.WriteData() - Closing websocket connection for client \" %v \"", c.ID)
 		ticker.Stop()
 		c.Connection.Close()
 	}()
@@ -143,7 +149,9 @@ func (c *Client) WriteData() {
 
 		// This case handles outgoing messages from the client to the websocket connection.
 		case data, ok := <-c.Egress:
+			// If the channel is closed, the ok variable will be set to false.
 			if !ok {
+				log.Printf("sockets.WriteData() - Egress channel unavailable for client \" %v \", websocket closed", c.ID)
 				c.Connection.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}

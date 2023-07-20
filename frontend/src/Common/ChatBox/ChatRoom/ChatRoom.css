@@ -127,7 +127,9 @@
 
 .chat-room .chat-messages {
     max-height: 300px;
-    overflow-y: auto
+    overflow-y: auto;
+    flex-wrap: wrap;
+    /* Add this line to allow messages to wrap onto the next line */
 }
 
 .chat-room .chat-message {
@@ -137,7 +139,8 @@
     background-color: #e1f5fe;
     color: #000;
     margin: 0 10px;
-    flex-direction: column;
+    word-break: break-all;
+    /* This line allows long words to wrap onto the next line */
 }
 
 .chat-room .sender-message .chat-message {
