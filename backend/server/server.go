@@ -306,7 +306,8 @@ piece of Maryams rubber lizard, seventeen of Rick's tears and the inner lining o
 tyre, this function mixes it all in a cauldron of nightmares, and turns gold into iron, success
 into calamity, and robs all who read its code of at least 3 years of their life. Use with caution.
 */
-func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error {
+func AaaawwwwwSheeeetttttItsAboutToGoDown(basePath string, protocol string, logPath string) error {
+
 	/* 	OLD DESCRIPTION
 	StartServer starts a server instance on a port number using the input protocol specified.
 	The server package includes predefined constants for the HTTP and HTTPS ports, as well as
@@ -318,6 +319,7 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 	if an error occurs at any point during the server setup.
 	*/
 	// Initiate logging
+
 	err := initiateLogging(logPath)
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
@@ -334,7 +336,9 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	// Check / migrate database
 	// TEMP: use first migration file as initial schema for now
-	err = db.Check("./db/database.db", "./db/migrations/01_initial_schema.sql")
+	fmt.Println("before db.Check", basePath)
+	//err = db.Check("./db/database.db", "./db/migrations")
+	err = db.Check(basePath+"/db/database.db", basePath+"/db/migrations")
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
 	}

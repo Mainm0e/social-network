@@ -59,10 +59,11 @@ It takes in a database connection and applies all the migrations in the
 ./backend/db/migrations folder. It returns a non-nil error value if an error is
 encountered in applying the migrations.
 */
-func executeMigration(DB *sql.DB) error {
+func executeMigration(DB *sql.DB, migrationDir string) error {
 	log.Println("Migrating...")
+
 	migrations := &migrate.FileMigrationSource{
-		Dir: "./db/migrations",
+		Dir: migrationDir,
 	}
 	log.Println("Migration:", migrations)
 	n, err := migrate.Exec(DB, "sqlite3", migrations, migrate.Up)
@@ -121,7 +122,8 @@ finally calls the local executeMigration function to migrate the database to the
 version. It returns a non-nil error value if an error is encountered in any of these
 steps.
 */
-func Check(dbFile, sqlFile string) error {
+func Check(dbFile, migrationDir string) error {
+	fmt.Println("Checking database...", "dbFile:", dbFile, "migrationDir:", migrationDir)
 	_, err := os.Stat(dbFile)
 	if os.IsNotExist(err) {
 		// Initialise database if specified input does not already exist
@@ -139,7 +141,7 @@ func Check(dbFile, sqlFile string) error {
 		return err
 	}
 
-	err = executeMigration(DB)
+	err = executeMigration(DB, migrationDir)
 	if err != nil {
 		return (errors.New("error migrating database: " + err.Error()))
 	}
