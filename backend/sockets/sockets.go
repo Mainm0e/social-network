@@ -209,8 +209,19 @@ func (m *Manager) Run() {
 		case client := <-m.Unregister:
 			log.Printf("sockets.Run() - Deregistering client with ID: %v", client.ID)
 			if _, ok := m.Clients.Load(client.ID); ok {
-				m.Clients.Delete(client)
+				// Prepare deregistering event message and marshal it to JSON.
+				deregisterEvent, _ := json.Marshal(events.Event{
+					Type:    "disconnectWS",
+					Payload: json.RawMessage(fmt.Sprintf(`{"clientID": "%v"}`, client.ID)),
+				})
+
+				// Close the client's egress channel, websocket connection, and remove it from the clients map.
 				close(client.Egress)
+				_ = client.Connection.Close()
+				m.Clients.Delete(client)
+
+				// Broadcast logout event to all connected clients.
+				m.Broadcast <- deregisterEvent
 			}
 
 		// Data is being broadcast: Send it to all connected clients.
