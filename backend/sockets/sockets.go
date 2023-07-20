@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -57,7 +58,23 @@ func NewClient(conn *websocket.Conn, wsManager *Manager, id int) *Client {
 		Manager:    wsManager,
 		Egress:     make(chan []byte),
 		ID:         id,
+		Once:       sync.Once{},
 	}
+}
+
+/*
+Cleanup() is a method for a *Client struct, and ensures that the client's
+WebSocket connection is closed and that the client is unregistered from the
+Manager. Using the Once field ensures that the connection is closed and the
+client is unregistered only once, even if the Cleanup() method is called
+multiple times.
+*/
+func (c *Client) Cleanup() {
+	c.Once.Do(func() {
+		log.Printf("Closing websocket connection for client \" %v \"", c.ID)
+		c.Manager.Unregister <- c
+		c.Connection.Close()
+	})
 }
 
 /*
