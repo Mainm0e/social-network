@@ -120,10 +120,6 @@ func (c *Client) ReadData() {
 		}
 
 		handler(event, c)
-		// if err != nil {
-		// 	log.Printf("sockets.ReadData() - Error handling event: %v", err)
-		// 	break
-		// }
 	}
 }
 
@@ -202,14 +198,14 @@ func (m *Manager) Run() {
 		select {
 		// A new client is registering: Store it in the clients map.
 		case client := <-m.Register:
-			log.Printf("sockets.Run() - Registering new client with ID: %v", client.ID)
+			log.Println("sockets.Run() - Registering new client")
 			m.Clients.Store(client.ID, client)
 
 		// A client is unregistering: If it exists in the clients map, remove it.
 		case client := <-m.Unregister:
-			log.Printf("sockets.Run() - Deregistering client with ID: %v", client.ID)
-			if _, ok := m.Clients.Load(client); ok {
-				m.Clients.Delete(client)
+			log.Println("sockets.Run() - Deregistering new client")
+			if _, ok := m.Clients.Load(client.ID); ok {
+				m.Clients.Delete(client.ID)
 				close(client.Egress)
 			}
 
@@ -225,8 +221,7 @@ func (m *Manager) Run() {
 				default:
 					// The client's send channel is unavailable. Remove it.
 					close(client.Egress)
-					m.Clients.Delete(client)
-					log.Printf("sockets.Run() - Deregistering client with ID \" %v \" due to socket manager broadcast irregularity", client.ID)
+					m.Clients.Delete(client.ID)
 					return false // Stop iteration.
 				}
 			})
@@ -247,13 +242,13 @@ func (m *Manager) ServeWS(w http.ResponseWriter, r *http.Request) {
 	// Perform validation checks on the session cookie.
 	cookie, err := r.Cookie(sessions.COOKIE_NAME)
 	if err != nil {
-		log.Printf("sockets.ServeWS() error - No sessionID cookie found: %v", err)
+		log.Printf("sessions.ServeWS() error - No sessionID cookie found: %v", err)
 		http.Error(w, "Invalid session", http.StatusUnauthorized)
 		return
 	} else {
 		isValid, err := sessions.CookieCheck(cookie)
 		if !isValid || err != nil {
-			log.Printf("sockets.ServeWS() error - Invalid sessionID cookie for session \" %v \": %v", cookie.Value, err)
+			log.Printf("sessions.ServeWS() error - Invalid sessionID cookie for session \" %v \": %v", cookie.Value, err)
 			http.Error(w, "Invalid session", http.StatusUnauthorized)
 			return
 		}
