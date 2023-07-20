@@ -2,6 +2,7 @@ package sockets
 
 import (
 	"backend/events"
+	"context"
 	"net/http"
 	"sync"
 	"time"
@@ -90,6 +91,8 @@ WebSocket connection. It includes the client's WebSocket connection, the Manager
 that manages the client, and a channel for outgoing messages (egress).
 */
 type Client struct {
+	Context    context.Context
+	CancelFunc context.CancelFunc
 	Connection *websocket.Conn
 	Manager    *Manager
 	Egress     chan []byte // A channel for outgoing messages
