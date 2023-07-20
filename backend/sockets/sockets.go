@@ -3,6 +3,7 @@ package sockets
 import (
 	"backend/events"
 	"backend/server/sessions"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -53,7 +54,12 @@ WebSocket connection has been established and a new Client needs to be created t
 manage the connection.
 */
 func NewClient(conn *websocket.Conn, wsManager *Manager, id int) *Client {
+	// Create a cancellable context for the client
+	ctx, cancelFunc := context.WithCancel(context.Background())
+
 	return &Client{
+		Context:    ctx,
+		CancelFunc: cancelFunc,
 		Connection: conn,
 		Manager:    wsManager,
 		Egress:     make(chan []byte),
@@ -74,6 +80,7 @@ func (c *Client) Cleanup() {
 		log.Printf("sockets.Cleanup() - closing websocket connection for client \" %v \"", c.ID)
 		c.Manager.Unregister <- c
 		c.Connection.Close()
+		c.CancelFunc() // Cancel the client's context
 	})
 }
 
@@ -108,6 +115,14 @@ func (c *Client) ReadData() {
 				log.Printf("sockets.ReadData() - Unexpected close error: %v", err)
 			}
 			break
+		}
+
+		// Check if context has been cancelled
+		select {
+		case <-c.Context.Done():
+			log.Println("sockets.ReadData() - Client context has been cancelled")
+			return
+		default:
 		}
 
 		// Unmarshal the received message into an event.
@@ -170,6 +185,14 @@ func (c *Client) WriteData() {
 				log.Printf("sockets.WriteData() - Egress channel unavailable for client \" %v \", websocket closed", c.ID)
 				c.Connection.WriteMessage(websocket.CloseMessage, []byte{})
 				return
+			}
+
+			// Check if the context has been cancelled.
+			select {
+			case <-c.Context.Done():
+				log.Println("sockets.WriteData() - Client context has been cancelled")
+				return
+			default:
 			}
 
 			// NextWriter returns a writer for the next message to send.
