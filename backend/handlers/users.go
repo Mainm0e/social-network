@@ -50,7 +50,7 @@ It also checks if the non-member users have already been invited to the group by
 The function returns the list of non-member users as a []Profile and any encountered errors.
 */
 func nonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error) {
-	users, err := ReadAllUsers(userId, sessionId)
+	usersIds, err := findFollowers(userId)
 	if err != nil {
 		return []Profile{}, errors.New("Error fetching users: " + err.Error())
 	}
@@ -62,20 +62,26 @@ func nonMemberUsers(groupId int, userId int, sessionId string) ([]Profile, error
 
 	memberIds := make(map[int]struct{})
 	for _, member := range members {
-		if member.(db.GroupMember).Status == "member" {
+		if member.(db.GroupMember).Status == "member" || member.(db.GroupMember).Status == "pending" {
 			memberIds[member.(db.GroupMember).UserId] = struct{}{}
 		}
 	}
 	var nonMembers []Profile
-	for _, user := range users {
-		_, exists := memberIds[user.UserId]
+	for _, id := range usersIds {
+		_, exists := memberIds[id]
 		if !exists {
 			// now let see if this user already invited selected user to this group or not !!!!
-			invitations, err := db.FetchData("notifications", "receiverId = ? AND senderId = ? AND groupId = ?", user.UserId, userId, groupId)
+			invitations, err := db.FetchData("notifications", "receiverId = ? AND senderId = ? AND groupId = ?", id, userId, groupId)
 			if err != nil {
 				return nil, errors.New("Error fetching notification data" + err.Error())
 			}
 			if len(invitations) == 0 {
+				user, err := FillProfile(userId, id, sessionId)
+				if err != nil {
+					return nil, errors.New("Error fetching user" + err.Error())
+				}
+
+				// append the user to the list of non-members
 				nonMembers = append(nonMembers, user)
 			}
 		}

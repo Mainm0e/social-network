@@ -27,8 +27,13 @@ const Header = ({profile,handleRefresh}) => {
       const method = "POST"
       const type = "followRequest"
       const payload ={ sessionId: getCookie("sessionId"), senderId: getUserId("userId"), receiverId:user.userId}
-      fetchData(method,type,payload).then((data) => {console.log(data)})
-      handleRefresh();
+      fetchData(method,type,payload).then((data) => {
+        console.log(data)})
+
+      /* add delay */
+      setTimeout(() => {
+        handleRefresh();
+      }, 100);
     };
   
     const changePrivacy = async () => {
@@ -54,7 +59,7 @@ const Header = ({profile,handleRefresh}) => {
           </div>
           {checkPrivacy()}
           <div className="followers info">
-            {user.followerNum > 0 && <label onClick={link_followers}>Followers: </label>||<label>Followers: </label>}
+            {user.followerNum > 0 && <label onClick={link_followers} >Followers: </label>||<label>Followers: </label>}
             <span>{user.followerNum}</span>
           </div>
           <div className="following info">
@@ -116,7 +121,7 @@ const Followbtn = ({  relation, privacy ,followRequest , changePrivacy}) => {
   } else if (relation === "following") {
     return (
       <div className="follow_btn">
-        <button className="follow_btn"  onClick={handleSentRequest}>
+        <button className="follow_btn"  onClick={handleSentRequest} style={{ cursor: 'pointer' }}>
           Unfollow
         </button>
       </div>
@@ -125,7 +130,7 @@ const Followbtn = ({  relation, privacy ,followRequest , changePrivacy}) => {
   else if (relation === "follow") {
     return (
       <div className="follow_btn">
-        <button className="follow_btn" onClick={handleSentRequest}>
+        <button className="follow_btn" onClick={handleSentRequest} style={{ cursor: 'pointer' }}>
           follow
         </button>
       </div>
@@ -133,7 +138,7 @@ const Followbtn = ({  relation, privacy ,followRequest , changePrivacy}) => {
   } else if (relation === "pending"){
     return (
       <div className="follow_btn">
-        <button className="follow_btn" onClick={handleSentRequest}>
+        <button className="follow_btn" onClick={handleSentRequest} style={{ cursor: 'pointer' }}>
           pending
         </button>
       </div>

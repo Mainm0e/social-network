@@ -89,10 +89,10 @@
 }
 
 .chat-room .chat-room-input {
-    padding: 10px;
     border-top: 1px solid #ccc;
     display: flex;
     align-items: center;
+    background: red;
 }
 
 .chat-room .chat-room-input ::placeholder {
@@ -101,12 +101,16 @@
 }
 
 .chat-room .chat-room-input input {
+    width: 100%;
+    height: 100%;
     /* d */
     flex-grow: 1;
     /* Take up remaining horizontal space */
-    padding: 5px;
+    padding: 10px;
     border: none;
     border-radius: 5px;
+    outline: none;
+    font-family: myFancyFont;
 }
 
 .chat-room .sender-message {
@@ -123,7 +127,9 @@
 
 .chat-room .chat-messages {
     max-height: 300px;
-    overflow-y: auto
+    overflow-y: auto;
+    flex-wrap: wrap;
+    /* Add this line to allow messages to wrap onto the next line */
 }
 
 .chat-room .chat-message {
@@ -133,7 +139,8 @@
     background-color: #e1f5fe;
     color: #000;
     margin: 0 10px;
-    flex-direction: column;
+    word-break: break-all;
+    /* This line allows long words to wrap onto the next line */
 }
 
 .chat-room .sender-message .chat-message {

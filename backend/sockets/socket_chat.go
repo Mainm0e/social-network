@@ -5,7 +5,6 @@ import (
 	"backend/events"
 	"backend/handlers"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -45,8 +44,12 @@ func (m *Manager) BroadcastPrivateMsg(senderID int, receiverID int, msgEventJSON
 	})
 
 	// Check if both the sender and receiver have received the message
-	if !senderUpdated || !receiverUpdated {
-		return errors.New("BroadcastPrivateMsg() notice - sender or receiver not updated as respective logged in client not found")
+	if !senderUpdated && !receiverUpdated {
+		return fmt.Errorf("BroadcastPrivateMsg() error - sender \" %v \" and receiver \" %v \" not updated as BOTH respective live socket connections not found", senderID, receiverID)
+	} else if !senderUpdated {
+		log.Printf("BroadcastPrivateMsg() notice - sender with ID: \" %v \" not updated in private chat with client \" %v \" as live socket connection not found", senderID, receiverID)
+	} else if !receiverUpdated {
+		log.Printf("BroadcastPrivateMsg() notice - receiver with ID: \" %v \" not updated in private chat with client \" %v \" as live socket connection not found", receiverID, senderID)
 	}
 
 	return nil
@@ -88,10 +91,12 @@ func (m *Manager) BroadcastGroupMsg(groupID int, payloadJSON []byte) error {
 				// Attempt to send the message to this client
 				select {
 				case client.(*Client).Egress <- payloadJSON:
+					log.Printf("BroadcastGroupMsg() to sender with ID: \" %v \" ", userID)
 					sent = true
 				default:
 					close(client.(*Client).Egress)
 					m.Clients.Delete(key)
+					log.Printf("BroadcastGroupMsg() - deleting client with ID: \" %v \" ", userID)
 				}
 				// Stop iteration for this client as the message has been sent (or attempted)
 				return false
@@ -212,6 +217,7 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 	}
 
 	// Find the client with the matching ID and send the event
+	clientUpdated := false
 	m.Clients.Range(func(key interface{}, value interface{}) bool {
 		client, ok := value.(*Client)
 		if !ok {
@@ -220,20 +226,19 @@ func (m *Manager) SendChatHistory(chatHistory *ChatHistory) error {
 			return true
 		}
 		if client.ID == chatHistory.ClientID {
-			select {
-			case client.Egress <- eventJSON:
-				log.Printf("SendChatHistory() - Sent chat history to client %d\n", chatHistory.ClientID)
-			default:
-				// The Egress channel could be full or closed, or the client could be disconnected
-				log.Printf("SendChatHistory() error - Could not send message to client %d\n", chatHistory.ClientID)
-			}
+			client.Egress <- eventJSON
+			log.Printf("SendChatHistory() - Sent chat history to client %d\n", chatHistory.ClientID)
+			clientUpdated = true
 			return false // Stop ranging as the client is found
 		}
 		return true // Continue ranging
 	})
 
-	return nil
+	if !clientUpdated {
+		return fmt.Errorf("SendChatHistory() error - client with ID: \" %v \" not found", chatHistory.ClientID)
+	}
 
+	return nil
 }
 
 /********************** IS TYPING EVENT / LOGIC ******************************/

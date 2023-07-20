@@ -1,5 +1,7 @@
 import { logout } from "./logout"
+import { home } from "./link"
 export async function fetchData(method, type, payload) {
+  console.log("type",type,"payload",payload)
   const response = await fetch("http://localhost:8080/api", {
     method: method,
     credentials: "include",
@@ -26,6 +28,7 @@ if (!response.ok) {
   }
 } else {
   const responseData = await response.json();
+  console.log("responseData", responseData);
   if (type === "login") {
     if (responseData.statusCode === 200) {
       document.cookie = "sessionId=" + responseData.event.payload.sessionId;
@@ -51,6 +54,9 @@ if (!response.ok) {
     if (responseData.message === "Error handling event:Error fetchingUser:user not found"){
       logout();
     }
+  }
+  if (responseData.statusCode === 400) {
+    home();
   }
 }
 }

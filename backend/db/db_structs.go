@@ -69,6 +69,7 @@ type Group struct {
 }
 
 type GroupMember struct {
+	Id      int    `json:"id"`
 	UserId  int    `json:"userId"`
 	GroupId int    `json:"groupId"`
 	Status  string `json:"status"`

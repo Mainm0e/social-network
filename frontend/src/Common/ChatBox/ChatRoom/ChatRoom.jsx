@@ -12,37 +12,15 @@ const ChatRoom = (props) => {
   const [chatHistory, setChatHistory] = useState([]);
   const [isTyping, setIsTyping] = useState(false); // store isTyping event from server
   const [currentReceiver, setCurrentReceiver] = useState(receiver);
-  const [startChat , setStartChat] = useState(false);
+  const [startChat, setStartChat] = useState(false);
 
-  // start chat function for make sure chat history is up to date
-  // when user change chat
-  // chatbox will scroll to bottom when start chat
-  const chatState = () => {
-    if (startChat === false) {
-      setTimeout(() => {
-        const chatMessages = document.getElementById("chat-container");
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }, 100);
-      setStartChat(true);
-    } else if (currentReceiver !== receiver) {
-      setCurrentReceiver(receiver);
-      setStartChat(false);
-    }
-  };
-  // for chat history
-
-  // for sending message
-  const [chatType, setChatType] = useState("privateMsg");
-
-  // todo: add functionality when user is typing
-
-  // !! how to get chat history from server is confusing right now  in GroupChat
 
   const getChatContent = () => {
     const payload = {
       sessionID: getCookie("sessionId"),
       chatType: type,
-      clientID: getUserId("userId"),      targetID: receiver.userId,
+      clientID: getUserId("userId"),
+      targetID: receiver.userId,
     };
     if (type === "group") {
       payload.targetID = id;
@@ -54,6 +32,39 @@ const ChatRoom = (props) => {
     socket.send(JSON.stringify(chatHistoryRequest)); // Send the message as a string
   };
 
+  // start chat function for make sure chat history is up to date
+  // when user change chat
+  // chatbox will scroll to bottom when start chat
+  const chatState = () => {
+    if (currentReceiver !== receiver) {
+      console.log("change receiver")
+      setCurrentReceiver(receiver);
+      setStartChat(false);
+      getChatContent();
+      setTimeout(() => {
+        const chatMessages = document.getElementById("chat-container");
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 100);
+      setStartChat(true);
+    }
+    if (startChat === false) {
+      getChatContent();
+      setTimeout(() => {
+        const chatMessages = document.getElementById("chat-container");
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 100);
+      setStartChat(true);
+    }
+  };
+  // for chat history
+
+  // for sending message
+  const [chatType, setChatType] = useState("privateMsg");
+
+  // todo: add functionality when user is typing
+
+  // !! how to get chat history from server is confusing right now  in GroupChat
+
   // get chat content from server
   useEffect(() => {
     const updateChatSettings = async () => {
@@ -61,7 +72,7 @@ const ChatRoom = (props) => {
         // for sending message
         setChatType("groupMsg");
       }
-      if (type === "private"){
+      if (type === "private") {
         // for sending message
         setChatType("privateMsg");
       }
@@ -69,7 +80,6 @@ const ChatRoom = (props) => {
 
     const getChatContentAsync = async () => {
       await updateChatSettings();
-      getChatContent();
     };
     chatState();
     getChatContentAsync();
@@ -84,39 +94,33 @@ const ChatRoom = (props) => {
       }
     }
   };
-  const chatContent = chatHistory.map((message, index) => {
-    if (type === "private" && message.msgType === "PrivateMsg") {
-      const isSender = message.senderId === sender;
-      const isReceiver = message.receiverId === sender;
-      if (!isSender && !isReceiver) {
-        return null;
-      }
-      return (
+
+
+  const [test, setTest] = useState([]);
+  const addNewMessage = (message) => {
+    const isSender = message.senderId === sender;
+    const isReceiver = message.receiverId === sender;
+    let index = test.length;
+    let newElement = <></>
+   
+    if (type === "private" && message.msgType === "PrivateMsg" && (isSender || isReceiver)) {
+      newElement = (
         <div
-          className={`${
-            isSender ? "sender" : isReceiver ? "receiver" : ""
-          }-message`}
+          className={`${isSender ? "sender" : "receiver"}-message`}
           key={index}
         >
           <div className="chat-message">{message.messageContent}</div>
         </div>
       );
-    } else if (type === "group" && message.msgType === "GroupMsg") {
-      const isSender = message.senderId === sender;
-      const otherMember = message.senderId !== sender;
-      if (!isSender && !otherMember) {
-        return null;
-      }
-      return (
+    } else if (type === "group" && message.msgType === "GroupMsg" && (isSender || message.senderId !== sender)) {
+      newElement = (
         <div
-          className={`${
-            isSender ? "sender" : otherMember ? "receiver" : ""
-          }-message`}
+          className={`${isSender ? "sender" : "receiver"}-message`}
           key={index}
         >
           <div className="chat-message">
             {message.messageContent}
-            {otherMember && (
+            {!isSender && (
               <div className="chat-message-sender">
                 {getSenderName(message.senderId)}
               </div>
@@ -124,8 +128,12 @@ const ChatRoom = (props) => {
           </div>
         </div>
       );
+    } else {
+      newElement = null;
     }
-  });
+
+    setTest((prevTest) => [...prevTest, newElement]);
+  };
 
   // send typing event to server when user is typing
   const typingMessage = (e) => {
@@ -188,27 +196,30 @@ const ChatRoom = (props) => {
     if (message.type === "chatHistory") {
       setChatHistory(message.payload.chatHistory);
     } else if (message.type === "PrivateMsg") {
-      // ! SAME HERE
-      // ! struct message that i got from server is different from getChatHistory
+      console.log(message);
       const newMessage = {
         senderId: message.payload.senderID,
         receiverId: message.payload.receiverID,
         messageContent: message.payload.message,
         sendTime: message.payload.timeStamp,
+        msgType: message.type,
       };
-
-      setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+       if (newMessage.senderId === receiver.userId || newMessage.receiverId === receiver.userId ){
+         setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+       }
+   /*    if (newMessage.senderId === receiver.userId)
+       addNewMessage(newMessage); */
     } else if (message.type === "GroupMsg") {
-      // ! SAME HERE
-      // ! struct message that i got from server is different from getChatHistory
       const newMessage = {
         senderId: message.payload.senderID,
         receiverId: message.payload.receiverID,
         messageContent: message.payload.message,
         sendTime: message.payload.timeStamp,
+        msgType: message.type,
       };
-
-      setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+      if (newMessage.receiverId === id){
+        setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+      }
     } else if (message.type === "isTyping") {
       setIsTyping(true);
       setTimeout(() => {
@@ -233,8 +244,7 @@ const ChatRoom = (props) => {
         </div>
         {type === "private" && (
           <>
-            <div className="chat-room-name">{receiver.firstName}
-              </div>
+            <div className="chat-room-name">{receiver.firstName}</div>
             {isTyping && (
               <div className="typing-indicator">
                 <div className="dot-1"></div>
@@ -250,9 +260,15 @@ const ChatRoom = (props) => {
       </div>
       <div className="chat-room-content">
         <div id="chat-container" className="chat-messages">
-          {chatContent}
+          <ChatContent
+            chatHistory={chatHistory}
+            type={type}
+            sender={sender}
+            receiver={receiver}
+          />
         </div>
       </div>
+
       <div className="chat-room-input">
         <input
           type="text"
@@ -271,3 +287,57 @@ const ChatRoom = (props) => {
 };
 
 export default ChatRoom;
+
+const ChatContent = ({ chatHistory, type, sender, receiver }) => {
+  const getSenderName = (senderId) => {
+    if (type === "group") {
+      for (let i = 0; i < receiver.members.length; i++) {
+        if (receiver.members[i].userId === senderId) {
+          return receiver.members[i].firstName;
+        }
+      }
+    }
+  };
+
+  return (
+    <>
+      {chatHistory.map((message, index) => {
+        const isSender = message.senderId === sender;
+        const isReceiver = message.receiverId === sender;
+
+        if (type === "private" && message.msgType === "PrivateMsg" && (isSender || isReceiver)) {
+          return (
+            <div
+              className={`${isSender ? "sender" : "receiver"}-message`}
+              key={index}
+            >
+              <div className="chat-message">{message.messageContent}</div>
+            </div>
+          );
+        } else if (type === "group" && message.msgType === "GroupMsg" && (isSender || message.senderId !== sender)) {
+          return (
+            <div
+              className={`${isSender ? "sender" : "receiver"}-message`}
+              key={index}
+            >
+              <div className="chat-message">
+                {message.messageContent}
+                {!isSender && (
+                  <div className="chat-message-sender">
+                    {getSenderName(message.senderId)}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        } else {
+          return null;
+        }
+      })}
+    </>
+  );
+};
+
+
+
+

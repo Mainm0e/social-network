@@ -21,6 +21,11 @@ const Invite = ({ clearBox }) => {
     });
   }, []);
 
+  const closeBox = () => {
+    window.location.hash = "";
+    clearBox();
+  };
+
   return (
     <div className="invite-container">
       <div className="invite-header">
@@ -34,7 +39,7 @@ const Invite = ({ clearBox }) => {
           {data === null && <div>No users to invite</div>}
       </div>
       <div className="invite-footer">
-        <button onClick={clearBox}>Close</button>
+        <button onClick={closeBox}>Close</button>
         </div>
     </div>
   );
