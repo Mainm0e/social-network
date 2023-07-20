@@ -117,10 +117,6 @@ func (c *Client) ReadData() {
 		}
 
 		handler(event, c)
-		// if err != nil {
-		// 	log.Printf("sockets.ReadData() - Error handling event: %v", err)
-		// 	break
-		// }
 	}
 }
 
@@ -200,8 +196,8 @@ func (m *Manager) Run() {
 		// A client is unregistering: If it exists in the clients map, remove it.
 		case client := <-m.Unregister:
 			log.Println("sockets.Run() - Deregistering new client")
-			if _, ok := m.Clients.Load(client); ok {
-				m.Clients.Delete(client)
+			if _, ok := m.Clients.Load(client.ID); ok {
+				m.Clients.Delete(client.ID)
 				close(client.Egress)
 			}
 
@@ -217,7 +213,7 @@ func (m *Manager) Run() {
 				default:
 					// The client's send channel is unavailable. Remove it.
 					close(client.Egress)
-					m.Clients.Delete(client)
+					m.Clients.Delete(client.ID)
 					return false // Stop iteration.
 				}
 			})
