@@ -102,7 +102,7 @@ func (c *Client) ReadData() {
 			// In case of an error unmarshalling, it sends back an error event to the client.
 			errorEvent := events.Event{
 				Type:    "error",
-				Payload: json.RawMessage(fmt.Sprintf(`{"sockets.ReadData() error": "Failed to parse event: %v"}`, err)),
+				Payload: json.RawMessage(fmt.Sprintf(`{"message": "sockets.ReadData() error - Failed to parse event: %v"}`, err)),
 			}
 
 			eventBytes, _ := json.Marshal(errorEvent)
@@ -116,14 +116,10 @@ func (c *Client) ReadData() {
 		handler, ok := c.Manager.Handlers[event.Type]
 		if !ok {
 			log.Printf("sockets.ReadData() - No handler for event type %v", event.Type)
-			break
+			continue // Do not break go routine if an unrecognized event type is received
 		}
 
 		handler(event, c)
-		// if err != nil {
-		// 	log.Printf("sockets.ReadData() - Error handling event: %v", err)
-		// 	break
-		// }
 	}
 }
 
@@ -173,7 +169,12 @@ func (c *Client) WriteData() {
 			// This helps in flushing any queued messages in the channel.
 			n := len(c.Egress)
 			for i := 0; i < n; i++ {
-				w.Write(<-c.Egress)
+				data, ok := <-c.Egress
+				if !ok {
+					log.Printf("sockets.WriteData() - Egress channel unavailable for client \" %v \"", c.ID)
+					break
+				}
+				w.Write(data)
 			}
 
 			// Close finalizes the message. The writer must be closed before the next call to
@@ -217,8 +218,8 @@ func (m *Manager) Run() {
 
 				// Close the client's egress channel, websocket connection, and remove it from the clients map.
 				close(client.Egress)
-				_ = client.Connection.Close()
-				m.Clients.Delete(client)
+				_ = client.Connection.Close() // TODO: Think about error handling...
+				m.Clients.Delete(client.ID)
 
 				// Broadcast logout event to all connected clients.
 				m.Broadcast <- deregisterEvent
@@ -236,7 +237,7 @@ func (m *Manager) Run() {
 				default:
 					// The client's send channel is unavailable. Remove it.
 					close(client.Egress)
-					m.Clients.Delete(client)
+					m.Clients.Delete(client.ID)
 					log.Printf("sockets.Run() - Deregistering client with ID \" %v \" due to socket manager broadcast irregularity", client.ID)
 					return false // Stop iteration.
 				}
