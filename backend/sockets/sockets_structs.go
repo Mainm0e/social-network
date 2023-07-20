@@ -94,4 +94,5 @@ type Client struct {
 	Manager    *Manager
 	Egress     chan []byte // A channel for outgoing messages
 	ID         int         // UserID of client
+	Once       sync.Once   // To ensure connection closure happens only once
 }
