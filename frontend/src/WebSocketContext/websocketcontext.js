@@ -24,6 +24,10 @@ export const WebSocketProvider = ({ children, isLoggedIn }) => {
       logout();
     };
 
+    ws.onclose = (event) => {
+      console.log('WebSocket is closed now. With code:', event.code, ' Reason:', event.reason);
+    };
+
     // On component unmount, close the websocket connection
     return () => {
       if (ws) {
