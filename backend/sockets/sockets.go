@@ -123,6 +123,14 @@ func (c *Client) ReadData() {
 		// Log the message received by the client
 		log.Printf("Client \" %v \" received message: %s", c.ID, message)
 
+		// Check if context has been cancelled
+		select {
+		case <-c.Context.Done():
+			log.Println("sockets.ReadData() - Client context has been cancelled")
+			return
+		default:
+		}
+
 		// Unmarshal the received message into an event.
 		var event events.Event
 		if err := json.Unmarshal(message, &event); err != nil {
@@ -187,6 +195,14 @@ func (c *Client) WriteData() {
 				return
 			}
 
+			// Check if the context has been cancelled.
+			select {
+			case <-c.Context.Done():
+				log.Println("sockets.WriteData() - Client context has been cancelled")
+				return
+			default:
+			}
+
 			// NextWriter returns a writer for the next message to send.
 			w, err := c.Connection.NextWriter(websocket.TextMessage)
 			if err != nil {
@@ -229,12 +245,12 @@ func (m *Manager) Run() {
 		select {
 		// A new client is registering: Store it in the clients map.
 		case client := <-m.Register:
-			log.Println("sockets.Run() - Registering new client")
+			log.Printf("sockets.Run() - Registering new client with ID \" %v \"", client.ID)
 			m.Clients.Store(client.ID, client)
 
 		// A client is unregistering: If it exists in the clients map, remove it.
 		case client := <-m.Unregister:
-			log.Println("sockets.Run() - Deregistering new client")
+			log.Printf("sockets.Run() - Deregistering client with ID \" %v \"", client.ID)
 			if _, ok := m.Clients.Load(client.ID); ok {
 				m.Clients.Delete(client.ID)
 				close(client.Egress)
