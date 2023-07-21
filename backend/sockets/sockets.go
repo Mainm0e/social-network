@@ -3,10 +3,12 @@ package sockets
 import (
 	"backend/events"
 	"backend/server/sessions"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -52,12 +54,34 @@ WebSocket connection has been established and a new Client needs to be created t
 manage the connection.
 */
 func NewClient(conn *websocket.Conn, wsManager *Manager, id int) *Client {
+	// Create a cancellable context for the client
+	ctx, cancelFunc := context.WithCancel(context.Background())
+
 	return &Client{
+		Context:    ctx,
+		CancelFunc: cancelFunc,
 		Connection: conn,
 		Manager:    wsManager,
 		Egress:     make(chan []byte),
 		ID:         id,
+		Once:       sync.Once{},
 	}
+}
+
+/*
+Cleanup() is a method for a *Client struct, and ensures that the client's
+WebSocket connection is closed and that the client is unregistered from the
+Manager. Using the Once field ensures that the connection is closed and the
+client is unregistered only once, even if the Cleanup() method is called
+multiple times.
+*/
+func (c *Client) Cleanup() {
+	c.Once.Do(func() {
+		log.Printf("sockets.Cleanup() - closing websocket connection for client \" %v \"", c.ID)
+		c.Manager.Unregister <- c
+		c.Connection.Close()
+		c.CancelFunc() // Cancel the client's context
+	})
 }
 
 /*
@@ -68,9 +92,8 @@ func (c *Client) ReadData() {
 	// Defer the closing of the client's websocket connection, which gets called
 	// when the function returns
 	defer func() {
-		log.Printf("sockets.ReadData() - Closing websocket connection for client \" %v \"", c.ID)
-		c.Manager.Unregister <- c
-		c.Connection.Close()
+		log.Println("sockets.ReadData() go-routine cleaning up & closing...")
+		c.Cleanup()
 	}()
 
 	c.Connection.SetReadLimit(MAX_DATA_SIZE)
@@ -88,11 +111,17 @@ func (c *Client) ReadData() {
 		// It returns the type of the message and the message itself, which is a byte slice.
 		_, message, err := c.Connection.ReadMessage()
 		if err != nil {
+			// If an error is encountered in reading the message, log the error and break
+			// (results in the client being unregistered and the connection being closed)
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("sockets.ReadData() - Unexpected close error: %v", err)
 			}
+			log.Printf("sockets.ReadData() - Error for client \" %v \" in reading message: %v", c.ID, err)
 			break
 		}
+
+		// Log the message received by the client
+		log.Printf("Client \" %v \" received message: %s", c.ID, message)
 
 		// Unmarshal the received message into an event.
 		var event events.Event
@@ -116,7 +145,9 @@ func (c *Client) ReadData() {
 		handler, ok := c.Manager.Handlers[event.Type]
 		if !ok {
 			log.Printf("sockets.ReadData() - No handler for event type %v", event.Type)
-			break
+			// Don't use break here, because we want to continue reading from the connection
+			// even if an unknown event type is received.
+			continue
 		}
 
 		handler(event, c)
@@ -135,9 +166,9 @@ func (c *Client) WriteData() {
 	// Defer the stopping of the ticker and closing of the client's websocket connection,
 	// which gets called when the function returns.
 	defer func() {
-		log.Printf("sockets.WriteData() - Closing websocket connection for client \" %v \"", c.ID)
+		log.Println("sockets.WriteData() go-routine cleaning up & closing...")
 		ticker.Stop()
-		c.Connection.Close()
+		c.Cleanup()
 	}()
 
 	// Infinite loop to continuously write data to the websocket connection.
