@@ -337,15 +337,22 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(basePath string, protocol string, logP
 	// Check / migrate database
 	// TEMP: use first migration file as initial schema for now
 	fmt.Println("before db.Check", basePath)
-	//err = db.Check("./db/database.db", "./db/migrations")
-	err = db.Check(basePath+"/db/database.db", basePath+"/db/migrations")
+
+	err = db.Check("db/database.db", "db/migrations")
+	//dbDialect := os.Getenv("DB_DIALECT")
+	/* 	dbDataSource := os.Getenv("DB_DATASOURCE")
+	   	dbMigrationsDir := os.Getenv("DB_MIGRATIONS_DIR") */
+
+	//fmt.Println("dbDataSource", dbDataSource, "dbMigrationsDir", dbMigrationsDir)
+	//	err = db.Check(basePath+"/db/database.db", basePath+"/db/migrations")
+	//err = db.Check(dbDataSource, dbMigrationsDir)
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
 	}
 
 	// Setup channel to receive the server instance, enabling graceful shutdown
 	serverCh := make(chan *http.Server)
-
+	fmt.Printf("Server starting on portocol %s...\n", protocol)
 	// If HTTP is specified, setup HTTP server in a goroutine
 	if protocol == "http" {
 		go setupHTTP(serverCh, HTTP_PORT)

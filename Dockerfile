@@ -1,13 +1,33 @@
 # Stage 1: Build Golang backend
-FROM golang:1.20 AS backend-builder
+FROM golang:1.20.3 AS backend-builder
 
 WORKDIR /app/backend
 
 # Copy the backend source code into the container
-COPY backend .
+# Copy the backend source code into the container
+COPY backend/go.mod .
+COPY backend/go.sum .
+RUN go mod download
 
+# Copy the rest of the backend source code
+COPY backend/ .
 # Build the Golang backend
-RUN go build -o /server-bin
+RUN go build -o server-bin .
+
+# Stage 2: Create final image for backend
+FROM golang:1.20.3 AS backend
+
+WORKDIR /app
+
+# Copy the Golang backend executable from the previous stage
+COPY --from=backend-builder /app/backend/server-bin .
+
+# Expose the port for the backend
+EXPOSE 8080
+
+# Start the backend
+CMD ["./server-bin"]
+
 
 # Stage 2: Build React frontend
 FROM node:14 AS frontend-builder
@@ -21,19 +41,8 @@ COPY frontend .
 RUN npm install
 RUN npm run build
 
-# Stage 3: Create final image for backend
-FROM golang:1.20 AS backend
-
-WORKDIR /app
-
 # Copy the Golang backend executable from the previous stage
-COPY --from=backend-builder /server-bin .
-
-# Expose the port for the backend
-EXPOSE 8080
-
-# Start the backend
-CMD ["./server-bin"]
+#COPY --from=backend-builder /server-bin .
 
 # Stage 4: Create final image for frontend
 FROM nginx:alpine AS frontend
