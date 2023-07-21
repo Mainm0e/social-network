@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Build the backend image
 docker build -t backend-image:latest --target backend .
 
