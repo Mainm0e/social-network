@@ -65,7 +65,6 @@ func executeMigration(DB *sql.DB, migrationDir string) error {
 	migrations := &migrate.FileMigrationSource{
 		Dir: migrationDir,
 	}
-	log.Println("Migration:", migrations)
 	n, err := migrate.Exec(DB, "sqlite3", migrations, migrate.Up)
 	if err != nil {
 		return errors.New("executeMigration() - error in applying migrations: " + err.Error())
@@ -123,7 +122,6 @@ version. It returns a non-nil error value if an error is encountered in any of t
 steps.
 */
 func Check(dbFile, migrationDir string) error {
-	fmt.Println("Checking database...", "dbFile:", dbFile, "migrationDir:", migrationDir)
 	_, err := os.Stat(dbFile)
 	if os.IsNotExist(err) {
 		// Initialise database if specified input does not already exist

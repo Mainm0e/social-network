@@ -2,10 +2,7 @@
 
 # Function to handle termination of the script
 trap 'kill $(jobs -p)' EXIT
-#export DB_DIALECT=sqlite3
-#export DB_DATASOURCE=$(pwd)/backend/db/database.db
-#export DB_MIGRATIONS_DIR=$(pwd)/backend/db/migrations
-# Start the backend
+
 cd backend
 echo "Starting backend server..."
 go run . &
