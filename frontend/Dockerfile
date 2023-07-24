@@ -1,16 +1,13 @@
 # Build React frontend
 FROM node:14 AS frontend-builder
 
-WORKDIR /app/frontend
+WORKDIR /app
 
 # Copy the frontend source code into the container
 COPY . .
 # Install dependencies and build the React frontend
 RUN npm install
 RUN npm run build
-
-#Create final image for frontend
-FROM nginx:alpine AS frontend
 
 # Copy the built React frontend from the previous stage
 COPY --from=frontend-builder /app/frontend/build /usr/share/nginx/html
