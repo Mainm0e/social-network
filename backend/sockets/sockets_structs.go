@@ -2,6 +2,7 @@ package sockets
 
 import (
 	"backend/events"
+	"context"
 	"net/http"
 	"sync"
 	"time"
@@ -87,11 +88,20 @@ type ClientList struct {
 /*
 Client struct represents a single client that is connected to the server via a
 WebSocket connection. It includes the client's WebSocket connection, the Manager
-that manages the client, and a channel for outgoing messages (egress).
+that manages the client, and a channel for outgoing messages (egress), as well as the
+client's ID (which is used as a key in the ClientList map). It includes a context
+and a cancel function to allow the client to cancel the context. The context is used
+to cancel the client's connection to the server when the client closes the connection.
+Lastly, a sync.Once object is included as a struct field to ensure that the connection
+closure happens only once, which in turn prevents multiple goroutines from closing the
+connection at the same time.
 */
 type Client struct {
+	Context    context.Context
+	CancelFunc context.CancelFunc
 	Connection *websocket.Conn
 	Manager    *Manager
 	Egress     chan []byte // A channel for outgoing messages
 	ID         int         // UserID of client
+	Once       sync.Once   // To ensure connection closure happens only once
 }
