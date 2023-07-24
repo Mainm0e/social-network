@@ -17,7 +17,12 @@ const Header = ({profile,handleRefresh}) => {
             <label>Email: </label>
             <span>{user.privateProfile.email}</span>
           </div>
+          <div className="aboutme">
+            <label>Bio: </label>
+            <span>{user.privateProfile.aboutme}</span>
+          </div>
         </>
+        
       );
     } else {
       return <></>;
@@ -57,6 +62,10 @@ const Header = ({profile,handleRefresh}) => {
             <span> </span>
             <span>{user.lastName}</span>
           </div>
+          <div className="nickName info">
+            <label>Nickname: </label>
+            <span>{user.nickName}</span>
+          </div>
           {checkPrivacy()}
           <div className="followers info">
             {user.followerNum > 0 && <label onClick={link_followers} >Followers: </label>||<label>Followers: </label>}
@@ -68,7 +77,7 @@ const Header = ({profile,handleRefresh}) => {
           </div>
           {/* follow button */}
           <Followbtn relation={user.relation} privacy={user.privacy} followRequest={followRequest} changePrivacy={changePrivacy} />
-        </div>
+        </div>        
       </div>
     </div>
   );
