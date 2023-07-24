@@ -270,7 +270,9 @@ const ChatRoom = (props) => {
       </div>
 
       <div className="chat-room-input">
+        {/* set input limit */}
         <input
+          maxLength={700}
           type="text"
           placeholder="Type a message..."
           value={messageInput}
@@ -280,7 +282,7 @@ const ChatRoom = (props) => {
               sendMessage();
             }
           }}
-        />
+      />
       </div>
     </div>
   );
