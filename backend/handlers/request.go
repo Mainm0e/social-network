@@ -119,7 +119,7 @@ func insertGroupRequest(senderId int, groupId int) error {
 		}
 	case "member":
 		//delete group member from group_members table
-		err = db.DeleteData("group_member", groupId, senderId)
+		err = db.DeleteData("group_member", senderId, groupId)
 		if err != nil {
 			return errors.New("Error deleting group member" + err.Error())
 		}
@@ -134,7 +134,7 @@ func insertGroupRequest(senderId int, groupId int) error {
 			return errors.New("Error deleting notification" + err.Error())
 		}
 		//delete user from group_members table
-		err = db.DeleteData("group_member", groupId, senderId)
+		err = db.DeleteData("group_member", senderId, groupId)
 		if err != nil {
 			return errors.New("Error deleting group member" + err.Error())
 		}
@@ -295,6 +295,7 @@ func FollowOrJoinResponse(payload json.RawMessage) (Response, error) {
 				return response, err
 			}
 		} else if follow.SenderId != 0 {
+
 			err = deleteRequest("group_member", follow.SenderId, follow.GroupId, follow.NotifId, follow.Content)
 			if err != nil {
 				response = Response{err.Error(), events.Event{}, http.StatusBadRequest}

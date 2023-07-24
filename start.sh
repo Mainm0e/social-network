@@ -3,7 +3,6 @@
 # Function to handle termination of the script
 trap 'kill $(jobs -p)' EXIT
 
-# Start the backend
 cd backend
 echo "Starting backend server..."
 go run . &

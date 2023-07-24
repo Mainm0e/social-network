@@ -208,21 +208,28 @@ const CreatePost = ({ onSubmit, type }) => {
           </button>
         </div>
         {type === "user" && (
-        <div className="create_post_privacy">
-          <select value={privacy} onChange={handlePrivacyChange}>
-            <option value="public">Public</option>
-            <option value="private">Private</option>
-            <option value="semi-private">Semi-Private</option>
-          </select>
+          <div className="create_post_privacy">
+            <select value={privacy} onChange={handlePrivacyChange}>
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+              <option value="semi-private">Semi-Private</option>
+            </select>
             {/* Render the privacy option here */}
-            {privacy === "semi-private" && (
+
+            {privacy === "semi-private" &&
+            follower !== null &&
+            follower !== undefined ? (
               <FollowerList
-              users={follower}
-              followers={followers}
-              handleFollowerChange={handleFollowerChange}
+                users={follower}
+                followers={followers}
+                handleFollowerChange={handleFollowerChange}
               />
-              )}
+            ) : privacy === "semi-private" ? (
+              <div className="create_post_follower_list">
+                <p>No followers</p>
               </div>
+            ) : null}
+          </div>
         )}
       </form>
     </div>

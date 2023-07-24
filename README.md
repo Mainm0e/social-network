@@ -1,12 +1,58 @@
 # SOCIAL-NETWORK, grit:lab javascript project
 
 ## USE
-  
-Frontend
-start app "npm start" (if!! is not work try 
-"   rm -rf node_modules
-    npm install         "
-)  
+>1. Clone the repository to your local machine:
+>```bash
+>git clone https://github.com/Mainm0e/social-network.git
+>```
+>2. Navigate to the project directory:
+>```bash
+>cd social-network
+>```
+### Option 1: Docker & Docker Compose
+
+
+To run the application using Docker Compose, follow these steps:
+
+>3. Make sure you have Docker and Docker Compose installed on your system.
+>
+>4. Build the Docker images and start the containers using Docker Compose:
+>```bash
+>docker-compose up
+>```
+>>This command will build the backend and frontend images (if not already built) and launch the services.
+>>>The backend will be available at http://localhost:8080.
+>>>
+>>>The frontend will be available at http://localhost:3000.
+>5. To stop the services, press `Ctrl + C` in the terminal where Docker Compose is running.
+If you want to remove the containers and clean up resources after stopping the services, run the following command:
+>```bash
+>docker-compose down
+>```
+
+>Note: if you do not have Docker Compose:
+>
+>3. you can run the docker.sh File in the project directory to Create and Run Docker images:
+>```bash
+>bash docker.sh
+>```
+### Option 2: Local Development Setup
+To start the backend and frontend using the provided bash script, follow these steps:
+>3. Make sure you have the necessary permissions to execute the script. If not, give execute permission to the bash script:
+>```bash
+>chmod +x start.sh
+>```
+>4. Run the bash script:
+>```bash
+>bash start.sh
+>```
+>>The script will start the backend server and the frontend React app concurrently.
+>>>The backend will be available at http://localhost:8080.
+>>>
+>>>The frontend will be available at http://localhost:3000.
+>5. To stop the project, press `Ctrl + C` in the terminal where the bash script is running.
+>The script will automatically handle the termination of the backend and frontend processes.
+
 
 ## PROJECT OVERVIEW
 

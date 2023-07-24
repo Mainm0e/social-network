@@ -8,6 +8,7 @@ import RegisterGroup from "./Group/RegisterGroup";
 import "./MainBox.css";
 import { getCookie, getUserId } from "../../tools/cookie";
 import { fetchData } from "../../tools/fetchData";
+import {home} from "../../tools/link";
 
 
 
@@ -118,11 +119,16 @@ const Group = ({ groupId, refreshComponent }) => {
         group = data[i]
       }
     }
-    return (
+    if (group === null) {
+      home()
+      return null
+    } else {
+      return (
       <div className="main-box">
         <GroupHeader group={group} handleRefresh={handleRefresh} />
         <GroupBody id={groupId}/>
       </div>
     );
   }
+}
 }

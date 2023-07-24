@@ -53,7 +53,7 @@ func logAndResetRequest(r *http.Request) *http.Request {
 	}
 
 	// Print the event type
-	log.Println("logAndResetRequest() -- Event:", event.Type)
+	log.Printf("logAndResetRequest() -- Event: %v ; Payload: %v", event.Type, string(event.Payload))
 
 	// Reset the request body
 	r.Body = io.NopCloser(bytes.NewBuffer(body))
@@ -307,6 +307,7 @@ tyre, this function mixes it all in a cauldron of nightmares, and turns gold int
 into calamity, and robs all who read its code of at least 3 years of their life. Use with caution.
 */
 func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error {
+
 	/* 	OLD DESCRIPTION
 	StartServer starts a server instance on a port number using the input protocol specified.
 	The server package includes predefined constants for the HTTP and HTTPS ports, as well as
@@ -318,6 +319,7 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 	if an error occurs at any point during the server setup.
 	*/
 	// Initiate logging
+
 	err := initiateLogging(logPath)
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
@@ -334,14 +336,14 @@ func AaaawwwwwSheeeetttttItsAboutToGoDown(protocol string, logPath string) error
 
 	// Check / migrate database
 	// TEMP: use first migration file as initial schema for now
-	err = db.Check("./db/database.db", "./db/migrations/01_initial_schema.sql")
+	err = db.Check("db/database.db", "db/migrations")
 	if err != nil {
 		return errors.New("StartServer() error: " + err.Error())
 	}
 
 	// Setup channel to receive the server instance, enabling graceful shutdown
 	serverCh := make(chan *http.Server)
-
+	fmt.Printf("Server starting on portocol %s...\n", protocol)
 	// If HTTP is specified, setup HTTP server in a goroutine
 	if protocol == "http" {
 		go setupHTTP(serverCh, HTTP_PORT)

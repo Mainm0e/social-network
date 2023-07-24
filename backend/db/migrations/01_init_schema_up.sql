@@ -72,10 +72,12 @@ CREATE TABLE follow
 -- group-members is an N-to-N relationship, so we use a third table for it
 CREATE TABLE group_member
 (
+  id     INTEGER NULL,
   userId  INTEGER NOT NULL,
   groupId INTEGER NOT NULL,
   -- invited, requester, member
   status  TEXT    NOT NULL,
+  PRIMARY KEY (id AUTOINCREMENT),
   FOREIGN KEY (userId) REFERENCES users (userId),
   FOREIGN KEY (groupId) REFERENCES groups (groupId)
 );
