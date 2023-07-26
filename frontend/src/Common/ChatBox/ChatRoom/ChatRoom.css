@@ -133,13 +133,14 @@
 }
 
 .chat-room .chat-message {
-    display: flex;
-    padding: 10px;
-    border-radius: 5px;
     background-color: #e1f5fe;
+    border-radius: 5px;
     color: #000;
+    display: flex;
     margin: 0 10px;
+    padding: 10px;
     word-break: break-all;
+    flex-direction: column;
     /* This line allows long words to wrap onto the next line */
 }
 
