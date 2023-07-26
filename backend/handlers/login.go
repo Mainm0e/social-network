@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/db/security"
 	"backend/events"
 	"backend/server/sessions"
 	"encoding/json"
@@ -21,7 +22,7 @@ func (lg *LoginData) login() (int, error) {
 		return 0, errors.New("user not found")
 	}
 	// Compare the provided password with the password stored in the database.
-	if user.Password == lg.Password {
+	if security.MatchPasswords([]byte(lg.Password), user.Password) {
 		return user.UserId, nil
 	} else {
 		return 0, errors.New("password incorrect")

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/db"
+	"backend/db/security"
 	"backend/events"
 	"backend/utils"
 	"encoding/json"
@@ -17,7 +18,11 @@ It takes in a byte slice `data` containing the registration information.
 It returns a boolean value indicating whether the registration was successful, and an error if any occurred.
 */
 func (regData *RegisterData) register() error {
-	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, regData.Password, regData.AboutMe, regData.Avatar, "private", time.Now())
+	hashedPassword, errPwd := security.HashPwd([]byte(regData.Password), 8)
+	if errPwd != nil {
+		log.Println(errPwd.Error())
+	}
+	_, err := db.InsertData("users", regData.Email, regData.FirstName, regData.LastName, regData.BirthDate, regData.NickName, hashedPassword, regData.AboutMe, regData.Avatar, "private", time.Now())
 	if err != nil {
 		return errors.New("Error inserting user" + err.Error())
 	}
